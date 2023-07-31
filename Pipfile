@@ -4,10 +4,13 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-tiktokapi = "5.2.2"
-playwright = "1.30.0"
+tiktokapipy = "==0.2.2"
+playwright = "==1.36.0"
+"discord.py" = "==2.3.1"
 
 [dev-packages]
+black = "==23.7.0"
+ruff = "==0.0.280"
 
 [requires]
-python_version = "3.8"
+python_version = "3.11"

@@ -1,0 +1,15 @@
+[project]
+name = "discord-video-embed-bot"
+description = "Discord bot that reads messages and embeds videos from various websited that don't support this"
+version = "0.1.0"
+authors = [{ name = "Amadej Kastelic", email = "amadejkastelic7@gmail.com" }]
+dependencies = ["tiktokapipy", "playwright"]
+
+[project.optional-dependencies]
+dev = ["black", "ruff"]
+
+[tool.black]
+line-length = 88
+target-version = ['py311']
+include = '\.pyi?$'
+skip-string-normalization = true
