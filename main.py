@@ -8,6 +8,8 @@ import discord
 
 from downloader import registry
 
+emoji = ['😼', '😺', '😸', '😹', '😻', '🙀', '😿', '😾', '😩']
+
 
 class DiscordClient(discord.Client):
     async def on_ready(self):
@@ -28,7 +30,7 @@ class DiscordClient(discord.Client):
         video = await client.download()
 
         await message.channel.send(
-            content=f'Here you go {message.author.mention} 😼.',
+            content=f'Here you go {message.author.mention} {random.choice(emoji)}.',
             file=discord.File(fp=video, filename='video.mp4'),
         )
         await new_message.delete()
