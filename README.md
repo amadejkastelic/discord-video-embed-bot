@@ -10,7 +10,7 @@ A Discord bot that automatically embeds messages containing a video link of a su
 - Tiktok ✅
 
 ## How to run
-- Build the docker image: `docker build . -t video-embed-bot` or simply pull the container from ghcr:
+- Build the docker image: `docker build . -t video-embed-bot` or simply pull it from ghcr:
 ```bash
 docker pull ghcr.io/amadejkastelic/discord-video-embed-bot:0.1.0
 ```
