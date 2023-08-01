@@ -5,8 +5,6 @@ name: Build and publish the container image
   push:
     tags:
       - '*'
-    branches:
-      - 'main'
 
 jobs:
   build-and-push-image:
