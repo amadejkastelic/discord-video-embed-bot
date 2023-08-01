@@ -7,10 +7,11 @@ name = "pypi"
 tiktokapipy = "==0.2.2"
 playwright = "==1.36.0"
 "discord.py" = "==2.3.1"
+instaloader = "==4.10"
 
 [dev-packages]
 black = "==23.7.0"
-ruff = "==0.0.280"
+flake8 = "==6.1.0"
 
 [requires]
 python_version = "3.11"

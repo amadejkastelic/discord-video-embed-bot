@@ -1,8 +1,5 @@
-import aiohttp
-import io
 import os
 import random
-import typing
 
 import discord
 
@@ -21,11 +18,11 @@ class DiscordClient(discord.Client):
 
         try:
             client = registry.get_instance(url=message.content.strip())
-        except Exception as e:
+        except Exception:
             return
 
         await message.delete()
-        new_message = await message.channel.send(f'🔥 Working on it 🥵')
+        new_message = await message.channel.send('🔥 Working on it 🥵')
 
         video = await client.download()
 

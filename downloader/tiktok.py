@@ -6,7 +6,6 @@ import os
 import requests
 import typing
 import urllib
-from os import path
 
 from tiktokapipy.async_api import AsyncTikTokAPI
 from tiktokapipy.models import video
@@ -22,10 +21,7 @@ class TiktokClient(base.BaseClient):
 
         async with AsyncTikTokAPI() as api:
             video = await api.video(clean_url)
-            cookies = {
-                cookie['name']: cookie['value']
-                for cookie in await api.context.cookies()
-            }
+            cookies = {cookie['name']: cookie['value'] for cookie in await api.context.cookies()}
             referer = 'https://www.tiktok.com/'
             if video.image_post:
                 return await self._download_slideshow(
@@ -39,20 +35,14 @@ class TiktokClient(base.BaseClient):
                 referer=referer,
             )
 
-    async def _download_video(
-        self, video: video.Video, cookies: typing.Dict[str, str], referer: str
-    ) -> io.BytesIO:
+    async def _download_video(self, video: video.Video, cookies: typing.Dict[str, str], referer: str) -> io.BytesIO:
         async with aiohttp.ClientSession(cookies=cookies) as session:
-            async with session.get(
-                video.video.download_addr, headers={'referer': referer}
-            ) as resp:
+            async with session.get(video.video.download_addr, headers={'referer': referer}) as resp:
                 return io.BytesIO(await resp.read())
 
-    async def _download_slideshow(
-        self, video: video.Video, cookies: typing.Dict[str, str], referer: str
-    ) -> io.BytesIO:
+    async def _download_slideshow(self, video: video.Video, cookies: typing.Dict[str, str], referer: str) -> io.BytesIO:
         vf = (
-            '"scale=iw*min(1080/iw\,1920/ih):ih*min(1080/iw\,1920/ih),'
+            '"scale=iw*min(1080/iw\\,1920/ih):ih*min(1080/iw\\,1920/ih),'
             'pad=1080:1920:(1080-iw)/2:(1920-ih)/2,'
             'format=yuv420p"'
         )
@@ -60,14 +50,10 @@ class TiktokClient(base.BaseClient):
 
         for i, image_data in enumerate(video.image_post.images):
             url = image_data.image_url.url_list[-1]
-            urllib.request.urlretrieve(
-                url, path.join(directory, f'temp_{video.id}_{i:02}.jpg')
-            )
+            urllib.request.urlretrieve(url, os.path.join(directory, f'temp_{video.id}_{i:02}.jpg'))
 
-        read = requests.get(
-            video.music.play_url, cookies=cookies, headers={'referer': referer}
-        )
-        with open(path.join(directory, f'temp_{video.id}.mp3'), 'wb') as w:
+        read = requests.get(video.music.play_url, cookies=cookies, headers={'referer': referer})
+        with open(os.path.join(directory, f'temp_{video.id}.mp3'), 'wb') as w:
             for chunk in read.iter_content(chunk_size=512):
                 if chunk:
                     w.write(chunk)
@@ -90,14 +76,14 @@ class TiktokClient(base.BaseClient):
             stderr=asyncio.subprocess.PIPE,
         )
         _, stderr = await ffmpeg_proc.communicate()
-        generated_files = glob.glob(path.join(directory, f'temp_{video.id}*'))
+        generated_files = glob.glob(os.path.join(directory, f'temp_{video.id}*'))
 
-        if not path.exists(path.join(directory, f'temp_{video.id}.mp4')):
+        if not os.path.exists(os.path.join(directory, f'temp_{video.id}.mp4')):
             for file in generated_files:
                 os.remove(file)
             raise Exception('Something went wrong with piecing the slideshow together')
 
-        with open(path.join(directory, f'temp_{video.id}.mp4'), 'rb') as f:
+        with open(os.path.join(directory, f'temp_{video.id}.mp4'), 'rb') as f:
             ret = io.BytesIO(f.read())
 
         for file in generated_files:

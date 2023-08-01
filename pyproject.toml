@@ -6,10 +6,29 @@ authors = [{ name = "Amadej Kastelic", email = "amadejkastelic7@gmail.com" }]
 dependencies = ["tiktokapipy", "playwright"]
 
 [project.optional-dependencies]
-dev = ["black", "ruff"]
+dev = ["black", "flake8"]
 
 [tool.black]
-line-length = 88
+line-length = 120
 target-version = ['py311']
 include = '\.pyi?$'
 skip-string-normalization = true
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.flake8-quotes]
+inline-quotes = "single"
+multiline-quotes = "single"
+docstring-quotes = "double"
+
+[tool.ruff.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.mccabe]
+max-complexity = 10
+
+[tool.ruff.isort]
+force-single-line = true
+known-third-party = ["btspython"]
+case-sensitive = true
