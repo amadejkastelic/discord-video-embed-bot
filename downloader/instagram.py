@@ -11,6 +11,7 @@ class InstagramClient(base.BaseClient):
     DOMAINS = ['instagram.com', 'ddinstagram.com']
 
     def __init__(self, url: str):
+        super(InstagramClient, self).__init__(url=url)
         self.client = instaloader.Instaloader()
         self.id = urlparse(url).path.strip('/').split('/')[-1]
 
@@ -19,4 +20,11 @@ class InstagramClient(base.BaseClient):
 
         async with aiohttp.ClientSession() as session:
             async with session.get(post.video_url) as resp:
-                return io.BytesIO(await resp.read())
+                return (
+                    self.MESSAGE.format(
+                        url=self.url,
+                        title=post.title or post.caption,
+                        likes=post.likes,
+                    ),
+                    io.BytesIO(await resp.read()),
+                )

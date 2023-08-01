@@ -16,7 +16,7 @@ from downloader import base
 class TiktokClient(base.BaseClient):
     DOMAINS = ['tiktok.com']
 
-    async def download(self) -> io.BytesIO:
+    async def download(self) -> typing.Tuple[str, io.BytesIO]:
         clean_url = self._clean_url(self.url)
 
         async with AsyncTikTokAPI() as api:
@@ -24,15 +24,24 @@ class TiktokClient(base.BaseClient):
             cookies = {cookie['name']: cookie['value'] for cookie in await api.context.cookies()}
             referer = 'https://www.tiktok.com/'
             if video.image_post:
-                return await self._download_slideshow(
+                byte_array = await self._download_slideshow(
                     video=video,
                     cookies=cookies,
                     referer=referer,
                 )
-            return await self._download_video(
-                video=video,
-                cookies=cookies,
-                referer=referer,
+            else:
+                byte_array = await self._download_video(
+                    video=video,
+                    cookies=cookies,
+                    referer=referer,
+                )
+            return (
+                self.MESSAGE.format(
+                    url=self.url,
+                    title=video.desc or '❌',
+                    likes=video.stats.digg_count,
+                ),
+                byte_array,
             )
 
     async def _download_video(self, video: video.Video, cookies: typing.Dict[str, str], referer: str) -> io.BytesIO:

@@ -24,11 +24,12 @@ class DiscordClient(discord.Client):
         await message.delete()
         new_message = await message.channel.send('🔥 Working on it 🥵')
 
-        video = await client.download()
+        text, video = await client.download()
 
         await message.channel.send(
-            content=f'Here you go {message.author.mention} {random.choice(emoji)}.',
+            content=f'Here you go {message.author.mention} {random.choice(emoji)}.\n{text}',
             file=discord.File(fp=video, filename='video.mp4'),
+            suppress_embeds=True,
         )
         await new_message.delete()
 
