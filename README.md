@@ -1,4 +1,8 @@
 # discord-video-embed-bot
+A Discord bot that automatically embeds messages containing a video link of a supported platform.
+
+![image](https://github.com/amadejkastelic/discord-video-embed-bot/assets/26391003/bada7a36-db0d-44ba-89ee-afe4f79ad7d3)
+
 
 ## Supported platforms
 - Instagram ✅
