@@ -1,7 +1,7 @@
-import aiohttp
 import io
 from urllib.parse import urlparse
 
+import aiohttp
 import instaloader
 
 from downloader import base
@@ -23,7 +23,7 @@ class InstagramClient(base.BaseClient):
                 return (
                     self.MESSAGE.format(
                         url=self.url,
-                        title=post.title or post.caption,
+                        description=post.title or post.caption,
                         likes=post.likes,
                     ),
                     io.BytesIO(await resp.read()),

@@ -3,6 +3,7 @@ import asyncio
 import io
 import glob
 import os
+import logging
 import requests
 import typing
 import urllib
@@ -18,6 +19,8 @@ class TiktokClient(base.BaseClient):
 
     async def download(self) -> typing.Tuple[str, io.BytesIO]:
         clean_url = self._clean_url(self.url)
+
+        logging.debug(f'Trying to download tiktok video {clean_url}...')
 
         async with AsyncTikTokAPI() as api:
             video = await api.video(clean_url)
@@ -38,7 +41,7 @@ class TiktokClient(base.BaseClient):
             return (
                 self.MESSAGE.format(
                     url=self.url,
-                    title=video.desc or '❌',
+                    description=video.desc or '❌',
                     likes=video.stats.digg_count,
                 ),
                 byte_array,
