@@ -35,7 +35,7 @@ class DiscordClient(discord.Client):
             text, video = await client.download()
         except Exception as e:
             logging.error(f'Failed downloading {url}: {str(e)}')
-            new_message.edit(f'Failed downloading {url}. {message.author.mention}')
+            await new_message.edit(content=f'Failed downloading {url}. {message.author.mention}')
             return
 
         await message.channel.send(

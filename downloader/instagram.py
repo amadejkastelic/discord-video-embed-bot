@@ -1,7 +1,6 @@
 import io
 from urllib.parse import urlparse
 
-import aiohttp
 import instaloader
 
 from downloader import base
@@ -18,13 +17,12 @@ class InstagramClient(base.BaseClient):
     async def download(self) -> io.BytesIO:
         post = instaloader.Post.from_shortcode(self.client.context, self.id)
 
-        async with aiohttp.ClientSession() as session:
-            async with session.get(post.video_url) as resp:
-                return (
-                    self.MESSAGE.format(
-                        url=self.url,
-                        description=post.title or post.caption,
-                        likes=post.likes,
-                    ),
-                    io.BytesIO(await resp.read()),
-                )
+        with self.client.context._session.get(post.video_url) as resp:
+            return (
+                self.MESSAGE.format(
+                    url=self.url,
+                    description=post.title or post.caption,
+                    likes=post.likes,
+                ),
+                io.BytesIO(resp.content),
+            )
