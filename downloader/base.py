@@ -1,8 +1,9 @@
 import io
+import typing
 
 
 class BaseClient(object):
-    DOMAIN: str
+    DOMAINS: typing.List[str]
 
     def __init__(self, url: str):
         self.url = url

@@ -1,13 +1,14 @@
 import aiohttp
 import io
-import instaloader
 from urllib.parse import urlparse
+
+import instaloader
 
 from downloader import base
 
 
 class InstagramClient(base.BaseClient):
-    DOMAIN = 'instagram.com'
+    DOMAINS = ['instagram.com', 'ddinstagram.com']
 
     def __init__(self, url: str):
         self.client = instaloader.Instaloader()

@@ -14,7 +14,7 @@ from downloader import base
 
 
 class TiktokClient(base.BaseClient):
-    DOMAIN = 'tiktok.com'
+    DOMAINS = ['tiktok.com']
 
     async def download(self) -> io.BytesIO:
         clean_url = self._clean_url(self.url)
