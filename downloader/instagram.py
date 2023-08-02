@@ -1,10 +1,10 @@
 import io
-import typing
 from urllib.parse import urlparse, parse_qs
 
 import instaloader
 
 from downloader import base
+from models import post
 
 
 class InstagramClient(base.BaseClient):
@@ -18,27 +18,27 @@ class InstagramClient(base.BaseClient):
         self.id = parsed_url.path.strip('/').split('/')[-1]
         self.index = int(parse_qs(parsed_url.query).get('img_index', ['1'])[0]) - 1
 
-    async def download(self) -> typing.Tuple[str, io.BytesIO]:
-        post = instaloader.Post.from_shortcode(self.client.context, self.id)
+    async def download(self) -> post.Post:
+        p = instaloader.Post.from_shortcode(self.client.context, self.id)
 
-        match post.typename:
+        match p.typename:
             case 'GraphImage':
-                download_url = post.url
+                download_url = p.url
             case 'GraphVideo':
-                download_url = post.video_url
+                download_url = p.video_url
             case 'GraphSidecar':
-                node = next(post.get_sidecar_nodes(start=self.index, end=self.index))
+                node = next(p.get_sidecar_nodes(start=self.index, end=self.index))
                 if node.is_video:
                     download_url = node.video_url
                 else:
                     download_url = node.display_url
 
         with self.client.context._session.get(download_url) as resp:
-            return (
-                self.MESSAGE.format(
-                    url=self.url,
-                    description=post.title or post.caption,
-                    likes=post.likes,
-                ),
-                io.BytesIO(resp.content),
+            return post.Post(
+                url=self.url,
+                author=p.owner_profile.username,
+                description=p.title or p.caption,
+                likes=p.likes,
+                views=p.video_view_count,
+                buffer=io.BytesIO(resp.content),
             )

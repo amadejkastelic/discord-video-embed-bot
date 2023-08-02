@@ -35,15 +35,17 @@ class DiscordClient(discord.Client):
         new_message = await message.channel.send('🔥 Working on it 🥵')
 
         try:
-            text, buffer = await client.download()
+            post = await client.download()
         except Exception as e:
             logging.error(f'Failed downloading {url}: {str(e)}')
             await new_message.edit(content=f'Failed downloading {url}. {message.author.mention}')
             return
 
+        filename = f'file.{self._guess_extension_from_buffer(buffer=post.buffer)}'
+
         await message.channel.send(
-            content=f'Here you go {message.author.mention} {random.choice(emoji)}.\n{text}',
-            file=discord.File(fp=buffer, filename=f'file.{self._guess_extension_from_buffer(buffer=buffer)}'),
+            content=f'Here you go {message.author.mention} {random.choice(emoji)}.\n{str(post)}',
+            file=discord.File(fp=post.buffer, filename=f'SPOILER_{filename}' if post.spoiler else filename),
             suppress_embeds=True,
         )
         await new_message.delete()

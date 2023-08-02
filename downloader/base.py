@@ -1,5 +1,6 @@
-import io
 import typing
+
+from models import post
 
 
 class BaseClient(object):
@@ -9,5 +10,5 @@ class BaseClient(object):
     def __init__(self, url: str):
         self.url = url
 
-    async def download(self) -> typing.Tuple[str, io.BytesIO]:
+    async def download(self) -> post.Post:
         raise NotImplementedError()

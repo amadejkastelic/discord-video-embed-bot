@@ -1,26 +1,29 @@
 import aiohttp
 import io
 import os
-import typing
 
 import facebook_scraper
 
 from downloader import base
+from models import post
 
 
 class FacebookClient(base.BaseClient):
     DOMAINS = ['facebook.com', 'fb.watch']
 
-    async def download(self) -> typing.Tuple[str, io.BytesIO]:
+    async def download(self) -> post.Post:
         if not os.path.exists('cookies.txt'):
             raise RuntimeError('cookies.txt missing, please export facebook cookies and place them in the app root')
 
-        post = next(facebook_scraper.get_posts(post_urls=[self.url], cookies='cookies.txt', options={'video': True}))
-        description = post.get('text', '')
-        likes = post.get('likes', 0)
+        video = next(facebook_scraper.get_posts(post_urls=[self.url], cookies='cookies.txt', options={'video': True}))
 
         async with aiohttp.ClientSession() as session:
-            async with session.get(post['video']) as resp:
-                return self.MESSAGE.format(url=self.url, description=description, likes=likes), io.BytesIO(
-                    await resp.read()
+            async with session.get(video['video']) as resp:
+                return post.Post(
+                    url=self.url,
+                    author=video.get('username'),
+                    description=video.get('text'),
+                    likes=video.get('likes'),
+                    views=sum(video.get('reactions', dict()).values()),
+                    buffer=io.BytesIO(await resp.read()),
                 )

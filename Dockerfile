@@ -3,7 +3,7 @@ FROM python:3.11-slim-bullseye
 ENV PYTHONFAULTHANDLER=1 \
     PYTHONUNBUFFERED=1
 
-RUN apt -y update && apt -y install ffmpeg
+RUN apt -y update && apt -y install ffmpeg libmagic
 
 RUN pip install "pipenv"
 
