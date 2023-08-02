@@ -1,10 +1,13 @@
+import io
 import logging
+import mimetypes
 import os
 import random
 import re
 import typing
 
 import discord
+import magic
 
 from downloader import registry
 
@@ -32,7 +35,7 @@ class DiscordClient(discord.Client):
         new_message = await message.channel.send('🔥 Working on it 🥵')
 
         try:
-            text, video = await client.download()
+            text, buffer = await client.download()
         except Exception as e:
             logging.error(f'Failed downloading {url}: {str(e)}')
             await new_message.edit(content=f'Failed downloading {url}. {message.author.mention}')
@@ -40,7 +43,7 @@ class DiscordClient(discord.Client):
 
         await message.channel.send(
             content=f'Here you go {message.author.mention} {random.choice(emoji)}.\n{text}',
-            file=discord.File(fp=video, filename='video.mp4'),
+            file=discord.File(fp=buffer, filename=f'file.{self._guess_extension_from_buffer(buffer=buffer)}'),
             suppress_embeds=True,
         )
         await new_message.delete()
@@ -48,6 +51,11 @@ class DiscordClient(discord.Client):
     def _find_first_url(self, string: str) -> typing.Optional[str]:
         urls = re.findall(r'(https?://[^\s]+)', string)
         return urls[0] if urls else None
+
+    def _guess_extension_from_buffer(self, buffer: io.BytesIO) -> str:
+        extension = mimetypes.guess_extension(type=magic.from_buffer(buffer.read(2048), mime=True))
+        buffer.seek(0)
+        return extension
 
 
 intents = discord.Intents.default()

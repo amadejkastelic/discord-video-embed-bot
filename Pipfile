@@ -9,6 +9,7 @@ playwright = "==1.36.0"
 "discord.py" = "==2.3.1"
 instaloader = "==4.10"
 facebook-scraper = "==0.2.59"
+python-magic = "0.4.27"
 
 [dev-packages]
 black = "==23.7.0"
