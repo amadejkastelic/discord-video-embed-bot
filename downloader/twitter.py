@@ -1,4 +1,3 @@
-import aiohttp
 import json
 
 from downloader import base
