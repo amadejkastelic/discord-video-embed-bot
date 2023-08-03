@@ -30,12 +30,9 @@ class TwitterClient(base.BaseClient):
         self.id = url.split('/')[-1].split('?')[0]
 
     async def get_post(self) -> post.Post:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                url=scrape_url, data='', headers=headers, params={'id': self.id, 'lang': 'en'}
-            ) as resp:
-                tweet = json.loads(await resp.text())
-
+        tweet = json.loads(
+            await self._fetch_content(url=scrape_url, data='', headers=headers, params={'id': self.id, 'lang': 'en'})
+        )
         if not tweet:
             raise ValueError(f'Failed retreiving tweet {self.url}')
 
