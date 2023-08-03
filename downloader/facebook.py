@@ -24,6 +24,5 @@ class FacebookClient(base.BaseClient):
                     author=video.get('username'),
                     description=video.get('text'),
                     likes=video.get('likes'),
-                    views=sum(video.get('reactions', dict()).values()),
                     buffer=io.BytesIO(await resp.read()),
                 )
