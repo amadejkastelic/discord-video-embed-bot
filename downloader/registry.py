@@ -1,5 +1,3 @@
-import os
-
 from downloader import base
 from downloader import facebook
 from downloader import instagram
