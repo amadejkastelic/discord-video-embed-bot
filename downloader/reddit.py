@@ -23,7 +23,7 @@ class RedditClient(base.BaseClient):
             url=self.url,
             description=media.GetPostTitle().Get(),
             author=media.GetPostAuthor().Get(),
-            spoiler=self._is_nsfw,
+            spoiler=self._is_nsfw(),
         )
 
         files = glob.glob(os.path.join(media.destination, f'{media.output}*'))
@@ -37,4 +37,5 @@ class RedditClient(base.BaseClient):
         return p
 
     def _is_nsfw(self) -> bool:
-        return 'nsfw' in str(requests.get(self.url).content)
+        content = str(requests.get(self.url).content)
+        return 'nsfw&quot;:true' in content or 'isNsfw&quot;:true' in content
