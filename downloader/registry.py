@@ -3,6 +3,7 @@ from downloader import facebook
 from downloader import instagram
 from downloader import reddit
 from downloader import tiktok
+from downloader import twitter
 
 
 CLASSES = {
@@ -10,6 +11,7 @@ CLASSES = {
     tiktok.TiktokClient,
     facebook.FacebookClient,
     reddit.RedditClient,
+    twitter.TwitterClient,
 }
 
 
