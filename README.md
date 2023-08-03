@@ -17,9 +17,3 @@ docker pull ghcr.io/amadejkastelic/discord-video-embed-bot:0.1.0
 ```
 - Run it with your discord api key: `docker run -e DISCORD_API_KEY=<api_key> video-embed-bot`
 - Facebook requires you to provide cookies. Download them in your browser using [an extension](https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc) while you're logged in and mount them to the container).
-- Reddit support requires three env variables:
-```bash
-REDDIT_CLIENT_ID=<your_reddit_client_id>
-REDDIT_CLIENT_SECRET=<your_reddit_client_secret>
-REDDIT_USERAGENT=<your_reddit_useragent>
-```

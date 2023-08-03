@@ -41,11 +41,19 @@ class DiscordClient(discord.Client):
             await new_message.edit(content=f'Failed downloading {url}. {message.author.mention}')
             return
 
-        filename = f'file.{self._guess_extension_from_buffer(buffer=post.buffer)}'
+        file = None
+        if post.buffer:
+            file = discord.File(
+                fp=post.buffer,
+                filename='{spoiler}file.{extension}'.format(
+                    spoiler='SPOILER_' if post.spoiler else '',
+                    extension=self._guess_extension_from_buffer(buffer=post.buffer),
+                ),
+            )
 
         await message.channel.send(
             content=f'Here you go {message.author.mention} {random.choice(emoji)}.\n{str(post)}',
-            file=discord.File(fp=post.buffer, filename=f'SPOILER_{filename}' if post.spoiler else filename),
+            file=file,
             suppress_embeds=True,
         )
         await new_message.delete()
