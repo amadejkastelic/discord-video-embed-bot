@@ -39,7 +39,7 @@ class DiscordClient(discord.Client):
         except Exception as e:
             logging.error(f'Failed downloading {url}: {str(e)}')
             await new_message.edit(content=f'Failed downloading {url}. {message.author.mention}')
-            return
+            raise e
 
         file = None
         if post.buffer:

@@ -61,7 +61,7 @@ class TwitterClient(base.BaseClient):
 
         return p
 
-    async def _download(self, url: str, **kwargs) -> io.BytesIO:
+    async def _download(self, url: str) -> io.BytesIO:
         async with aiohttp.ClientSession() as session:
             async with session.get(url=url) as resp:
                 return io.BytesIO(await resp.read())

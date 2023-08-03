@@ -15,14 +15,23 @@ class FacebookClient(base.BaseClient):
         if not os.path.exists('cookies.txt'):
             raise RuntimeError('cookies.txt missing, please export facebook cookies and place them in the app root')
 
-        video = next(facebook_scraper.get_posts(post_urls=[self.url], cookies='cookies.txt', options={'video': True}))
+        fb_post = next(facebook_scraper.get_posts(post_urls=[self.url], cookies='cookies.txt'))
 
+        p = post.Post(
+            url=self.url,
+            author=fb_post.get('username'),
+            description=fb_post.get('text'),
+            likes=fb_post.get('likes'),
+        )
+
+        if fb_post.get('video'):
+            p.buffer = await self._download(url=fb_post['video'])
+        elif fb_post.get('images'):
+            p.buffer = await self._download(url=fb_post['images'][0])
+
+        return p
+
+    async def _download(self, url: str) -> io.BytesIO:
         async with aiohttp.ClientSession() as session:
-            async with session.get(video['video']) as resp:
-                return post.Post(
-                    url=self.url,
-                    author=video.get('username'),
-                    description=video.get('text'),
-                    likes=video.get('likes'),
-                    buffer=io.BytesIO(await resp.read()),
-                )
+            async with session.get(url=url) as resp:
+                return io.BytesIO(await resp.read())
