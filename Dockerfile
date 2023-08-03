@@ -12,6 +12,7 @@ COPY Pipfile ./
 COPY Pipfile.lock ./
 COPY main.py ./
 COPY downloader/* ./downloader/
+COPY models/* ./models/
 COPY cookies.txt ./
 
 RUN pipenv install && pipenv run playwright install && pipenv run playwright install-deps
