@@ -1,5 +1,4 @@
 import aiohttp
-import io
 import json
 
 from downloader import base
@@ -30,7 +29,7 @@ class TwitterClient(base.BaseClient):
         super(TwitterClient, self).__init__(url=url)
         self.id = url.split('/')[-1].split('?')[0]
 
-    async def download(self) -> post.Post:
+    async def get_post(self) -> post.Post:
         async with aiohttp.ClientSession() as session:
             async with session.get(
                 url=scrape_url, data='', headers=headers, params={'id': self.id, 'lang': 'en'}
@@ -60,8 +59,3 @@ class TwitterClient(base.BaseClient):
             p.buffer = await self._download(url=tweet.get('user').get('profile_image_url_https'))
 
         return p
-
-    async def _download(self, url: str) -> io.BytesIO:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url=url) as resp:
-                return io.BytesIO(await resp.read())

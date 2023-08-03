@@ -1,3 +1,5 @@
+import aiohttp
+import io
 import typing
 
 from models import post
@@ -10,5 +12,15 @@ class BaseClient(object):
     def __init__(self, url: str):
         self.url = url
 
-    async def download(self) -> post.Post:
+    async def get_post(self) -> post.Post:
         raise NotImplementedError()
+
+    async def _download(self, url: str, cookies: typing.Optional[typing.Dict[str, str]] = None, **kwargs) -> io.BytesIO:
+        async with aiohttp.ClientSession(cookies=cookies) as session:
+            async with session.get(url=url, **kwargs) as resp:
+                return io.BytesIO(await resp.read())
+
+    async def _fetch_content(self, url: str, cookies: typing.Optional[typing.Dict[str, str]] = None, **kwargs) -> str:
+        async with aiohttp.ClientSession(cookies=cookies) as session:
+            async with session.get(url=url, **kwargs) as resp:
+                return await resp.text()

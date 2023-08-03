@@ -18,7 +18,7 @@ class InstagramClient(base.BaseClient):
         self.id = parsed_url.path.strip('/').split('/')[-1]
         self.index = int(parse_qs(parsed_url.query).get('img_index', ['1'])[0]) - 1
 
-    async def download(self) -> post.Post:
+    async def get_post(self) -> post.Post:
         p = instaloader.Post.from_shortcode(self.client.context, self.id)
 
         match p.typename:

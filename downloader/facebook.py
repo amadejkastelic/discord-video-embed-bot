@@ -1,5 +1,3 @@
-import aiohttp
-import io
 import os
 
 import facebook_scraper
@@ -11,7 +9,7 @@ from models import post
 class FacebookClient(base.BaseClient):
     DOMAINS = ['facebook.com', 'fb.watch']
 
-    async def download(self) -> post.Post:
+    async def get_post(self) -> post.Post:
         if not os.path.exists('cookies.txt'):
             raise RuntimeError('cookies.txt missing, please export facebook cookies and place them in the app root')
 
@@ -30,8 +28,3 @@ class FacebookClient(base.BaseClient):
             p.buffer = await self._download(url=fb_post['images'][0])
 
         return p
-
-    async def _download(self, url: str) -> io.BytesIO:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url=url) as resp:
-                return io.BytesIO(await resp.read())

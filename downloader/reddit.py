@@ -16,7 +16,7 @@ class RedditClient(base.BaseClient):
     def __init__(self, url: str):
         super(RedditClient, self).__init__(url=url)
 
-    async def download(self) -> post.Post:
+    async def get_post(self) -> post.Post:
         media = RedDownloader.Download(url=self.url, quality=720, destination='/tmp/', output=str(uuid.uuid4()))
 
         p = post.Post(

@@ -1,4 +1,3 @@
-import aiohttp
 import asyncio
 import io
 import glob
@@ -15,10 +14,13 @@ from downloader import base
 from models import post
 
 
+headers = {'referer': 'https://www.tiktok.com/'}
+
+
 class TiktokClient(base.BaseClient):
     DOMAINS = ['tiktok.com']
 
-    async def download(self) -> post.Post:
+    async def get_post(self) -> post.Post:
         clean_url = self._clean_url(self.url)
 
         logging.debug(f'Trying to download tiktok video {clean_url}...')
@@ -26,18 +28,16 @@ class TiktokClient(base.BaseClient):
         async with AsyncTikTokAPI() as api:
             video = await api.video(clean_url)
             cookies = {cookie['name']: cookie['value'] for cookie in await api.context.cookies()}
-            referer = 'https://www.tiktok.com/'
             if video.image_post:
                 buffer = await self._download_slideshow(
                     video=video,
                     cookies=cookies,
-                    referer=referer,
                 )
             else:
-                buffer = await self._download_video(
-                    video=video,
+                buffer = await self._download(
+                    url=video.video.download_addr,
                     cookies=cookies,
-                    referer=referer,
+                    headers=headers,
                 )
             return post.Post(
                 url=self.url,
@@ -48,12 +48,7 @@ class TiktokClient(base.BaseClient):
                 buffer=buffer,
             )
 
-    async def _download_video(self, video: video.Video, cookies: typing.Dict[str, str], referer: str) -> io.BytesIO:
-        async with aiohttp.ClientSession(cookies=cookies) as session:
-            async with session.get(video.video.download_addr, headers={'referer': referer}) as resp:
-                return io.BytesIO(await resp.read())
-
-    async def _download_slideshow(self, video: video.Video, cookies: typing.Dict[str, str], referer: str) -> io.BytesIO:
+    async def _download_slideshow(self, video: video.Video, cookies: typing.Dict[str, str]) -> io.BytesIO:
         vf = (
             '"scale=iw*min(1080/iw\\,1920/ih):ih*min(1080/iw\\,1920/ih),'
             'pad=1080:1920:(1080-iw)/2:(1920-ih)/2,'
@@ -65,7 +60,7 @@ class TiktokClient(base.BaseClient):
             url = image_data.image_url.url_list[-1]
             urllib.request.urlretrieve(url, os.path.join(directory, f'temp_{video.id}_{i:02}.jpg'))
 
-        read = requests.get(video.music.play_url, cookies=cookies, headers={'referer': referer})
+        read = requests.get(video.music.play_url, cookies=cookies, headers=headers)
         with open(os.path.join(directory, f'temp_{video.id}.mp3'), 'wb') as w:
             for chunk in read.iter_content(chunk_size=512):
                 if chunk:

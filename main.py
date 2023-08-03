@@ -35,7 +35,7 @@ class DiscordClient(discord.Client):
         new_message = await message.channel.send('🔥 Working on it 🥵')
 
         try:
-            post = await client.download()
+            post = await client.get_post()
         except Exception as e:
             logging.error(f'Failed downloading {url}: {str(e)}')
             await new_message.edit(content=f'Failed downloading {url}. {message.author.mention}')
