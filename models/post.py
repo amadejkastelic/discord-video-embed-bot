@@ -26,7 +26,7 @@ class Post:
         ).format(
             url=self.url,
             author=self.author or '❌',
-            created=self.created.strftime('%H:%M · %b %-d, %Y') or '❌',
+            created=self.created.strftime('%H:%M · %b %-d, %Y') if self.created else '❌',
             description=self.description or '❌',
             views=self._human_format(self.views) if self.views else '❌',
             likes=self._human_format(self.likes) if self.likes else '❌',
