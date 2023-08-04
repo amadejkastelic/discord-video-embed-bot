@@ -26,7 +26,9 @@ class TwitterClient(base.BaseClient):
 
     def __init__(self, url: str):
         super(TwitterClient, self).__init__(url=url)
-        self.id = url.split('/')[-1].split('?')[0]
+        metadata = url.split('/status/')[-1].split('?')[0].split('/')
+        self.id = metadata[0]
+        self.index = int(metadata[2]) - 1 if len(metadata) == 3 and metadata[1] == 'photo' else 0
 
     async def get_post(self) -> post.Post:
         tweet = json.loads(
@@ -45,7 +47,7 @@ class TwitterClient(base.BaseClient):
 
         media_details = tweet.get('mediaDetails')
         if media_details:
-            media = media_details[0]
+            media = media_details[self.index if self.index < len(media_details) else 0]
             if media.get('type') == 'photo':
                 p.buffer = await self._download(url=media.get('media_url_https'))
             elif media.get('type') == 'video':

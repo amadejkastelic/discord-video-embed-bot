@@ -11,6 +11,7 @@ instaloader = "==4.10"
 facebook-scraper = "==0.2.59"
 python-magic = "0.4.27"
 reddownloader = "==4.2.0"
+asyncpraw = "==7.7.1"
 
 [dev-packages]
 black = "==23.7.0"

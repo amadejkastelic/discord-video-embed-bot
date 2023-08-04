@@ -1,3 +1,4 @@
+import datetime
 import io
 import typing
 from dataclasses import dataclass
@@ -12,17 +13,20 @@ class Post:
     likes: typing.Optional[int] = None
     buffer: typing.Optional[io.BytesIO] = None
     spoiler: bool = False
+    created: typing.Optional[datetime.datetime] = None
 
     def __str__(self) -> str:
         return (
             '🔗 URL: {url}\n'
             '🧑🏻‍🎨 Author: {author}\n'
+            '📅 Created: {created}\n'
             '📕 Description: {description}\n'
             '👀 Views: {views}\n'
             '👍🏻 Likes: {likes}\n'
         ).format(
             url=self.url,
             author=self.author or '❌',
+            created=self.created or '❌',
             description=self.description or '❌',
             views=self._human_format(self.views) if self.views else '❌',
             likes=self._human_format(self.likes) if self.likes else '❌',
