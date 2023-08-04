@@ -81,7 +81,7 @@ class RedditClient(base.BaseClient):
         p.description = submission.title
         p.likes = submission.score
         p.spoiler = submission.over_18 or submission.spoiler
-        p.created = datetime.datetime.fromtimestamp(submission.created_utc)
+        p.created = datetime.datetime.fromtimestamp(submission.created_utc).astimezone()
         return True
 
     def _is_nsfw(self) -> bool:

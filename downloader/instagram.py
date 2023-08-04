@@ -41,4 +41,5 @@ class InstagramClient(base.BaseClient):
                 likes=p.likes,
                 views=p.video_view_count,
                 buffer=io.BytesIO(resp.content),
+                created=p.date_local,
             )

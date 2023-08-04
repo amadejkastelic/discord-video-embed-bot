@@ -20,6 +20,7 @@ class FacebookClient(base.BaseClient):
             author=fb_post.get('username'),
             description=fb_post.get('text'),
             likes=fb_post.get('likes'),
+            created=fb_post.get('time').astimezone(),
         )
 
         if fb_post.get('video'):

@@ -1,3 +1,4 @@
+import datetime
 import json
 
 from downloader import base
@@ -43,6 +44,7 @@ class TwitterClient(base.BaseClient):
             description=tweet.get('text'),
             likes=tweet.get('favorite_count'),
             spoiler=tweet.get('possibly_sensitive', False),
+            created=datetime.datetime.fromisoformat(tweet.get('created_at')).astimezone(),
         )
 
         media_details = tweet.get('mediaDetails')

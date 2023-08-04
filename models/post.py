@@ -18,15 +18,15 @@ class Post:
     def __str__(self) -> str:
         return (
             '🔗 URL: {url}\n'
+            '📕 Description: {description}\n'
             '🧑🏻‍🎨 Author: {author}\n'
             '📅 Created: {created}\n'
-            '📕 Description: {description}\n'
             '👀 Views: {views}\n'
             '👍🏻 Likes: {likes}\n'
         ).format(
             url=self.url,
             author=self.author or '❌',
-            created=self.created or '❌',
+            created=self.created.strftime('%H:%M · %b %-d, %Y') or '❌',
             description=self.description or '❌',
             views=self._human_format(self.views) if self.views else '❌',
             likes=self._human_format(self.likes) if self.likes else '❌',

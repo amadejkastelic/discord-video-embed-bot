@@ -45,7 +45,7 @@ class DiscordClient(discord.Client):
         if post.buffer:
             file = discord.File(
                 fp=post.buffer,
-                filename='{spoiler}file.{extension}'.format(
+                filename='{spoiler}file{extension}'.format(
                     spoiler='SPOILER_' if post.spoiler else '',
                     extension=self._guess_extension_from_buffer(buffer=post.buffer),
                 ),

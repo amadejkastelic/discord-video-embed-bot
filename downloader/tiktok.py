@@ -7,7 +7,9 @@ import requests
 import typing
 import urllib
 
+import ffmpeg
 from tiktokapipy.async_api import AsyncTikTokAPI
+from tiktokapipy.models import user
 from tiktokapipy.models import video
 
 from downloader import base
@@ -41,11 +43,12 @@ class TiktokClient(base.BaseClient):
                 )
             return post.Post(
                 url=self.url,
-                author=video.author,
+                author=video.author.unique_id if isinstance(video.author, user.LightUser) else video.author,
                 description=video.desc,
                 views=video.stats.play_count,
                 likes=video.stats.digg_count,
                 buffer=buffer,
+                created=video.create_time.astimezone(),
             )
 
     async def _download_slideshow(self, video: video.Video, cookies: typing.Dict[str, str]) -> io.BytesIO:
@@ -66,18 +69,37 @@ class TiktokClient(base.BaseClient):
                 if chunk:
                     w.write(chunk)
 
-        command = [
-            'ffmpeg',
-            '-r 2/5',
-            f'-i {directory}/temp_{video.id}_%02d.jpg',
-            f'-i {directory}/temp_{video.id}.mp3',
-            '-r 30',
-            f'-vf {vf}',
-            '-acodec copy',
-            f'-t {len(video.image_post.images) * 2.5}',
-            f'{directory}/temp_{video.id}.mp4',
-            '-y',
-        ]
+        audio_duration = float(ffmpeg.probe(f'{directory}/temp_{video.id}.mp3')['format']['duration'])
+
+        if audio_duration <= (len(video.image_post.images) * 2.5):
+            command = [
+                'ffmpeg',
+                '-r 2/5',
+                f'-i {directory}/temp_{video.id}_%02d.jpg',
+                f'-i {directory}/temp_{video.id}.mp3',
+                '-r 30',
+                f'-vf {vf}',
+                '-acodec copy',
+                f'-t {len(video.image_post.images) * 2.5}',
+                f'{directory}/temp_{video.id}.mp4',
+                '-y',
+            ]
+        else:
+            command = [
+                'ffmpeg',
+                '-y',
+                '-loop 1',
+                '-framerate 1/2.5',
+                f'-i {directory}/temp_{video.id}_%02d.jpg',
+                f'-i {directory}/temp_{video.id}.mp3',
+                '-shortest',
+                '-acodec aac',
+                '-vcodec libx264',
+                '-movflags +faststart',
+                f'-vf {vf}',
+                f'{directory}/temp_{video.id}.mp4',
+            ]
+
         ffmpeg_proc = await asyncio.create_subprocess_shell(
             ' '.join(command),
             stdout=asyncio.subprocess.PIPE,
