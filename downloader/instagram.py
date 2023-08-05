@@ -60,7 +60,7 @@ class InstagramClient(base.BaseClient):
                 else:
                     download_url = node.display_url
 
-        with self.client.context._session.get(download_url) as resp:
+        with requests.get(url=download_url) as resp:
             return post.Post(
                 url=self.url,
                 author=p.owner_profile.username,
