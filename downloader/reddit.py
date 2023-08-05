@@ -4,10 +4,12 @@ import logging
 import glob
 import os
 import requests
+import shutil
 import typing
 import uuid
 
 import asyncpraw
+import cv2
 from RedDownloader import RedDownloader
 
 from downloader import base
@@ -64,11 +66,21 @@ class RedditClient(base.BaseClient):
 
         files = glob.glob(os.path.join(media.destination, f'{media.output}*'))
         if files:
-            with open(files[0], 'rb') as f:
-                p.buffer = io.BytesIO(f.read())
+            if os.path.isdir(files[0]):
+                images = [cv2.imread(os.path.join(files[0], file)) for file in sorted(os.listdir(files[0]))]
 
-            for file in files:
-                os.remove(file)
+                file_path = os.path.join(files[0], 'result.jpg')
+                cv2.imwrite(file_path, cv2.hconcat(images))
+                with open(file_path, 'rb') as f:
+                    p.buffer = io.BytesIO(f.read())
+
+                shutil.rmtree(files[0])
+            else:
+                with open(files[0], 'rb') as f:
+                    p.buffer = io.BytesIO(f.read())
+
+                for file in files:
+                    os.remove(file)
 
         return p
 

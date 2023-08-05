@@ -74,6 +74,7 @@ class TiktokClient(base.BaseClient):
         if audio_duration <= (len(video.image_post.images) * 2.5):
             command = [
                 'ffmpeg',
+                '-y',
                 '-r 2/5',
                 f'-i {directory}/temp_{video.id}_%02d.jpg',
                 f'-i {directory}/temp_{video.id}.mp3',
@@ -82,7 +83,6 @@ class TiktokClient(base.BaseClient):
                 '-acodec copy',
                 f'-t {len(video.image_post.images) * 2.5}',
                 f'{directory}/temp_{video.id}.mp4',
-                '-y',
             ]
         else:
             command = [
