@@ -1,6 +1,7 @@
-import aiohttp
 import io
 import typing
+
+import aiohttp
 
 from models import post
 

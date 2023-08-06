@@ -1,14 +1,10 @@
-import io
 import logging
-import mimetypes
 import os
 import random
-import re
-import typing
 
 import discord
-import magic
 
+import utils
 from downloader import registry
 
 emoji = ['😼', '😺', '😸', '😹', '😻', '🙀', '😿', '😾', '😩', '🙈', '🙉', '🙊', '😳']
@@ -22,7 +18,7 @@ class DiscordClient(discord.Client):
         if message.author == self.user:
             return
 
-        url = self._find_first_url(message.content)
+        url = utils.find_first_url(message.content)
         if not url:
             return
 
@@ -47,7 +43,7 @@ class DiscordClient(discord.Client):
                 fp=post.buffer,
                 filename='{spoiler}file{extension}'.format(
                     spoiler='SPOILER_' if post.spoiler else '',
-                    extension=self._guess_extension_from_buffer(buffer=post.buffer),
+                    extension=utils.guess_extension_from_buffer(buffer=post.buffer),
                 ),
             )
 
@@ -57,15 +53,6 @@ class DiscordClient(discord.Client):
             suppress_embeds=True,
         )
         await new_message.delete()
-
-    def _find_first_url(self, string: str) -> typing.Optional[str]:
-        urls = re.findall(r'(https?://[^\s]+)', string)
-        return urls[0] if urls else None
-
-    def _guess_extension_from_buffer(self, buffer: io.BytesIO) -> str:
-        extension = mimetypes.guess_extension(type=magic.from_buffer(buffer.read(2048), mime=True))
-        buffer.seek(0)
-        return extension
 
 
 intents = discord.Intents.default()

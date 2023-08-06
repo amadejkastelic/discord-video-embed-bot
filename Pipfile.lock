@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "51f70fcb8e0302db9ce1919013ef334af4de03d3a6f5de9253061ec07806a1b7"
+            "sha256": "333ac402e07e1236fb344a8f5c1bcaf204826f93d7b83d4cc07eedddaa1f16ae"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -1137,11 +1137,11 @@
         },
         "tiktokapipy": {
             "hashes": [
-                "sha256:36325a14b22f416868f50cddb5373f29ab420bc426f3d8135aa81463e5e65a40",
-                "sha256:64eead740dbc9a7f9d77f7ae2f9c3d0b3abcd78bd1ed12356c83a7db365069c9"
+                "sha256:3b5faee4bb0ccf20d688e6233ce4a55535c0614cfe4d3482578e9e04502e7007",
+                "sha256:be31c5c0dea2c2f9cd32abf634559c5cadee07dca2973b98eed8f3ee3b35cccb"
             ],
             "index": "pypi",
-            "version": "==0.2.2"
+            "version": "==0.2.3"
         },
         "tqdm": {
             "hashes": [
@@ -1392,6 +1392,14 @@
             "index": "pypi",
             "version": "==6.1.0"
         },
+        "flake8-import-order": {
+            "hashes": [
+                "sha256:82ed59f1083b629b030ee9d3928d9e06b6213eb196fe745b3a7d4af2168130df",
+                "sha256:e23941f892da3e0c09d711babbb0c73bc735242e9b216b726616758a920d900e"
+            ],
+            "index": "pypi",
+            "version": "==0.18.2 "
+        },
         "mccabe": {
             "hashes": [
                 "sha256:348e0240c33b60bbdf4e523192ef919f28cb2c3d7d5c7794f74009290f236325",
@@ -1447,6 +1455,14 @@
             ],
             "markers": "python_version >= '3.8'",
             "version": "==3.1.0"
+        },
+        "setuptools": {
+            "hashes": [
+                "sha256:11e52c67415a381d10d6b462ced9cfb97066179f0e871399e006c4ab101fc85f",
+                "sha256:baf1fdb41c6da4cd2eae722e135500da913332ab3f2f5c7d33af9b492acb5235"
+            ],
+            "markers": "python_version >= '3.7'",
+            "version": "==68.0.0"
         }
     }
 }

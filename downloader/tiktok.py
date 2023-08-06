@@ -1,13 +1,13 @@
 import asyncio
-import io
 import glob
-import os
+import io
 import logging
-import requests
+import os
 import typing
 import urllib
 
 import ffmpeg
+import requests
 from tiktokapipy.async_api import AsyncTikTokAPI
 from tiktokapipy.models import user
 from tiktokapipy.models import video

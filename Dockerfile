@@ -21,7 +21,7 @@ RUN pip install "pipenv"
 WORKDIR /app
 COPY Pipfile ./
 COPY Pipfile.lock ./
-COPY main.py ./
+COPY *.py ./
 COPY downloader/* ./downloader/
 COPY models/* ./models/
 

@@ -1,15 +1,15 @@
 import datetime
+import glob
 import io
 import logging
-import glob
 import os
-import requests
 import shutil
 import typing
 import uuid
 
 import asyncpraw
 import cv2
+import requests
 from RedDownloader import RedDownloader
 
 from downloader import base
