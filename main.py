@@ -47,11 +47,17 @@ class DiscordClient(discord.Client):
                 ),
             )
 
-        await message.channel.send(
-            content=f'Here you go {message.author.mention} {random.choice(emoji)}.\n{str(post)}',
-            file=file,
-            suppress_embeds=True,
-        )
+        try:
+            await message.channel.send(
+                content=f'Here you go {message.author.mention} {random.choice(emoji)}.\n{str(post)}',
+                file=file,
+                suppress_embeds=True,
+            )
+        except Exception as e:
+            logging.error(f'Failed sending message {url}: {str(e)}')
+            await message.channel.send(
+                content=f'Failed sending discord message for {url} ({message.author.mention}).\nError: {str(e)}'
+            )
         await new_message.delete()
 
 
