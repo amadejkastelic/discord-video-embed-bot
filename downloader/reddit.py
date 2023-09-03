@@ -1,16 +1,11 @@
 import datetime
-import glob
 import io
-import logging
 import os
-import shutil
 import typing
-import uuid
 
 import asyncpraw
-import cv2
+import redvid
 import requests
-from RedDownloader import RedDownloader
 
 from downloader import base
 from models import post
@@ -45,42 +40,11 @@ class RedditClient(base.BaseClient):
         self.client = RedditClientSingleton.get_instance()
 
     async def get_post(self) -> post.Post:
-        media = None
-        try:
-            media = RedDownloader.Download(url=self.url, quality=720, destination='/tmp/', output=str(uuid.uuid4()))
-        except Exception as e:
-            logging.error(f'Failed download video: {str(e)}')
-
         p = post.Post(url=self.url)
 
         did_hydrate = await self._hydrate_post(p)
-        if not did_hydrate and not media:
-            raise RuntimeError('Failed fetching reddit post')
-        elif not did_hydrate:
-            p.description = media.GetPostTitle().Get()
-            p.author = media.GetPostAuthor().Get()
-            p.spoiler = self._is_nsfw()
-
-        if not media:
-            return p
-
-        files = glob.glob(os.path.join(media.destination, f'{media.output}*'))
-        if files:
-            if os.path.isdir(files[0]):
-                images = [cv2.imread(os.path.join(files[0], file)) for file in sorted(os.listdir(files[0]))]
-
-                file_path = os.path.join(files[0], 'result.jpg')
-                cv2.imwrite(file_path, cv2.hconcat(images))
-                with open(file_path, 'rb') as f:
-                    p.buffer = io.BytesIO(f.read())
-
-                shutil.rmtree(files[0])
-            else:
-                with open(files[0], 'rb') as f:
-                    p.buffer = io.BytesIO(f.read())
-
-                for file in files:
-                    os.remove(file)
+        if not did_hydrate:
+            raise Exception('No reddit credentials')
 
         return p
 
@@ -94,6 +58,17 @@ class RedditClient(base.BaseClient):
         p.likes = submission.score
         p.spoiler = submission.over_18 or submission.spoiler
         p.created = datetime.datetime.fromtimestamp(submission.created_utc).astimezone()
+
+        if submission.url.startswith('https://i.redd.it/'):
+            p.buffer = await self._download(url=submission.url)
+        elif submission.url.startswith('https://v.redd.it/'):
+            redvid.Downloader(
+                url=submission.url, path='/tmp', filename=f'{submission.id}.mp4', max_q=True, log=False
+            ).download()
+            with open(f'/tmp/{submission.id}.mp4', 'rb') as f:
+                p.buffer = io.BytesIO(f.read())
+            os.remove(f'/tmp/{submission.id}.mp4')
+
         return True
 
     def _is_nsfw(self) -> bool:
