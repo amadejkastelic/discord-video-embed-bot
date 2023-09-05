@@ -1,5 +1,10 @@
 import datetime
 import json
+import logging
+import os
+import typing
+
+import twscrape
 
 from downloader import base
 from models import post
@@ -22,6 +27,32 @@ headers = {
 }
 
 
+class TwitterClientSingleton(object):
+    INSTANCE: typing.Optional[twscrape.API] = None
+
+    @classmethod
+    async def get_instance(cls) -> typing.Optional[twscrape.API]:
+        username = os.getenv('TWITTER_USERNAME')
+        email = os.getenv('TWITTER_EMAIL')
+        password = os.getenv('TWITTER_PASSWORD')
+        if not all([username, email, password]):
+            return None
+
+        if not cls.INSTANCE:
+            cls.INSTANCE = twscrape.API()
+            await cls.INSTANCE.pool.add_account(
+                username=username, email=email, password=password, email_password=password
+            )
+            await cls.INSTANCE.pool.login_all()
+
+        return cls.INSTANCE
+
+    @classmethod
+    async def relogin(cls) -> None:
+        if cls.INSTANCE:
+            await cls.INSTANCE.pool.relogin(usernames=[os.getenv('TWITTER_USERNAME')])
+
+
 class TwitterClient(base.BaseClient):
     DOMAINS = ['twitter.com', 'x.com']
 
@@ -32,6 +63,49 @@ class TwitterClient(base.BaseClient):
         self.index = int(metadata[2]) - 1 if len(metadata) == 3 and metadata[1] == 'photo' else 0
 
     async def get_post(self) -> post.Post:
+        client = await TwitterClientSingleton.get_instance()
+        if not client:
+            return await self._get_post_no_login()
+
+        return await self._get_post_login(client=client)
+
+    async def _get_post_login(self, client: twscrape.API, retry_count=0) -> post.Post:
+        try:
+            details = await client.tweet_details(int(self.id))
+            p = post.Post(
+                url=self.url,
+                author=f'{details.user.displayname} ({details.user.username})',
+                description=details.rawContent,
+                views=details.viewCount,
+                likes=details.likeCount,
+                created=details.date.astimezone(),
+            )
+
+            if not details.media:
+                return p
+
+            if details.media.videos:
+                url = max(details.media.videos[0].variants, key=lambda x: x.bitrate).url
+            elif details.media.photos:
+                url = details.media.photos[0].url
+            elif details.media.animated:
+                url = details.media.animated[0].videoUrl
+            else:
+                return p
+
+            p.buffer = await self._download(url=url, cookies=(await client.pool.get_all())[0].cookies)
+            return p
+        except Exception as e:
+            logging.error(f'Failed fetching from twitter, retrying: {str(e)}')
+            if retry_count == 0:
+                await TwitterClientSingleton.relogin()
+                return await self._get_post_login(client=client, retry_count=retry_count + 1)
+            elif retry_count == 1:
+                return await self._get_post_no_login()
+            else:
+                raise Exception('Failed fetching from twitter')
+
+    async def _get_post_no_login(self) -> post.Post:
         tweet = json.loads(
             await self._fetch_content(url=scrape_url, data='', headers=headers, params={'id': self.id, 'lang': 'en'})
         )

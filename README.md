@@ -24,3 +24,9 @@ REDDIT_API_TOKEN=<your_reddit_api_token>
 REDDIT_API_SECRET=<your_reddit_api_secret>
 REDDIT_USER_AGENT=<name_version_and_your_username>
 ```
+- For better twitter support you need to add credentials:
+```bash
+TWITTER_USERNAME=<your_twitter_username>
+TWITTER_EMAIL=<your_twitter_email>
+TWITTER_PASSWORD=<your_twitter_password>
+```
