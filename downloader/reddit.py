@@ -6,6 +6,7 @@ import typing
 import asyncpraw
 import redvid
 import requests
+from asyncpraw import exceptions as praw_exceptions
 
 from downloader import base
 from models import post
@@ -52,7 +53,13 @@ class RedditClient(base.BaseClient):
         if not self.client:
             return False
 
-        submission = await self.client.submission(url=self.url)
+        try:
+            submission = await self.client.submission(url=self.url)
+        except praw_exceptions.InvalidURL:
+            self.url = requests.get(self.url).url.split('?')[0]
+            submission = await self.client.submission(url=self.url)
+
+        p.url = self.url
         p.author = submission.author
         p.description = submission.title
         p.likes = submission.score
