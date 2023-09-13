@@ -1,3 +1,4 @@
+import enum
 import io
 import os
 import typing
@@ -8,6 +9,20 @@ import requests
 
 from downloader import base
 from models import post
+
+
+class LinkType(enum.Enum):
+    MEDIA = 1
+    PROFILE = 2
+    STORY = 3
+
+    @classmethod
+    def from_url(cls, url: str) -> typing.Self:
+        if '/p/' in url or '/reel/' in url:
+            return cls.MEDIA
+        if '/stories/' in url or '/story/' in url:
+            return cls.STORY
+        return cls.PROFILE
 
 
 class InstagramClientSingleton(object):
@@ -37,16 +52,21 @@ class InstagramClient(base.BaseClient):
         parsed_url = urlparse(url)
         self.id = parsed_url.path.strip('/').split('/')[-1]
         self.index = int(parse_qs(parsed_url.query).get('img_index', ['1'])[0]) - 1
-        self._is_story = '/stories/' in url
+        self._link_type = LinkType.from_url(url=url)
 
     async def get_post(self) -> post.Post:
-        if self._is_story:
-            return self._get_story()
+        match self._link_type:
+            case LinkType.STORY:
+                return self._get_story()
+            case LinkType.MEDIA:
+                return self._get_post()
+            case LinkType.PROFILE:
+                return self._get_profile()
 
-        return self._get_post()
+        raise NotImplementedError(f'Not yet implemented for {self.url}')
 
     def _get_post(self) -> post.Post:
-        p = instaloader.Post.from_shortcode(self.client.context, self.id)
+        p = instaloader.Post.from_shortcode(context=self.client.context, shortcode=self.id)
 
         match p.typename:
             case 'GraphImage':
@@ -72,7 +92,7 @@ class InstagramClient(base.BaseClient):
             )
 
     def _get_story(self) -> post.Post:
-        story = instaloader.StoryItem.from_mediaid(self.client.context, int(self.id))
+        story = instaloader.StoryItem.from_mediaid(context=self.client.context, mediaid=int(self.id))
         if story.is_video:
             url = story.video_url
         else:
@@ -85,4 +105,16 @@ class InstagramClient(base.BaseClient):
                 description=story.caption,
                 buffer=io.BytesIO(resp.content),
                 created=story.date_local,
+            )
+
+    def _get_profile(self) -> post.Post:
+        profile = instaloader.Profile.from_username(context=self.client.context, username=self.id)
+
+        with requests.get(url=profile.profile_pic_url) as resp:
+            return post.Post(
+                url=self.url,
+                author=profile.username,
+                description=profile.biography,
+                buffer=io.BytesIO(resp.content),
+                likes=profile.followers,
             )
