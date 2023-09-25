@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os
 import random
@@ -27,8 +28,7 @@ class DiscordClient(discord.Client):
         except Exception:
             return
 
-        await message.delete()
-        new_message = await message.channel.send('🔥 Working on it 🥵')
+        new_message = (await asyncio.gather(message.delete(), message.channel.send('🔥 Working on it 🥵')))[1]
 
         try:
             post = await client.get_post()
@@ -48,17 +48,33 @@ class DiscordClient(discord.Client):
             )
 
         try:
-            await message.channel.send(
+            msg = await message.channel.send(
                 content=f'Here you go {message.author.mention} {random.choice(emoji)}.\n{str(post)}',
                 file=file,
                 suppress_embeds=True,
             )
+            await msg.add_reaction('❌')
+            logging.info(f'User {message.author.display_name} sent message with url {url}')
         except Exception as e:
             logging.error(f'Failed sending message {url}: {str(e)}')
             await message.channel.send(
                 content=f'Failed sending discord message for {url} ({message.author.mention}).\nError: {str(e)}'
             )
         await new_message.delete()
+
+    async def on_reaction_add(self, reaction: discord.Reaction, user: discord.User):
+        if reaction.emoji == '❌' and user.mentioned_in(message=reaction.message):
+            url = utils.find_first_url(reaction.message.content)
+            logging.info(f'User {user.display_name} deleted message {url}.')
+            await asyncio.gather(
+                reaction.message.clear_reaction('❌'),
+                reaction.message.edit(
+                    content=f'Embed {url} deleted by {user.mention}.',
+                    embeds=[],
+                    attachments=[],
+                    suppress=True,
+                ),
+            )
 
 
 intents = discord.Intents.default()
