@@ -35,7 +35,10 @@ class DiscordClient(discord.Client):
             post = await client.get_post()
         except Exception as e:
             logging.error(f'Failed downloading {url}: {str(e)}')
-            await new_message.edit(content=f'Failed downloading {url}. {message.author.mention}')
+            await asyncio.gather(
+                new_message.edit(content=f'Failed downloading {url}. {message.author.mention}'),
+                new_message.add_reaction('❌'),
+            )
             raise e
 
         file = None
@@ -54,18 +57,19 @@ class DiscordClient(discord.Client):
                 file=file,
                 suppress_embeds=True,
             )
-            await msg.add_reaction('❌')
             logging.info(f'User {message.author.display_name} sent message with url {url}')
         except Exception as e:
             logging.error(f'Failed sending message {url}: {str(e)}')
-            await message.channel.send(
+            msg = await message.channel.send(
                 content=f'Failed sending discord message for {url} ({message.author.mention}).\nError: {str(e)}'
             )
-        await new_message.delete()
+
+        await asyncio.gather(msg.add_reaction('❌'), new_message.delete())
 
     async def on_reaction_add(self, reaction: discord.Reaction, user: discord.User):
         if (
-            reaction.emoji == '❌'
+            reaction.message.author.id == self.user.id
+            and reaction.emoji == '❌'
             and user.mentioned_in(message=reaction.message)
             and reaction.message.created_at.replace(tzinfo=None)
             >= (datetime.datetime.utcnow() - datetime.timedelta(minutes=5))
