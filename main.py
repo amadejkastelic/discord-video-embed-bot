@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import logging
 import os
 import random
@@ -63,19 +64,20 @@ class DiscordClient(discord.Client):
         await new_message.delete()
 
     async def on_reaction_add(self, reaction: discord.Reaction, user: discord.User):
-        if reaction.emoji == '❌' and user.mentioned_in(message=reaction.message):
-            url = utils.find_first_url(reaction.message.content)
-            logging.info(f'User {user.display_name} deleted message {url}.')
-            await asyncio.gather(
-                reaction.message.clear_reaction('❌'),
-                reaction.message.edit(
-                    content=f'Embed {url} deleted by {user.mention}.',
-                    embeds=[],
-                    attachments=[],
-                    suppress=True,
-                ),
-            )
+        if (
+            reaction.emoji == '❌'
+            and user.mentioned_in(message=reaction.message)
+            and reaction.message.created_at.replace(tzinfo=None)
+            >= (datetime.datetime.utcnow() - datetime.timedelta(minutes=5))
+        ):
+            logging.info(f'User {user.display_name} deleted message {utils.find_first_url(reaction.message.content)}')
+            await reaction.message.delete()
 
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s %(message)s',
+)
 
 intents = discord.Intents.default()
 intents.message_content = True
