@@ -48,17 +48,24 @@ class DiscordClient(discord.Client):
             )
 
         try:
-            await message.channel.send(
+            msg = await message.channel.send(
                 content=f'Here you go {message.author.mention} {random.choice(emoji)}.\n{str(post)}',
                 file=file,
                 suppress_embeds=True,
             )
+            await msg.add_reaction('❌')
+            logging.info(f'User {message.author.display_name} sent message with url {url}')
         except Exception as e:
             logging.error(f'Failed sending message {url}: {str(e)}')
             await message.channel.send(
                 content=f'Failed sending discord message for {url} ({message.author.mention}).\nError: {str(e)}'
             )
         await new_message.delete()
+
+    async def on_reaction_add(self, reaction: discord.Reaction, user: discord.User):
+        if reaction.emoji == '❌' and user.mentioned_in(message=reaction.message):
+            logging.info(f'User {user.display_name} deleted message.')
+            await reaction.message.delete()
 
 
 intents = discord.Intents.default()
