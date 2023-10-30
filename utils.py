@@ -14,4 +14,4 @@ def find_first_url(string: str) -> typing.Optional[str]:
 def guess_extension_from_buffer(buffer: io.BytesIO) -> str:
     extension = mimetypes.guess_extension(type=magic.from_buffer(buffer.read(2048), mime=True))
     buffer.seek(0)
-    return extension
+    return extension or '.mp4'

@@ -26,16 +26,22 @@ class Post:
         ).format(
             url=self.url,
             author=self.author or '❌',
-            created=self.created.strftime('%H:%M · %b %-d, %Y') if self.created else '❌',
+            created=self._date_human_format(date=self.created) if self.created else '❌',
             description=self.description or '❌',
-            views=self._human_format(self.views) if self.views else '❌',
-            likes=self._human_format(self.likes) if self.likes else '❌',
+            views=self._number_human_format(num=self.views) if self.views else '❌',
+            likes=self._number_human_format(num=self.likes) if self.likes else '❌',
         )
 
-    def _human_format(self, num: int) -> str:
+    def _number_human_format(self, num: int) -> str:
         num = float('{:.3g}'.format(num))
         magnitude = 0
         while abs(num) >= 1000:
             magnitude += 1
             num /= 1000.0
         return '{}{}'.format('{:f}'.format(num).rstrip('0').rstrip('.'), ['', 'K', 'M', 'B', 'T'][magnitude])
+
+    def _date_human_format(self, date: datetime.datetime) -> str:
+        if date.hour == 0 and date.minute == 0:
+            return date.strftime('%b %-d, %Y')
+
+        return date.strftime('%H:%M · %b %-d, %Y')

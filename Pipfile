@@ -15,6 +15,7 @@ ffmpeg-python = "==0.2.0"
 opencv-python = "==4.8.0.74"
 asyncpraw = "==7.7.1"
 twscrape = "==0.7.0"
+pytube = "==15.0.0"
 
 [dev-packages]
 black = "==23.7.0"

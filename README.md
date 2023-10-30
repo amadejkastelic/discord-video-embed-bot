@@ -10,6 +10,7 @@ A Discord bot that automatically embeds messages containing a video link of a su
 - Tiktok ✅
 - Reddit ✅
 - Twitter ✅
+- Youtube shorts ✅
 
 ## How to run
 - Build the docker image: `docker build . -t video-embed-bot` or simply pull it from ghcr:
