@@ -12,8 +12,8 @@ from tiktokapipy.async_api import AsyncTikTokAPI
 from tiktokapipy.models import user
 from tiktokapipy.models import video
 
+import models
 from downloader import base
-from models import post
 
 
 headers = {'referer': 'https://www.tiktok.com/'}
@@ -22,7 +22,7 @@ headers = {'referer': 'https://www.tiktok.com/'}
 class TiktokClient(base.BaseClient):
     DOMAINS = ['tiktok.com']
 
-    async def get_post(self) -> post.Post:
+    async def get_post(self) -> models.Post:
         clean_url = self._clean_url(self.url)
 
         logging.debug(f'Trying to download tiktok video {clean_url}...')
@@ -41,7 +41,7 @@ class TiktokClient(base.BaseClient):
                     cookies=cookies,
                     headers=headers,
                 )
-            return post.Post(
+            return models.Post(
                 url=self.url,
                 author=video.author.unique_id if isinstance(video.author, user.LightUser) else video.author,
                 description=video.desc,
@@ -105,7 +105,7 @@ class TiktokClient(base.BaseClient):
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
         )
-        _, stderr = await ffmpeg_proc.communicate()
+        await ffmpeg_proc.communicate()
         generated_files = glob.glob(os.path.join(directory, f'temp_{video.id}*'))
 
         if not os.path.exists(os.path.join(directory, f'temp_{video.id}.mp4')):

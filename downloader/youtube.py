@@ -2,17 +2,17 @@ import io
 
 import pytube
 
+import models
 from downloader import base
-from models import post
 
 
 class YoutubeClient(base.BaseClient):
     DOMAINS = ['youtube.com/shorts']
 
-    async def get_post(self) -> post.Post:
+    async def get_post(self) -> models.Post:
         vid = pytube.YouTube(self.url)
 
-        p = post.Post(
+        post = models.Post(
             url=self.url,
             author=vid.author,
             description=vid.title,
@@ -23,6 +23,6 @@ class YoutubeClient(base.BaseClient):
 
         vid.streams.filter(progressive=True, file_extension='mp4').order_by(
             'resolution'
-        ).desc().first().stream_to_buffer(p.buffer)
+        ).desc().first().stream_to_buffer(post.buffer)
 
-        return p
+        return post

@@ -6,8 +6,8 @@ import typing
 
 import twscrape
 
+import models
 from downloader import base
-from models import post
 
 scrape_url = 'https://cdn.syndication.twimg.com/tweet-result'
 headers = {
@@ -62,17 +62,17 @@ class TwitterClient(base.BaseClient):
         self.id = metadata[0]
         self.index = int(metadata[2]) - 1 if len(metadata) == 3 and metadata[1] == 'photo' else 0
 
-    async def get_post(self) -> post.Post:
+    async def get_post(self) -> models.Post:
         client = await TwitterClientSingleton.get_instance()
         if not client:
             return await self._get_post_no_login()
 
         return await self._get_post_login(client=client)
 
-    async def _get_post_login(self, client: twscrape.API, retry_count=0) -> post.Post:
+    async def _get_post_login(self, client: twscrape.API, retry_count=0) -> models.Post:
         try:
             details = await client.tweet_details(int(self.id))
-            p = post.Post(
+            p = models.Post(
                 url=self.url,
                 author=f'{details.user.displayname} ({details.user.username})',
                 description=details.rawContent,
@@ -105,14 +105,14 @@ class TwitterClient(base.BaseClient):
             else:
                 raise Exception('Failed fetching from twitter')
 
-    async def _get_post_no_login(self) -> post.Post:
+    async def _get_post_no_login(self) -> models.Post:
         tweet = json.loads(
             await self._fetch_content(url=scrape_url, data='', headers=headers, params={'id': self.id, 'lang': 'en'})
         )
         if not tweet:
             raise ValueError(f'Failed retreiving tweet {self.url}')
 
-        p = post.Post(
+        post = models.Post(
             url=self.url,
             author=tweet.get('user', {}).get('name'),
             description=tweet.get('text'),
@@ -125,11 +125,11 @@ class TwitterClient(base.BaseClient):
         if media_details:
             media = media_details[self.index if self.index < len(media_details) else 0]
             if media.get('type') == 'photo':
-                p.buffer = await self._download(url=media.get('media_url_https'))
+                post.buffer = await self._download(url=media.get('media_url_https'))
             elif media.get('type') == 'video':
                 video = max(media.get('video_info').get('variants'), key=lambda v: v.get('bitrate', 0))
-                p.buffer = await self._download(url=video.get('url'))
+                post.buffer = await self._download(url=video.get('url'))
         elif 'user' in tweet and 'profile_image_url_https' in tweet.get('user'):
-            p.buffer = await self._download(url=tweet.get('user').get('profile_image_url_https'))
+            post.buffer = await self._download(url=tweet.get('user').get('profile_image_url_https'))
 
-        return p
+        return post

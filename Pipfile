@@ -5,16 +5,16 @@ name = "pypi"
 
 [packages]
 tiktokapipy = "==0.2.3"
-playwright = "==1.36.0"
+playwright = "==1.39.0"
 "discord.py" = "==2.3.2"
-instaloader = "==4.10"
+instaloader = "==4.10.1"
 facebook-scraper = "==0.2.59"
 python-magic = "0.4.27"
 redvid = "==2.0.2"
 ffmpeg-python = "==0.2.0"
 opencv-python = "==4.8.0.74"
 asyncpraw = "==7.7.1"
-twscrape = "==0.7.0"
+twscrape = "==0.9.0"
 pytube = "==15.0.0"
 
 [dev-packages]

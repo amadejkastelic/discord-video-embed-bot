@@ -6,6 +6,7 @@ import random
 
 import discord
 
+import models
 import utils
 from downloader import registry
 
@@ -41,22 +42,8 @@ class DiscordClient(discord.Client):
             )
             raise e
 
-        file = None
-        if post.buffer:
-            file = discord.File(
-                fp=post.buffer,
-                filename='{spoiler}file{extension}'.format(
-                    spoiler='SPOILER_' if post.spoiler else '',
-                    extension=utils.guess_extension_from_buffer(buffer=post.buffer),
-                ),
-            )
-
         try:
-            msg = await message.channel.send(
-                content=f'Here you go {message.author.mention} {random.choice(emoji)}.\n{str(post)}',
-                file=file,
-                suppress_embeds=True,
-            )
+            msg = await self._send_post(post=post, channel=message.channel, author=message.author)
             logging.info(f'User {message.author.display_name} sent message with url {url}')
         except Exception as e:
             logging.error(f'Failed sending message {url}: {str(e)}')
@@ -65,6 +52,34 @@ class DiscordClient(discord.Client):
             )
 
         await asyncio.gather(msg.add_reaction('❌'), new_message.delete())
+
+    async def _send_post(
+        self, post: models.Post, channel: discord.GroupChannel, author: discord.User
+    ) -> discord.Message:
+        file = None
+        if post.buffer:
+            extension = utils.guess_extension_from_buffer(buffer=post.buffer)
+            file = discord.File(
+                fp=post.buffer,
+                filename='{spoiler}file{extension}'.format(
+                    spoiler='SPOILER_' if post.spoiler else '',
+                    extension=extension,
+                ),
+            )
+
+        try:
+            return await channel.send(
+                content=f'Here you go {author.mention} {random.choice(emoji)}.\n{str(post)}',
+                file=file,
+                suppress_embeds=True,
+            )
+        except discord.HTTPException as e:
+            if e.status != 413:  # Payload too large
+                raise e
+            logging.info('File too large, resizing...')
+            file.fp.seek(0)
+            post.buffer = await utils.resize(buffer=file.fp, extension=extension)
+            return await self._send_post(post=post, channel=channel, author=author)
 
     async def on_reaction_add(self, reaction: discord.Reaction, user: discord.User):
         if (

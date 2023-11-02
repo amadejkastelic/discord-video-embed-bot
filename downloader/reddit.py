@@ -8,8 +8,8 @@ import redvid
 import requests
 from asyncpraw import exceptions as praw_exceptions
 
+import models
 from downloader import base
-from models import post
 
 
 class RedditClientSingleton(object):
@@ -40,16 +40,16 @@ class RedditClient(base.BaseClient):
         super(RedditClient, self).__init__(url=url)
         self.client = RedditClientSingleton.get_instance()
 
-    async def get_post(self) -> post.Post:
-        p = post.Post(url=self.url)
+    async def get_post(self) -> models.Post:
+        post = models.Post(url=self.url)
 
-        did_hydrate = await self._hydrate_post(p)
+        did_hydrate = await self._hydrate_post(post)
         if not did_hydrate:
             raise Exception('No reddit credentials')
 
-        return p
+        return post
 
-    async def _hydrate_post(self, p: post.Post) -> bool:
+    async def _hydrate_post(self, post: models.Post) -> bool:
         if not self.client:
             return False
 
@@ -59,21 +59,21 @@ class RedditClient(base.BaseClient):
             self.url = requests.get(self.url).url.split('?')[0]
             submission = await self.client.submission(url=self.url)
 
-        p.url = self.url
-        p.author = submission.author
-        p.description = submission.title
-        p.likes = submission.score
-        p.spoiler = submission.over_18 or submission.spoiler
-        p.created = datetime.datetime.fromtimestamp(submission.created_utc).astimezone()
+        post.url = self.url
+        post.author = submission.author
+        post.description = submission.title
+        post.likes = submission.score
+        post.spoiler = submission.over_18 or submission.spoiler
+        post.created = datetime.datetime.fromtimestamp(submission.created_utc).astimezone()
 
         if submission.url.startswith('https://i.redd.it/'):
-            p.buffer = await self._download(url=submission.url)
+            post.buffer = await self._download(url=submission.url)
         elif submission.url.startswith('https://v.redd.it/'):
             redvid.Downloader(
                 url=submission.url, path='/tmp', filename=f'{submission.id}.mp4', max_q=True, log=False
             ).download()
             with open(f'/tmp/{submission.id}.mp4', 'rb') as f:
-                p.buffer = io.BytesIO(f.read())
+                post.buffer = io.BytesIO(f.read())
             os.remove(f'/tmp/{submission.id}.mp4')
 
         return True
