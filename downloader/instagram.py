@@ -36,8 +36,8 @@ class InstagramClientSingleton(object):
         cls.INSTANCE = instaloader.Instaloader(
             user_agent='Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0'
         )
-        if os.path.exists('instagram.sess'):
-            cls.INSTANCE.load_session_from_file(username='amadejkastelic', filename='instagram.sess')
+        if os.path.exists('instagram.sess') and os.getenv('INSTAGRAM_USERNAME') is not None:
+            cls.INSTANCE.load_session_from_file(username=os.getenv('INSTAGRAM_USERNAME'), filename='instagram.sess')
 
         return cls.INSTANCE
 
@@ -94,9 +94,9 @@ class InstagramClient(base.BaseClient):
     def _get_story(self) -> models.Post:
         story = instaloader.StoryItem.from_mediaid(context=self.client.context, mediaid=int(self.id))
         if story.is_video:
-            url = story.video_url
+            url = story.video_url or story.url
         else:
-            url = story.url
+            url = story.url or story.video_url
 
         with requests.get(url=url) as resp:
             return models.Post(

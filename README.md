@@ -18,16 +18,33 @@ A Discord bot that automatically embeds media and metadata of messages containin
 docker pull ghcr.io/amadejkastelic/discord-video-embed-bot:<latest|tag>
 ```
 - Run it with your discord api key: `docker run -e DISCORD_API_KEY=<api_key> video-embed-bot`
-- Facebook requires you to provide cookies. Download them in your browser using [an extension](https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc) while you're logged in and mount them to the container).
+
+### Facebook
+Facebook requires you to provide cookies. Download them in your browser using [an extension](https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc) while you're logged in and mount them to the container).
+
+### Reddit
 - For extended reddit support you need to create an app on reddit and add the following environment variables:
 ```bash
 REDDIT_API_TOKEN=<your_reddit_api_token>
 REDDIT_API_SECRET=<your_reddit_api_secret>
 REDDIT_USER_AGENT=<name_version_and_your_username>
 ```
+
+### Twitter
 - For better twitter support you need to add credentials:
 ```bash
 TWITTER_USERNAME=<your_twitter_username>
 TWITTER_EMAIL=<your_twitter_email>
 TWITTER_PASSWORD=<your_twitter_password>
+```
+
+### Instagram
+- For better instagram integration that allows to view items that require login, you need to provide the instagram.sess file and instagram username environemnt variable:
+```bash
+INSTAGRAM_USERNAME=<your_instagram_username>
+```
+- `instagram.sess` file should be in the working directory of your instance
+- You can obtain the session file by logging into Instagram in Firefox and running:
+```bash
+python bin/fetch_instagram_session.py
 ```
