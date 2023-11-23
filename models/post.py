@@ -18,11 +18,11 @@ class Post:
     def __str__(self) -> str:
         return (
             '🔗 URL: {url}\n'
-            '📕 Description: {description}\n'
             '🧑🏻‍🎨 Author: {author}\n'
             '📅 Created: {created}\n'
             '👀 Views: {views}\n'
             '👍🏻 Likes: {likes}\n'
+            '📕 Description: {description}\n'
         ).format(
             url=self.url,
             author=self.author or '❌',

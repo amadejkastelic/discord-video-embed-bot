@@ -59,9 +59,18 @@ class RedditClient(base.BaseClient):
             self.url = requests.get(self.url).url.split('?')[0]
             submission = await self.client.submission(url=self.url)
 
+        content = ''
+        if submission.selftext:
+            content = f'\n\n{submission.selftext}'
+        if submission.url:
+            if content:
+                content += f'\n{submission.url}'
+            else:
+                content = f'\n\n{submission.url}'
+
         post.url = self.url
         post.author = submission.author
-        post.description = submission.title
+        post.description = f'{submission.title}{content}'
         post.likes = submission.score
         post.spoiler = submission.over_18 or submission.spoiler
         post.created = datetime.datetime.fromtimestamp(submission.created_utc).astimezone()
