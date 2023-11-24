@@ -1,6 +1,5 @@
 import asyncio
 import datetime
-import io
 import logging
 import os
 import random
@@ -71,14 +70,7 @@ class DiscordClient(discord.Client):
         try:
             content = f'Here you go {author.mention} {random.choice(emoji)}.\n{str(post)}'
             if len(content) > 2000:
-                if file:
-                    content = content[:1997] + '...'
-                else:
-                    content, _, fp = str(post).partition('📕 Description: ')
-                    file = discord.File(
-                        fp=io.BytesIO(fp.encode()),
-                        filename='message.txt',
-                    )
+                content = content[:1997] + '...'
 
             return await channel.send(
                 content=content,

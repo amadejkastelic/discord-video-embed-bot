@@ -62,11 +62,6 @@ class RedditClient(base.BaseClient):
         content = ''
         if submission.selftext:
             content = f'\n\n{submission.selftext}'
-        if submission.url:
-            if content:
-                content += f'\n{submission.url}'
-            else:
-                content = f'\n\n{submission.url}'
 
         post.url = self.url
         post.author = submission.author
