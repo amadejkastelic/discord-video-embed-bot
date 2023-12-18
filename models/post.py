@@ -16,6 +16,8 @@ class Post:
     created: typing.Optional[datetime.datetime] = None
 
     def __str__(self) -> str:
+        description = self.description or '❌'
+
         return (
             '🔗 URL: {url}\n'
             '🧑🏻‍🎨 Author: {author}\n'
@@ -27,7 +29,7 @@ class Post:
             url=self.url,
             author=self.author or '❌',
             created=self._date_human_format(date=self.created) if self.created else '❌',
-            description=self.description or '❌',
+            description=description if not self.spoiler else f'||{description}||',
             views=self._number_human_format(num=self.views) if self.views else '❌',
             likes=self._number_human_format(num=self.likes) if self.likes else '❌',
         )

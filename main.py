@@ -70,7 +70,10 @@ class DiscordClient(discord.Client):
         try:
             content = f'Here you go {author.mention} {random.choice(emoji)}.\n{str(post)}'
             if len(content) > 2000:
-                content = content[:1997] + '...'
+                if not post.spoiler:
+                    content = content[:1997] + '...'
+                else:
+                    content = content[:1995] + '||...'
 
             return await channel.send(
                 content=content,
