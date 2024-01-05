@@ -16,12 +16,13 @@ class FacebookClient(base.BaseClient):
 
         fb_post = next(facebook_scraper.get_posts(post_urls=[self.url], **kwargs))
 
+        ts = fb_post.get('time')
         post = models.Post(
             url=self.url,
             author=fb_post.get('username'),
             description=fb_post.get('text'),
             likes=fb_post.get('likes'),
-            created=fb_post.get('time').astimezone() if 'time' in fb_post else None,
+            created=ts.astimezone() if ts else None,
         )
 
         if fb_post.get('video'):
