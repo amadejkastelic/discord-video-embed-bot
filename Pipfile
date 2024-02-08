@@ -5,21 +5,21 @@ name = "pypi"
 
 [packages]
 tiktokapipy = "==0.2.3"
-playwright = "==1.39.0"
+playwright = "==1.41.2"
 "discord.py" = "==2.3.2"
-instaloader = "==4.10.1"
+instaloader = "==4.10.3"
 facebook-scraper = "==0.2.59"
 python-magic = "0.4.27"
-redvid = "==2.0.2"
+redvid = "==2.0.3"
 ffmpeg-python = "==0.2.0"
-opencv-python = "==4.8.0.74"
+opencv-python = "==4.9.0.80"
 asyncpraw = "==7.7.1"
-twscrape = "==0.9.0"
+twscrape = "==0.10.1"
 pytube = "==15.0.0"
 
 [dev-packages]
-black = "==23.7.0"
-flake8 = "==6.1.0"
+black = "==24.1.1"
+flake8 = "==7.0.0"
 flake8-import-order = "==0.18.2 "
 
 [requires]

@@ -20,9 +20,10 @@ def guess_extension_from_buffer(buffer: io.BytesIO) -> str:
 
 
 async def resize(buffer: io.BytesIO, extension: str = 'mp4') -> io.BytesIO:
-    with tempfile.NamedTemporaryFile(suffix=extension) as input_tmp, tempfile.NamedTemporaryFile(
-        suffix=extension
-    ) as output_tmp:
+    with (
+        tempfile.NamedTemporaryFile(suffix=extension) as input_tmp,
+        tempfile.NamedTemporaryFile(suffix=extension) as output_tmp,
+    ):
         # with open('/tmp/temp', 'w+b') as tmp:
         input_tmp.write(buffer.read())
 
