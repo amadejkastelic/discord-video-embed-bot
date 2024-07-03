@@ -22,9 +22,9 @@ WORKDIR /app
 COPY Pipfile ./
 COPY Pipfile.lock ./
 COPY *.py ./
-COPY downloader/* ./downloader/
-COPY models/* ./models/
-COPY bots/* ./bots/
+COPY downloader/ ./downloader/
+COPY models/ ./models/
+COPY bots/ ./bots/
 
 RUN pipenv install && pipenv run playwright install chromium && pipenv run playwright install-deps
 
