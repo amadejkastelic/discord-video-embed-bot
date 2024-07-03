@@ -20,7 +20,13 @@ class CustomView(ui.View):
         interaction: discord.Interaction,
         button: ui.Button,
     ) -> None:
-        await interaction.message.delete()
+        if interaction.user.mentioned_in(interaction.message):
+            await interaction.message.delete()
+            logging.info(f'User {interaction.user.id} performed a delete action')
+        else:
+            logging.warning(
+                f'User {interaction.user.id} tried to perform an illegal delete action on {interaction.message.id}'
+            )
 
 
 class DiscordClient(discord.Client):
