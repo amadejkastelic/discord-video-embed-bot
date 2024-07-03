@@ -1,9 +1,14 @@
 import io
 
 import pytube
+from pytube.innertube import _default_clients
 
 import models
 from downloader import base
+
+
+# Age restriction bypass - https://stackoverflow.com/a/78267693/10428848
+_default_clients["ANDROID_MUSIC"] = _default_clients["ANDROID_CREATOR"]
 
 
 class YoutubeClient(base.BaseClient):
