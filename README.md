@@ -17,7 +17,7 @@ A Discord bot that automatically embeds media and metadata of messages containin
 ```bash
 docker pull ghcr.io/amadejkastelic/discord-video-embed-bot:<latest|tag>
 ```
-- Run it with your discord api key: `docker run -e DISCORD_API_KEY=<api_key> video-embed-bot`
+- Run it with your discord api key: `docker run -e DISCORD_API_TOKEN=<api_token> video-embed-bot`
 
 ### Facebook
 Facebook requires you to provide cookies. Download them in your browser using [an extension](https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc) while you're logged in and mount them to the container).

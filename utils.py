@@ -1,11 +1,14 @@
 import asyncio
 import io
 import mimetypes
+import random
 import re
 import tempfile
 import typing
 
 import magic
+
+emoji = ['😼', '😺', '😸', '😹', '😻', '🙀', '😿', '😾', '😩', '🙈', '🙉', '🙊', '😳']
 
 
 def find_first_url(string: str) -> typing.Optional[str]:
@@ -46,3 +49,7 @@ async def resize(buffer: io.BytesIO, extension: str = 'mp4') -> io.BytesIO:
         await ffmpeg_proc.communicate()
 
         return io.BytesIO(output_tmp.read())
+
+
+def random_emoji() -> str:
+    return random.choice(emoji)

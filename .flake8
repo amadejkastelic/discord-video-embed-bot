@@ -6,4 +6,4 @@ inline-quotes = single
 multiline-quotes = single
 docstring-quotes = double
 ban-relative-imports = true
-application-import-names = downloader,models,utils
+application-import-names = downloader,models,utils,bots

@@ -1,4 +1,4 @@
-FROM python:3.11-slim-bookworm
+FROM python:3.12-slim-bookworm
 
 ENV PYTHONFAULTHANDLER=1 \
     PYTHONUNBUFFERED=1
@@ -24,6 +24,7 @@ COPY Pipfile.lock ./
 COPY *.py ./
 COPY downloader/* ./downloader/
 COPY models/* ./models/
+COPY bots/* ./bots/
 
 RUN pipenv install && pipenv run playwright install chromium && pipenv run playwright install-deps
 
