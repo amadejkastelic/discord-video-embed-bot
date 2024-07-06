@@ -8,9 +8,9 @@ import discord
 from discord import app_commands
 from discord import ui
 
-import domain
-from common import utils
-from downloader import registry
+from bot import domain
+from bot.common import utils
+from bot.downloader import registry
 
 
 class CustomView(ui.View):
@@ -18,7 +18,7 @@ class CustomView(ui.View):
     async def on_click(
         self,
         interaction: discord.Interaction,
-        button: ui.Button,
+        _: ui.Button,
     ) -> None:
         if interaction.user.mentioned_in(interaction.message):
             await interaction.message.delete()
@@ -63,7 +63,7 @@ class DiscordClient(discord.Client):
         new_message = (await asyncio.gather(message.delete(), message.channel.send('🔥 Working on it 🥵')))[1]
 
         try:
-            post = await client.get_post()
+            post = await client.get_post(url=url)
         except Exception as e:
             logging.error(f'Failed downloading {url}: {str(e)}')
             await asyncio.gather(
@@ -104,7 +104,7 @@ class DiscordClient(discord.Client):
             return
 
         try:
-            post = await client.get_post()
+            post = await client.get_post(url=url)
             if not post.spoiler:
                 post.spoiler = spoiler
         except Exception as e:

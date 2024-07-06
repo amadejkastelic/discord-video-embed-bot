@@ -8,22 +8,37 @@ import urllib
 
 import ffmpeg
 import requests
+from django.conf import settings
 from tiktokapipy.async_api import AsyncTikTokAPI
 from tiktokapipy.models import user
 from tiktokapipy.models import video
 
-import domain
-from downloader import base
-
+from bot import domain
+from bot.downloader import base
+from bot.downloader.tiktok import config
 
 HEADERS = {'referer': 'https://www.tiktok.com/'}
 
 
-class TiktokClient(base.BaseClient):
+class TiktokClientSingleton(base.BaseClientSingleton):
     DOMAINS = ['tiktok.com']
+    _CONFIG_SCHEMA = config.TiktokConfigSchema
 
-    async def get_post(self) -> domain.Post:
-        clean_url = self._clean_url(self.url)
+    @classmethod
+    def _create_instance(cls) -> None:
+        conf: config.TiktokConfig = cls._load_config(conf=settings.INTEGRATION_CONFIGURATION.get('tiktok', {}))
+
+        if not conf.enabled:
+            logging.info('Tiktok integration not enabled')
+            cls._INSTANCE = base.MISSING
+            return
+
+        cls._INSTANCE = TiktokClient()
+
+
+class TiktokClient(base.BaseClient):
+    async def get_post(self, url: str) -> domain.Post:
+        clean_url = self._clean_url(url)
 
         logging.debug(f'Trying to download tiktok video {clean_url}...')
 
@@ -42,7 +57,7 @@ class TiktokClient(base.BaseClient):
                     headers=HEADERS,
                 )
             return domain.Post(
-                url=self.url,
+                url=url,
                 author=video.author.unique_id if isinstance(video.author, user.LightUser) else video.author,
                 description=video.desc,
                 views=video.stats.play_count,
@@ -121,7 +136,8 @@ class TiktokClient(base.BaseClient):
 
         return ret
 
-    def _clean_url(self, url: str) -> str:
+    @staticmethod
+    def _clean_url(url: str) -> str:
         clean_url = url
         if url.startswith('https://vm.') or url.startswith('https://www.tiktok.com/t/'):
             response = requests.get(

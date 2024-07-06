@@ -22,11 +22,11 @@ WORKDIR /app
 COPY Pipfile ./
 COPY Pipfile.lock ./
 COPY *.py ./
-COPY downloader/ ./downloader/
-COPY models/ ./models/
-COPY bots/ ./bots/
+COPY bot/ ./bot/
+COPY conf/ ./conf/
+COPY examples/settings_prod.py ./settings.py
 
 RUN pipenv install && pipenv run playwright install chromium && pipenv run playwright install-deps
 
 # Set this
-ENTRYPOINT ["pipenv", "run", "python", "main.py"]
+ENTRYPOINT ["pipenv", "run", "python", "manage.py", "discord_bot"]
