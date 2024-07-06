@@ -17,6 +17,9 @@ asyncpraw = "==7.7.1"
 twscrape = "==0.13"
 pytube2 = "==15.0.6"
 lxml-html-clean = "==0.1.1"
+Django = "==5.0.6"
+"psycopg[binary]" = "==3.2.1"
+pymemcache = "==4.0.0"
 
 [dev-packages]
 black = "==24.4.2"

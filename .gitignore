@@ -4,3 +4,5 @@ cookies.txt
 instagram.sess
 .env
 accounts.db
+settings.py
+docker/db/data

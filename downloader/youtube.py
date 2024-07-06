@@ -3,7 +3,7 @@ import io
 import pytube
 from pytube.innertube import _default_clients
 
-import models
+import domain
 from downloader import base
 
 
@@ -14,10 +14,10 @@ _default_clients["ANDROID_MUSIC"] = _default_clients["ANDROID_CREATOR"]
 class YoutubeClient(base.BaseClient):
     DOMAINS = ['youtube.com/shorts']
 
-    async def get_post(self) -> models.Post:
+    async def get_post(self) -> domain.Post:
         vid = pytube.YouTube(self.url)
 
-        post = models.Post(
+        post = domain.Post(
             url=self.url,
             author=vid.author,
             description=vid.title,

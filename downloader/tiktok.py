@@ -12,17 +12,17 @@ from tiktokapipy.async_api import AsyncTikTokAPI
 from tiktokapipy.models import user
 from tiktokapipy.models import video
 
-import models
+import domain
 from downloader import base
 
 
-headers = {'referer': 'https://www.tiktok.com/'}
+HEADERS = {'referer': 'https://www.tiktok.com/'}
 
 
 class TiktokClient(base.BaseClient):
     DOMAINS = ['tiktok.com']
 
-    async def get_post(self) -> models.Post:
+    async def get_post(self) -> domain.Post:
         clean_url = self._clean_url(self.url)
 
         logging.debug(f'Trying to download tiktok video {clean_url}...')
@@ -39,9 +39,9 @@ class TiktokClient(base.BaseClient):
                 buffer = await self._download(
                     url=video.video.download_addr,
                     cookies=cookies,
-                    headers=headers,
+                    headers=HEADERS,
                 )
-            return models.Post(
+            return domain.Post(
                 url=self.url,
                 author=video.author.unique_id if isinstance(video.author, user.LightUser) else video.author,
                 description=video.desc,
@@ -63,7 +63,7 @@ class TiktokClient(base.BaseClient):
             url = image_data.image_url.url_list[-1]
             urllib.request.urlretrieve(url, os.path.join(directory, f'temp_{video.id}_{i:02}.jpg'))
 
-        read = requests.get(video.music.play_url, cookies=cookies, headers=headers)
+        read = requests.get(video.music.play_url, cookies=cookies, headers=HEADERS)
         with open(os.path.join(directory, f'temp_{video.id}.mp3'), 'wb') as w:
             for chunk in read.iter_content(chunk_size=512):
                 if chunk:

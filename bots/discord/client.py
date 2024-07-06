@@ -8,8 +8,8 @@ import discord
 from discord import app_commands
 from discord import ui
 
-import models
-import utils
+import domain
+from common import utils
 from downloader import registry
 
 
@@ -120,7 +120,7 @@ class DiscordClient(discord.Client):
 
     async def _send_post(
         self,
-        post: models.Post,
+        post: domain.Post,
         send_func: typing.Callable,
         author: discord.User,
     ) -> discord.Message:

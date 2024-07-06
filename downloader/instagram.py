@@ -7,7 +7,7 @@ from urllib.parse import parse_qs, urlparse
 import instaloader
 import requests
 
-import models
+import domain
 from downloader import base
 
 
@@ -54,7 +54,7 @@ class InstagramClient(base.BaseClient):
         self.index = int(parse_qs(parsed_url.query).get('img_index', ['1'])[0]) - 1
         self._link_type = LinkType.from_url(url=url)
 
-    async def get_post(self) -> models.Post:
+    async def get_post(self) -> domain.Post:
         match self._link_type:
             case LinkType.STORY:
                 return self._get_story()
@@ -65,7 +65,7 @@ class InstagramClient(base.BaseClient):
 
         raise NotImplementedError(f'Not yet implemented for {self.url}')
 
-    def _get_post(self) -> models.Post:
+    def _get_post(self) -> domain.Post:
         p = instaloader.Post.from_shortcode(context=self.client.context, shortcode=self.id)
 
         match p.typename:
@@ -81,7 +81,7 @@ class InstagramClient(base.BaseClient):
                     download_url = node.display_url
 
         with requests.get(url=download_url) as resp:
-            return models.Post(
+            return domain.Post(
                 url=self.url,
                 author=p.owner_profile.username,
                 description=p.title or p.caption,
@@ -91,7 +91,7 @@ class InstagramClient(base.BaseClient):
                 created=p.date_local,
             )
 
-    def _get_story(self) -> models.Post:
+    def _get_story(self) -> domain.Post:
         story = instaloader.StoryItem.from_mediaid(context=self.client.context, mediaid=int(self.id))
         if story.is_video:
             url = story.video_url or story.url
@@ -99,7 +99,7 @@ class InstagramClient(base.BaseClient):
             url = story.url or story.video_url
 
         with requests.get(url=url) as resp:
-            return models.Post(
+            return domain.Post(
                 url=self.url,
                 author=story.owner_profile.username,
                 description=story.caption,
@@ -107,11 +107,11 @@ class InstagramClient(base.BaseClient):
                 created=story.date_local,
             )
 
-    def _get_profile(self) -> models.Post:
+    def _get_profile(self) -> domain.Post:
         profile = instaloader.Profile.from_username(context=self.client.context, username=self.id)
 
         with requests.get(url=profile.profile_pic_url) as resp:
-            return models.Post(
+            return domain.Post(
                 url=self.url,
                 author=profile.username,
                 description=profile.biography,

@@ -3,7 +3,7 @@ import typing
 
 import aiohttp
 
-import models
+import domain
 
 
 class BaseClient(object):
@@ -13,7 +13,7 @@ class BaseClient(object):
     def __init__(self, url: str):
         self.url = url
 
-    async def get_post(self) -> models.Post:
+    async def get_post(self) -> domain.Post:
         raise NotImplementedError()
 
     async def _download(self, url: str, cookies: typing.Optional[typing.Dict[str, str]] = None, **kwargs) -> io.BytesIO:

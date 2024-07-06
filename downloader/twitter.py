@@ -6,7 +6,7 @@ import typing
 
 import twscrape
 
-import models
+import domain
 from downloader import base
 
 scrape_url = 'https://cdn.syndication.twimg.com/tweet-result'
@@ -62,17 +62,17 @@ class TwitterClient(base.BaseClient):
         self.id = metadata[0]
         self.index = int(metadata[2]) - 1 if len(metadata) == 3 and metadata[1] == 'photo' else 0
 
-    async def get_post(self) -> models.Post:
+    async def get_post(self) -> domain.Post:
         client = await TwitterClientSingleton.get_instance()
         if not client:
             return await self._get_post_no_login()
 
         return await self._get_post_login(client=client)
 
-    async def _get_post_login(self, client: twscrape.API, retry_count=0) -> models.Post:
+    async def _get_post_login(self, client: twscrape.API, retry_count=0) -> domain.Post:
         try:
             details = await client.tweet_details(int(self.id))
-            p = models.Post(
+            p = domain.Post(
                 url=self.url,
                 author=f'{details.user.displayname} ({details.user.username})',
                 description=details.rawContent,
@@ -105,14 +105,14 @@ class TwitterClient(base.BaseClient):
             else:
                 raise Exception('Failed fetching from twitter')
 
-    async def _get_post_no_login(self) -> models.Post:
+    async def _get_post_no_login(self) -> domain.Post:
         tweet = json.loads(
             await self._fetch_content(url=scrape_url, data='', headers=headers, params={'id': self.id, 'lang': 'en'})
         )
         if not tweet:
             raise ValueError(f'Failed retreiving tweet {self.url}')
 
-        post = models.Post(
+        post = domain.Post(
             url=self.url,
             author=tweet.get('user', {}).get('name'),
             description=tweet.get('text'),

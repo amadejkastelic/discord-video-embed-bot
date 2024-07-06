@@ -8,7 +8,7 @@ import redvid
 import requests
 from asyncpraw import exceptions as praw_exceptions
 
-import models
+import domain
 from downloader import base
 
 
@@ -40,8 +40,8 @@ class RedditClient(base.BaseClient):
         super(RedditClient, self).__init__(url=url)
         self.client = RedditClientSingleton.get_instance()
 
-    async def get_post(self) -> models.Post:
-        post = models.Post(url=self.url)
+    async def get_post(self) -> domain.Post:
+        post = domain.Post(url=self.url)
 
         did_hydrate = await self._hydrate_post(post)
         if not did_hydrate:
@@ -49,7 +49,7 @@ class RedditClient(base.BaseClient):
 
         return post
 
-    async def _hydrate_post(self, post: models.Post) -> bool:
+    async def _hydrate_post(self, post: domain.Post) -> bool:
         if not self.client:
             return False
 
