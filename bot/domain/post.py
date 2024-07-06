@@ -3,6 +3,14 @@ import io
 import typing
 from dataclasses import dataclass
 
+DEFAULT_FORMAT = """🔗 URL: {url}\n
+🧑🏻‍🎨 Author: {author}\n
+📅 Created: {created}\n
+👀 Views: {views}\n
+👍🏻 Likes: {likes}\n
+📕 Description: {description}\n
+"""
+
 
 @dataclass
 class Post:
@@ -16,16 +24,12 @@ class Post:
     created: typing.Optional[datetime.datetime] = None
 
     def __str__(self) -> str:
+        return self.to_str_with_format(DEFAULT_FORMAT)
+
+    def to_str_with_format(self, f: str) -> str:
         description = self.description or '❌'
 
-        return (
-            '🔗 URL: {url}\n'
-            '🧑🏻‍🎨 Author: {author}\n'
-            '📅 Created: {created}\n'
-            '👀 Views: {views}\n'
-            '👍🏻 Likes: {likes}\n'
-            '📕 Description: {description}\n'
-        ).format(
+        f.format(
             url=self.url,
             author=self.author or '❌',
             created=self._date_human_format(date=self.created) if self.created else '❌',
