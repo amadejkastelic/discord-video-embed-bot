@@ -25,7 +25,7 @@ class BaseBotConfigSchema(marshmallow.Schema):
 
 
 class BaseBot(object):
-    VENDOR: constants.BotVendor
+    VENDOR: constants.ServerVendor
     _CONFIG_SCHEMA: BaseBotConfigSchema = BaseBotConfigSchema
 
     def _load_config(self, conf: typing.Dict) -> BaseBotConfig:

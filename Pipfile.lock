@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "f8fca6d4d6a37b923802bb5687ea7950d5db6c9767bcbd08dde8e68d339bb54f"
+            "sha256": "53860673d3d491e97ee3ca9e528b5b359e1b41228a564b25127a115ebf5f5491"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -322,6 +322,14 @@
             ],
             "version": "==3.0.6"
         },
+        "discord-oauth2.py": {
+            "hashes": [
+                "sha256:3703fdbcec5a526a8160e8f39eee79163eea29a7aab2c92df8c2146daf542a35",
+                "sha256:5d89fe690e9c9d81e127be4492239f7e38a2e8139afd69a31e84afdccd30f9b3"
+            ],
+            "markers": "python_version >= '3.8'",
+            "version": "==1.2.1"
+        },
         "discord.py": {
             "hashes": [
                 "sha256:b8af6711c70f7e62160bfbecb55be699b5cb69d007426759ab8ab06b1bd77d1d",
@@ -338,6 +346,15 @@
             "index": "pypi",
             "markers": "python_version >= '3.10'",
             "version": "==5.0.6"
+        },
+        "djangorestframework": {
+            "hashes": [
+                "sha256:2b8871b062ba1aefc2de01f773875441a961fefbf79f5eed1e32b2f096944b20",
+                "sha256:36fe88cd2d6c6bec23dca9804bab2ba5517a8bb9d8f47ebc68981b56840107ad"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.8'",
+            "version": "==3.15.2"
         },
         "facebook-scraper": {
             "hashes": [

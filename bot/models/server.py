@@ -43,7 +43,6 @@ class Server(models.Model):
         null=False,
     )
     prefix = models.CharField(max_length=1, null=True)
-    post_format = models.TextField()
 
     created = models.DateTimeField(auto_now_add=True, null=False)
     updated = models.DateTimeField(auto_now=True, null=True)
@@ -55,6 +54,36 @@ class Server(models.Model):
         ]
         constraints = [
             models.UniqueConstraint(name='vendor_unique_idx', fields=['vendor', 'vendor_uid']),
+        ]
+
+
+class ServerIntegrationPostFormat(models.Model):
+    uid = models.UUIDField(
+        db_index=True,
+        editable=False,
+        default=uuid.uuid4,
+        null=False,
+    )
+
+    integration = model_fields.StringEnumField(
+        enum=constants.Integration,
+        null=False,
+        editable=False,
+    )
+    post_format = models.TextField()
+
+    created = models.DateTimeField(auto_now_add=True, null=False)
+    updated = models.DateTimeField(auto_now=True, null=True)
+
+    server = models.ForeignKey(Server, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'server_integration_post_format'
+        constraints = [
+            models.UniqueConstraint(
+                name='server_integration_unique_idx',
+                fields=['server', 'integration'],
+            ),
         ]
 
 
