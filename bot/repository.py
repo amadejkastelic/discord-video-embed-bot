@@ -4,6 +4,7 @@ import typing
 
 from django.db import transaction
 
+from bot import cache
 from bot import constants
 from bot import domain
 from bot import models
@@ -45,7 +46,7 @@ def create_server(
             ]
         )
 
-    return domain.Server(
+    server = domain.Server(
         uid=server.uid,
         vendor_uid=server.vendor_uid,
         vendor=server.vendor,
@@ -63,33 +64,26 @@ def create_server(
         },
         _internal_id=server.pk,
     )
+    cache.set(key=cache.CacheKey.SERVER, value=server)
 
-
-def update_server(
-    uid: str,
-    status: constants.ServerStatus = constants.ServerStatus.ACTIVE,
-    tier: constants.ServerTier = constants.ServerTier.FREE,
-    tier_valid_until: typing.Optional[datetime.datetime] = None,
-    prefix: typing.Optional[str] = None,
-    post_format: typing.Optional[str] = None,
-) -> None:
-    models.Server.objects.filter(uid=uid).update(
-        status=status,
-        tier=tier,
-        tier_valid_until=tier_valid_until,
-        prefix=prefix,
-        post_format=post_format,
-    )
+    return server
 
 
 def get_number_of_posts_in_server_from_datetime(
     server_id: int,
     from_datetime: datetime.datetime,
 ) -> int:
-    return models.ServerPost.objects.filter(
+    post_cnt = cache.get(cache.CacheKey.SERVER_POST_COUNT)
+    if post_cnt is not cache.NO_HIT:
+        return post_cnt
+
+    post_cnt = models.ServerPost.objects.filter(
         server_id=server_id,
         created__gt=from_datetime,
     ).count()
+    cache.set(key=cache.CacheKey.SERVER_POST_COUNT, value=post_cnt, override_timeout=60)
+
+    return post_cnt
 
 
 def get_server(
@@ -97,6 +91,10 @@ def get_server(
     vendor_uid: str,
     status: constants.ServerStatus = constants.ServerStatus.ACTIVE,
 ) -> typing.Optional[domain.Server]:
+    server = cache.get(key=cache.CacheKey.SERVER)
+    if server is not cache.NO_HIT:
+        return server
+
     server = (
         models.Server.objects.filter(
             vendor=vendor,
@@ -110,7 +108,7 @@ def get_server(
     if not server:
         return None
 
-    return domain.Server(
+    server = domain.Server(
         uid=server.uid,
         vendor_uid=server.vendor_uid,
         vendor=server.vendor,
@@ -129,6 +127,9 @@ def get_server(
         },
         _internal_id=server.pk,
     )
+    cache.set(key=cache.CacheKey.SERVER, value=server)
+
+    return server
 
 
 def get_post(
@@ -202,6 +203,7 @@ def save_server_post(
             server=server,
             post_id=post._internal_id,
         )
+        cache.increment(cache.CacheKey.SERVER_POST_COUNT)
         return
 
     with transaction.atomic():
@@ -217,3 +219,4 @@ def save_server_post(
             server=server,
             post=post_model,
         )
+        cache.increment(cache.CacheKey.SERVER_POST_COUNT)
