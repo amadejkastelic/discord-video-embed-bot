@@ -3,11 +3,11 @@ import io
 import typing
 from dataclasses import dataclass
 
-DEFAULT_FORMAT = """🔗 URL: {url}\n
-🧑🏻‍🎨 Author: {author}\n
-📅 Created: {created}\n
-👀 Views: {views}\n
-👍🏻 Likes: {likes}\n
+DEFAULT_FORMAT = """🔗 URL: {url}
+🧑🏻‍🎨 Author: {author}
+📅 Created: {created}
+👀 Views: {views}
+👍🏻 Likes: {likes}
 📕 Description: {description}\n
 """
 
