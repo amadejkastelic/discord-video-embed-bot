@@ -25,12 +25,6 @@ class Server(models.Model):
         null=False,
     )
 
-    admin_id = models.CharField(
-        max_length=32,
-        null=False,
-        db_index=True,
-        editable=False,
-    )
     tier = model_fields.IntEnumField(
         enum=constants.ServerTier,
         default=constants.ServerTier.FREE,
@@ -47,6 +41,13 @@ class Server(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=False)
     updated = models.DateTimeField(auto_now=True, null=True)
 
+    owner = models.ForeignKey(
+        'User',
+        on_delete=models.SET_NULL,
+        null=True,
+        default=None,
+    )
+
     class Meta:
         db_table = 'server'
         indexes = [
@@ -59,7 +60,7 @@ class Server(models.Model):
 
 class ServerIntegrationPostFormat(models.Model):
     uid = models.UUIDField(
-        db_index=True,
+        unique=True,
         editable=False,
         default=uuid.uuid4,
         null=False,
@@ -75,7 +76,12 @@ class ServerIntegrationPostFormat(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=False)
     updated = models.DateTimeField(auto_now=True, null=True)
 
-    server = models.ForeignKey(Server, on_delete=models.CASCADE)
+    server = models.ForeignKey(
+        Server,
+        on_delete=models.SET_NULL,
+        null=True,
+        default=None,
+    )
 
     class Meta:
         db_table = 'server_integration_post_format'
@@ -87,20 +93,65 @@ class ServerIntegrationPostFormat(models.Model):
         ]
 
 
-class ServerPost(models.Model):
+class Post(models.Model):
     integration = model_fields.StringEnumField(
         enum=constants.Integration,
         null=False,
         editable=False,
     )
-    integration_id = models.CharField(
+    integration_uid = models.CharField(
         max_length=64,
         null=False,
         editable=False,
     )
     integration_index = models.PositiveSmallIntegerField(null=True)
 
-    author_id = models.CharField(
+    author = models.CharField(
+        max_length=128,
+        null=True,
+        default=None,
+    )
+    description = models.CharField(
+        max_length=2000,
+        null=True,
+        default=None,
+    )
+    views = models.BigIntegerField(
+        null=True,
+        default=None,
+    )
+    likes = models.BigIntegerField(
+        null=True,
+        default=None,
+    )
+    spoiler = models.BooleanField(
+        null=False,
+        default=False,
+    )
+    posted_at = models.DateTimeField(
+        null=True,
+        default=None,
+    )
+    blob = models.BinaryField(
+        max_length=1048576,
+        null=True,
+        default=None,
+    )
+
+    created = models.DateTimeField(auto_now_add=True, null=False)
+
+    class Meta:
+        db_table = 'post'
+        constraints = [
+            models.UniqueConstraint(
+                name='post_integration_unique_idx',
+                fields=['integration', 'integration_uid', 'integration_index'],
+            ),
+        ]
+
+
+class ServerPost(models.Model):
+    author_uid = models.CharField(
         max_length=32,
         null=False,
         db_index=True,
@@ -111,22 +162,24 @@ class ServerPost(models.Model):
         null=False,
         editable=False,
     )
-    content = models.TextField()
-    blob = models.BinaryField(max_length=1048576)
 
     created = models.DateTimeField(auto_now_add=True, null=False)
 
-    server = models.ForeignKey(Server, on_delete=models.CASCADE)
+    server = models.ForeignKey(
+        Server,
+        on_delete=models.SET_NULL,
+        null=True,
+        default=None,
+    )
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.SET_NULL,
+        null=True,
+        default=None,
+    )
 
     class Meta:
         db_table = 'server_post'
         indexes = [
             models.Index(fields=['server', 'created']),
-        ]
-        constraints = [
-            models.UniqueConstraint(
-                name='integration_unique_idx',
-                fields=['integration', 'integration_id', 'integration_index', 'server'],
-            ),
-            models.UniqueConstraint(name='url_unique_idx', fields=['url', 'server']),
         ]

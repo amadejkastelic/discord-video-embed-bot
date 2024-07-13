@@ -6,12 +6,18 @@ import aiohttp
 import marshmallow
 from marshmallow import fields as marshmallow_fields
 
+from bot import constants
 from bot import domain
 
 MISSING = -1
 
 
 class BaseClient(object):
+    INTEGRATION: constants.Integration
+
+    async def get_integration_data(self, url: str) -> typing.Tuple[constants.Integration, str, typing.Optional[int]]:
+        raise NotImplementedError()
+
     async def get_post(self, url: str) -> domain.Post:
         raise NotImplementedError()
 

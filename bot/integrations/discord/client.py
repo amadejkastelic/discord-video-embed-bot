@@ -8,9 +8,17 @@ import discord
 from discord import app_commands
 from discord import ui
 
+from bot import constants
 from bot import domain
+from bot import repository
 from bot.common import utils
 from bot.downloader import registry
+
+"""
+This file needs to be refactored at some point.
+Logic needs to be split so we can easily add support for another server type
+without duplicating business logic. This is basically service layer code.
+"""
 
 
 class CustomView(ui.View):
@@ -46,7 +54,7 @@ class DiscordClient(discord.Client):
         await self.tree.sync()
         logging.info(f'Logged on as {self.user}')
 
-    async def on_message(self, message: discord.Message):
+    async def on_message(self, message: discord.Message):  # noqa: C901
         if message.author == self.user:
             return
 
@@ -60,17 +68,41 @@ class DiscordClient(discord.Client):
             logging.error(f'Failed to obtain a strategy for url {url}. Error: {str(e)}')
             return
 
+        if not client:
+            logging.warning(f'Integration for url {url} probably not enabled')
+            return
+
         new_message = (await asyncio.gather(message.delete(), message.channel.send('🔥 Working on it 🥵')))[1]
 
-        try:
-            post = await client.get_post(url=url)
-        except Exception as e:
-            logging.error(f'Failed downloading {url}: {str(e)}')
-            await asyncio.gather(
-                new_message.edit(content=f'Failed downloading {url}. {message.author.mention}'),
-                new_message.add_reaction('❌'),
-            )
-            raise e
+        integration, integration_uid, integration_index = await client.get_integration_data(url=url)
+        post = repository.get_post(
+            url=url,
+            integration=integration,
+            integration_uid=integration_uid,
+            integration_index=integration_index,
+        )
+        if not post:
+            try:
+                post = await client.get_post(url=url)
+            except Exception as e:
+                logging.error(f'Failed downloading {url}: {str(e)}')
+                await asyncio.gather(
+                    new_message.edit(content=f'Failed downloading {url}. {message.author.mention}'),
+                    new_message.add_reaction('❌'),
+                )
+                raise e
+        else:
+            logging.info('Post already in DB, not downloading again...')
+
+        repository.save_server_post(
+            server_vendor=constants.ServerVendor.DISCORD,
+            server_uid=str(message.guild.id),
+            author_uid=str(message.author.id),
+            post=post,
+            integration=integration,
+            integration_uid=integration_uid,
+            integration_index=integration_index,
+        )
 
         try:
             msg = await self._send_post(post=post, send_func=message.channel.send, author=message.author)

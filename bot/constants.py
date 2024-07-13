@@ -23,5 +23,6 @@ class Integration(enum.Enum):
     FACEBOOK = 'facebook'
     TIKTOK = 'tiktok'
     REDDIT = 'reddit'
+    TWITCH = 'twitch'
     TWITTER = 'twitter'
     YOUTUBE = 'youtube'

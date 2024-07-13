@@ -22,6 +22,7 @@ class Post:
     buffer: typing.Optional[io.BytesIO] = None
     spoiler: bool = False
     created: typing.Optional[datetime.datetime] = None
+    _internal_id: typing.Optional[int] = None
 
     def __str__(self) -> str:
         return self.to_str_with_format(DEFAULT_FORMAT)
@@ -37,6 +38,12 @@ class Post:
             views=self._number_human_format(num=self.views) if self.views else '❌',
             likes=self._number_human_format(num=self.likes) if self.likes else '❌',
         )
+
+    def read_buffer(self) -> bytes:
+        self.buffer.seek(0)
+        res = self.buffer.read()
+        self.buffer.seek(0)
+        return res
 
     def _number_human_format(self, num: int) -> str:
         num = float('{:.3g}'.format(num))

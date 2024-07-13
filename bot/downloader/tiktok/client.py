@@ -13,6 +13,7 @@ from tiktokapipy.async_api import AsyncTikTokAPI
 from tiktokapipy.models import user
 from tiktokapipy.models import video
 
+from bot import constants
 from bot import domain
 from bot.downloader import base
 from bot.downloader.tiktok import config
@@ -37,6 +38,12 @@ class TiktokClientSingleton(base.BaseClientSingleton):
 
 
 class TiktokClient(base.BaseClient):
+    INTEGRATION = constants.Integration.TIKTOK
+
+    async def get_integration_data(self, url: str) -> typing.Tuple[constants.Integration, str, typing.Optional[int]]:
+        clean_url = self._clean_url(url)
+        return self.INTEGRATION, clean_url.split('?')[0].split('/')[-1], None
+
     async def get_post(self, url: str) -> domain.Post:
         clean_url = self._clean_url(url)
 

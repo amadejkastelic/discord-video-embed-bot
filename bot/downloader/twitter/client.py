@@ -6,6 +6,7 @@ import typing
 import twscrape
 from django.conf import settings
 
+from bot import constants
 from bot import domain
 from bot.downloader import base
 from bot.downloader.twitter import config
@@ -49,6 +50,8 @@ class TwitterClientSingleton(base.BaseClientSingleton):
 
 
 class TwitterClient(base.BaseClient):
+    INTEGRATION = constants.Integration.TWITTER
+
     def __init__(
         self,
         username: typing.Optional[str],
@@ -70,6 +73,10 @@ class TwitterClient(base.BaseClient):
     def _parse_url(url: str) -> typing.Tuple[str, int]:
         metadata = url.split('/status/')[-1].split('?')[0].split('/')
         return metadata[0], int(metadata[2]) - 1 if len(metadata) == 3 and metadata[1] == 'photo' else 0
+
+    async def get_integration_data(self, url: str) -> typing.Tuple[constants.Integration, str, typing.Optional[int]]:
+        uid, index = self._parse_url(url)
+        return self.INTEGRATION, uid, index
 
     async def relogin(self) -> None:
         if self.client:

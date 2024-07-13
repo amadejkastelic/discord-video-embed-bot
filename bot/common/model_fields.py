@@ -11,7 +11,7 @@ class StringEnumField(models.CharField):
         kwargs['choices'] = [(e.value, e.name) for e in enum]
         super().__init__(*args, **kwargs)
 
-    def from_db_value(self, value: str, **kwargs: typing.Any) -> typing.Any:
+    def from_db_value(self, value: str, *args: typing.Any, **kwargs: typing.Any) -> typing.Any:
         return self.enum(value) if value is not None else None
 
     def to_python(self, value: str) -> typing.Any:
@@ -38,7 +38,7 @@ class IntEnumField(models.PositiveSmallIntegerField):
         kwargs['choices'] = [(e.value, e.name) for e in enum]
         super().__init__(*args, **kwargs)
 
-    def from_db_value(self, value: str, **kwargs: typing.Any) -> typing.Any:
+    def from_db_value(self, value: str, *args: typing.Any, **kwargs: typing.Any) -> typing.Any:
         return self.enum(value) if value is not None else None
 
     def to_python(self, value: int) -> typing.Any:

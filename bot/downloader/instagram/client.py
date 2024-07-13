@@ -8,6 +8,7 @@ import instaloader
 import requests
 from django.conf import settings
 
+from bot import constants as bot_constants
 from bot import domain
 from bot.downloader import base
 from bot.downloader.instagram import config
@@ -35,6 +36,8 @@ class InstagramClientSingleton(base.BaseClientSingleton):
 
 
 class InstagramClient(base.BaseClient):
+    INTEGRATION = bot_constants.Integration.INSTAGRAM
+
     def __init__(
         self,
         username: typing.Optional[str],
@@ -47,14 +50,12 @@ class InstagramClient(base.BaseClient):
         if username and os.path.exists(session_file_path):
             self.client.load_session_from_file(username=username, filename=session_file_path)
 
-    @staticmethod
-    def _parse_url(url: str) -> typing.Tuple[str, int, constants.LinkType]:
-        parsed_url = urlparse(url)
-        uid = parsed_url.path.strip('/').split('/')[-1]
-        index = int(parse_qs(parsed_url.query).get('img_index', ['1'])[0]) - 1
-        link_type = constants.LinkType.from_url(url=url)
-
-        return uid, index, link_type
+    async def get_integration_data(
+        self,
+        url: str,
+    ) -> typing.Tuple[bot_constants.Integration, str, typing.Optional[int]]:
+        uid, index, _ = self._parse_url(url)
+        return self.INTEGRATION, uid, index
 
     async def get_post(self, url: str) -> domain.Post:
         uid, index, link_type = self._parse_url(url)
@@ -69,7 +70,16 @@ class InstagramClient(base.BaseClient):
 
         raise NotImplementedError(f'Not yet implemented for {url}')
 
-    def _get_post(self, url: str, uid: str, index: int) -> domain.Post:
+    @staticmethod
+    def _parse_url(url: str) -> typing.Tuple[str, int, constants.LinkType]:
+        parsed_url = urlparse(url)
+        uid = parsed_url.path.strip('/').split('/')[-1]
+        index = int(parse_qs(parsed_url.query).get('img_index', ['1'])[0]) - 1
+        link_type = constants.LinkType.from_url(url=url)
+
+        return uid, index, link_type
+
+    def _get_post(self, url: str, uid: str, index: int = 0) -> domain.Post:
         p = instaloader.Post.from_shortcode(context=self.client.context, shortcode=uid)
 
         match p.typename:

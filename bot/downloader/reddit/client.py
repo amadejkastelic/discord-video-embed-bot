@@ -2,6 +2,7 @@ import datetime
 import io
 import logging
 import os
+import typing
 
 import asyncpraw
 import redvid
@@ -9,6 +10,7 @@ import requests
 from asyncpraw import exceptions as praw_exceptions
 from django.conf import settings
 
+from bot import constants
 from bot import domain
 from bot.downloader import base
 from bot.downloader.reddit import config
@@ -35,6 +37,8 @@ class RedditClientSingleton(base.BaseClientSingleton):
 
 
 class RedditClient(base.BaseClient):
+    INTEGRATION = constants.Integration.REDDIT
+
     def __init__(self, client_id: str, client_secret: str, user_agent: str):
         super(RedditClient, self).__init__()
         self.client = asyncpraw.Reddit(
@@ -42,6 +46,9 @@ class RedditClient(base.BaseClient):
             client_secret=client_secret,
             user_agent=user_agent,
         )
+
+    async def get_integration_data(self, url: str) -> typing.Tuple[constants.Integration, str, typing.Optional[int]]:
+        return self.INTEGRATION, url.split('?')[0].split('/')[-2], None
 
     async def get_post(self, url: str) -> domain.Post:
         post = domain.Post(url=url)

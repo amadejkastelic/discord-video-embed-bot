@@ -1,9 +1,11 @@
 import logging
 import os
+import typing
 
 import facebook_scraper
 from django.conf import settings
 
+from bot import constants
 from bot import domain
 from bot.downloader import base
 from bot.downloader.facebook import config
@@ -26,9 +28,14 @@ class FacebookClientSingleton(base.BaseClientSingleton):
 
 
 class FacebookClient(base.BaseClient):
+    INTEGRATION = constants.Integration.FACEBOOK
+
     def __init__(self, cookies_path: str):
         super().__init__()
         self.cookies_path = cookies_path
+
+    async def get_integration_data(self, url: str) -> typing.Tuple[constants.Integration, str, typing.Optional[int]]:
+        return self.INTEGRATION, url.split('?')[0].split('/')[-1], None
 
     async def get_post(self, url: str) -> domain.Post:
         kwargs = {}

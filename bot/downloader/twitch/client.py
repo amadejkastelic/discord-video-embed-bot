@@ -9,6 +9,7 @@ from twitchdl import twitch
 from twitchdl import utils as twitch_utils
 from twitchdl.commands import download as twitch_download
 
+from bot import constants
 from bot import domain
 from bot.downloader import base
 from bot.downloader.twitch import config
@@ -31,6 +32,11 @@ class TwitchClientSingleton(base.BaseClientSingleton):
 
 
 class TwitchClient(base.BaseClient):
+    INTEGRATION = constants.Integration.TWITCH
+
+    async def get_integration_data(self, url: str) -> typing.Tuple[constants.Integration, str, typing.Optional[int]]:
+        return self.INTEGRATION, twitch_utils.parse_clip_identifier(url), None
+
     async def get_post(self, url: str) -> domain.Post:
         uid = twitch_utils.parse_clip_identifier(url)
         if not uid:
@@ -53,6 +59,9 @@ class TwitchClient(base.BaseClient):
 
     @staticmethod
     def _find_quality(qualities: typing.List[twitch.VideoQuality], max_quality: int = 720) -> int:
+        """
+        Filters out qualities higher than max_quality and returns the highest one left.
+        """
         return int(
             sorted(
                 list(filter(lambda quality: int(quality['quality']) <= max_quality, qualities)),
