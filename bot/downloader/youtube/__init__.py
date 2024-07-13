@@ -8,6 +8,7 @@ from pytube.innertube import _default_clients
 _default_clients["ANDROID_MUSIC"] = _default_clients["ANDROID_CREATOR"]
 
 
+# https://github.com/pytube/pytube/issues/1954#issuecomment-2218287594
 def patched_get_throttling_function_name(js: str) -> str:
     function_patterns = [
         # https://github.com/ytdl-org/youtube-dl/issues/29326#issuecomment-865985377

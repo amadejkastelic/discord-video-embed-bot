@@ -10,9 +10,8 @@ from discord import ui
 
 from bot import constants
 from bot import domain
-from bot import repository
+from bot import service
 from bot.common import utils
-from bot.downloader import registry
 
 """
 This file needs to be refactored at some point.
@@ -62,47 +61,25 @@ class DiscordClient(discord.Client):
         if not url:
             return
 
-        try:
-            client = registry.get_instance(url=url)
-        except Exception as e:
-            logging.error(f'Failed to obtain a strategy for url {url}. Error: {str(e)}')
-            return
-
-        if not client:
-            logging.warning(f'Integration for url {url} probably not enabled')
+        if service.should_handle_url(url) is False:
             return
 
         new_message = (await asyncio.gather(message.delete(), message.channel.send('🔥 Working on it 🥵')))[1]
 
-        integration, integration_uid, integration_index = await client.get_integration_data(url=url)
-        post = repository.get_post(
-            url=url,
-            integration=integration,
-            integration_uid=integration_uid,
-            integration_index=integration_index,
-        )
-        if not post:
-            try:
-                post = await client.get_post(url=url)
-            except Exception as e:
-                logging.error(f'Failed downloading {url}: {str(e)}')
-                await asyncio.gather(
-                    new_message.edit(content=f'Failed downloading {url}. {message.author.mention}'),
-                    new_message.add_reaction('❌'),
-                )
-                raise e
-        else:
-            logging.info('Post already in DB, not downloading again...')
-
-        repository.save_server_post(
-            server_vendor=constants.ServerVendor.DISCORD,
-            server_uid=str(message.guild.id),
-            author_uid=str(message.author.id),
-            post=post,
-            integration=integration,
-            integration_uid=integration_uid,
-            integration_index=integration_index,
-        )
+        try:
+            post = await service.get_post(
+                url=url,
+                server_vendor=constants.ServerVendor.DISCORD,
+                server_uid=str(message.guild.id),
+                author_uid=str(message.author.id),
+            )
+        except Exception as e:
+            logging.error(f'Failed downloading {url}: {str(e)}')
+            await asyncio.gather(
+                new_message.edit(content=f'Failed downloading {url}. Error: {str(e)}. {message.author.mention}'),
+                new_message.add_reaction('❌'),
+            )
+            raise e
 
         try:
             msg = await self._send_post(post=post, send_func=message.channel.send, author=message.author)
@@ -129,14 +106,16 @@ class DiscordClient(discord.Client):
     async def command_embed(self, interaction: discord.Interaction, url: str, spoiler: bool = False) -> None:
         await interaction.response.defer()
 
-        try:
-            client = registry.get_instance(url=url)
-        except Exception as e:
-            logging.error(f'Failed to obtain a strategy for url {url}. Error: {str(e)}')
+        if service.should_handle_url(url) is False:
             return
 
         try:
-            post = await client.get_post(url=url)
+            post = service.get_post(
+                url=url,
+                server_vendor=constants.ServerVendor.DISCORD,
+                server_uid=str(interaction.guild.id),
+                author_uid=str(interaction.user.id),
+            )
             if not post.spoiler:
                 post.spoiler = spoiler
         except Exception as e:

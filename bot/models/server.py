@@ -58,7 +58,7 @@ class Server(models.Model):
         ]
 
 
-class ServerIntegrationPostFormat(models.Model):
+class ServerIntegration(models.Model):
     uid = models.UUIDField(
         unique=True,
         editable=False,
@@ -71,20 +71,22 @@ class ServerIntegrationPostFormat(models.Model):
         null=False,
         editable=False,
     )
-    post_format = models.TextField()
+    post_format = models.TextField(null=True, default=None)
+    enabled = models.BooleanField(null=False, default=False)
 
     created = models.DateTimeField(auto_now_add=True, null=False)
     updated = models.DateTimeField(auto_now=True, null=True)
 
     server = models.ForeignKey(
         Server,
+        related_name='integrations',
         on_delete=models.SET_NULL,
         null=True,
         default=None,
     )
 
     class Meta:
-        db_table = 'server_integration_post_format'
+        db_table = 'server_integration'
         constraints = [
             models.UniqueConstraint(
                 name='server_integration_unique_idx',

@@ -3,6 +3,9 @@ import io
 import typing
 from dataclasses import dataclass
 
+from bot import constants
+
+
 DEFAULT_FORMAT = """🔗 URL: {url}
 🧑🏻‍🎨 Author: {author}
 📅 Created: {created}
@@ -13,7 +16,50 @@ DEFAULT_FORMAT = """🔗 URL: {url}
 
 
 @dataclass
-class Post:
+class Integration(object):
+    uid: str
+    integration: constants.Integration
+    enabled: bool
+    post_format: str = DEFAULT_FORMAT
+
+
+@dataclass
+class Server(object):
+    uid: str
+    vendor_uid: str
+    vendor: constants.ServerVendor
+    tier: constants.ServerTier
+    tier_valid_until: typing.Optional[datetime.datetime]
+    status: constants.ServerStatus
+    prefix: typing.Optional[str]
+    integrations: typing.Dict[constants.Integration, Integration]
+    _internal_id: typing.Optional[int]
+
+    def can_post(self, num_posts_in_one_day: int, integration: constants.Integration) -> bool:
+        if self.status != constants.ServerStatus.ACTIVE:
+            return False
+
+        if integration not in self.integrations or not self.integrations[integration].enabled:
+            return False
+
+        if self.tier_valid_until is not None and self.tier_valid_until < datetime.datetime.now():
+            return num_posts_in_one_day < 3
+
+        match (self.tier):
+            case constants.ServerTier.FREE:
+                return num_posts_in_one_day < 3
+            case constants.ServerTier.STANDARD:
+                return num_posts_in_one_day < 10
+            case constants.ServerTier.PREMIUM:
+                return num_posts_in_one_day < 25
+            case constants.ServerTier.ULTRA:
+                return True
+
+        return False
+
+
+@dataclass
+class Post(object):
     url: str
     author: typing.Optional[str] = None
     description: typing.Optional[str] = None

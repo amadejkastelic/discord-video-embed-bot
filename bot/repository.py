@@ -10,24 +10,59 @@ from bot import models
 
 
 def create_server(
-    uid: str,
-    bot_type: constants.ServerVendor,
-    admin_id: str,
+    vendor_uid: str,
+    vendor: constants.ServerVendor,
+    owner_id: typing.Optional[int] = None,
     tier: constants.ServerTier = constants.ServerTier.FREE,
-    tier_valid_until: typing.Optional[datetime.datetime] = None,
-    prefix: typing.Optional[str] = None,
-    post_format: typing.Optional[str] = None,
-) -> str:
-    return models.Server.objects.create(
-        uid=uid,
-        bot_type=bot_type,
-        admin_id=admin_id,
-        tier=tier,
-        tier_valid_until=tier_valid_until,
-        status=constants.ServerStatus.ACTIVE,
-        prefix=prefix,
-        post_format=post_format,
-    ).uid
+    status: constants.ServerStatus = constants.ServerStatus.ACTIVE,
+) -> domain.Server:
+    with transaction.atomic():
+        server = models.Server.objects.create(
+            vendor_uid=vendor_uid,
+            vendor=vendor,
+            tier=tier,
+            status=status,
+            owner_id=owner_id,
+        )
+        # Add some default integrations to server
+        integrations = models.ServerIntegration.objects.bulk_create(
+            [
+                models.ServerIntegration(
+                    integration=constants.Integration.INSTAGRAM,
+                    enabled=True,
+                    server_id=server.pk,
+                ),
+                models.ServerIntegration(
+                    integration=constants.Integration.TIKTOK,
+                    enabled=True,
+                    server_id=server.pk,
+                ),
+                models.ServerIntegration(
+                    integration=constants.Integration.YOUTUBE,
+                    enabled=True,
+                    server_id=server.pk,
+                ),
+            ]
+        )
+
+    return domain.Server(
+        uid=server.uid,
+        vendor_uid=server.vendor_uid,
+        vendor=server.vendor,
+        tier=server.tier,
+        tier_valid_until=server.tier_valid_until,
+        status=server.status,
+        prefix=server.prefix,
+        integrations={
+            integration.integration: domain.Integration(
+                uid=integration.uid,
+                integration=integration.integration,
+                enabled=integration.enabled,
+            )
+            for integration in integrations
+        },
+        _internal_id=server.pk,
+    )
 
 
 def update_server(
@@ -47,16 +82,53 @@ def update_server(
     )
 
 
+def get_number_of_posts_in_server_from_datetime(
+    server_id: int,
+    from_datetime: datetime.datetime,
+) -> int:
+    return models.ServerPost.objects.filter(
+        server_id=server_id,
+        created__gt=from_datetime,
+    ).count()
+
+
 def get_server(
     vendor: constants.ServerVendor,
     vendor_uid: str,
     status: constants.ServerStatus = constants.ServerStatus.ACTIVE,
-) -> typing.Optional[models.Server]:
-    models.Server.objects.filter(
-        vendor=vendor,
-        vendor_uid=vendor_uid,
-        status=status,
-    ).first()
+) -> typing.Optional[domain.Server]:
+    server = (
+        models.Server.objects.filter(
+            vendor=vendor,
+            vendor_uid=vendor_uid,
+            status=status,
+        )
+        .prefetch_related('integrations')
+        .first()
+    )
+
+    if not server:
+        return None
+
+    return domain.Server(
+        uid=server.uid,
+        vendor_uid=server.vendor_uid,
+        vendor=server.vendor,
+        tier=server.tier,
+        tier_valid_until=server.tier_valid_until,
+        status=server.status,
+        prefix=server.prefix,
+        integrations={
+            integration.integration: domain.Integration(
+                uid=integration.uid,
+                integration=integration.integration,
+                enabled=integration.enabled,
+                post_format=integration.post_format,
+            )
+            for integration in server.integrations.all()
+        },
+        _internal_id=server.pk,
+    )
 
 
 def get_post(
