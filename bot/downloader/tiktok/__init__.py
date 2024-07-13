@@ -4,7 +4,7 @@ import pydantic_core
 old_validate_python = pydantic_core.SchemaValidator.validate_python
 
 
-def validate(*args, **kwargs):
+def patched_validate_python(*args, **kwargs):
     if getattr(args[0], 'title') == 'VideoPage':
         try:
             args[1]['itemInfo']['itemStruct']['video']['subtitleInfos'] = []
@@ -14,4 +14,4 @@ def validate(*args, **kwargs):
     return old_validate_python(*args, **kwargs)
 
 
-pydantic_core.SchemaValidator.validate_python = validate
+pydantic_core.SchemaValidator.validate_python = patched_validate_python

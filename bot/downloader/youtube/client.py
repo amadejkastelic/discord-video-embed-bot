@@ -4,7 +4,6 @@ import typing
 
 import pytube
 from django.conf import settings
-from pytube.innertube import _default_clients
 
 from bot import constants
 from bot import domain
@@ -12,13 +11,9 @@ from bot.downloader import base
 from bot.downloader.youtube import config
 
 
-# Age restriction bypass - https://stackoverflow.com/a/78267693/10428848
-_default_clients["ANDROID_MUSIC"] = _default_clients["ANDROID_CREATOR"]
-
-
 class YoutubeClientSingleton(base.BaseClientSingleton):
     DOMAINS = ['youtube.com/shorts']
-    _CONFIG_SCHEMA = config.YoutubeConfig
+    _CONFIG_SCHEMA = config.YoutubeConfigSchema
 
     @classmethod
     def _create_instance(cls) -> None:
