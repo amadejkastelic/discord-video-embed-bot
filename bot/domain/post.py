@@ -29,7 +29,7 @@ class Post:
     def to_str_with_format(self, f: str) -> str:
         description = self.description or '❌'
 
-        f.format(
+        return f.format(
             url=self.url,
             author=self.author or '❌',
             created=self._date_human_format(date=self.created) if self.created else '❌',
