@@ -35,7 +35,7 @@ class Integration(object):
     def __str__(self) -> str:
         return INTEGRATION_INFO_FORMAT.format(
             name=self.integration.value.capitalize(),
-            enabled=self.enabled,
+            enabled='Enabled' if self.enabled else 'Disabled',
         )
 
 

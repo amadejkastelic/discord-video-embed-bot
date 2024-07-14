@@ -101,6 +101,38 @@ def update_post_format(
     cache.delete(store=cache.Store.SERVER, key=f'{vendor.value}_{vendor_uid}')
 
 
+def get_post_format(
+    vendor: constants.ServerVendor,
+    vendor_uid: str,
+    integration: constants.Integration,
+) -> str:
+    cache_key = f'{vendor.value}_{vendor_uid}_{integration.value}'
+    post_format = cache.get(
+        store=cache.Store.SERVER_INTEGRATION_POST_FORMAT,
+        key=cache_key,
+    )
+    if post_format != cache.NO_HIT:
+        return post_format
+
+    server_integration = (
+        models.ServerIntegration.objects.filter(
+            server__vendor=vendor,
+            server__vendor_uid=vendor_uid,
+            integration=integration,
+        )
+        .only('post_format')
+        .first()
+    )
+    if server_integration is not None and server_integration.post_format is not None:
+        post_format = server_integration.post_format
+    else:
+        post_format = domain.DEFAULT_POST_FORMAT
+
+    cache.set(store=cache.Store.SERVER_INTEGRATION_POST_FORMAT, key=cache_key, value=post_format)
+
+    return post_format
+
+
 def get_server(
     vendor: constants.ServerVendor,
     vendor_uid: str,

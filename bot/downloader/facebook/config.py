@@ -12,4 +12,6 @@ class FacebookConfig(base.BaseClientConfig):
 
 
 class FacebookConfigSchema(base.BaseClientConfigSchema):
+    _CONFIG_CLASS = FacebookConfig
+
     cookies_file_path = marshmallow_fields.Str(allow_none=True, load_default=None)

@@ -34,6 +34,18 @@ def change_server_member_banned_status(
     )
 
 
+def get_post_format(
+    server_vendor: constants.ServerVendor,
+    server_uid: str,
+    integration: constants.Integration,
+) -> str:
+    return repository.get_post_format(
+        vendor=server_vendor,
+        vendor_uid=server_uid,
+        integration=integration,
+    )
+
+
 async def get_post(
     url: str,
     server_vendor: constants.ServerVendor,
@@ -59,7 +71,7 @@ async def get_post(
     )
     if not server:
         logging.info(f'Server {server_uid} not configured, creating a default config')
-        repository.create_server(vendor=server_vendor, vendor_uid=server_uid)
+        server = repository.create_server(vendor=server_vendor, vendor_uid=server_uid)
 
     num_posts_in_server = repository.get_number_of_posts_in_server_from_datetime(
         server_id=server._internal_id,

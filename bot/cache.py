@@ -8,6 +8,7 @@ class Store(enum.Enum):
     SERVER = 'server'
     SERVER_POST_COUNT = 'server_post_count'
     SERVER_USER_BANNED = 'server_user_banned'
+    SERVER_INTEGRATION_POST_FORMAT = 'srv_int_post_fmt'
 
 
 NO_HIT = -1

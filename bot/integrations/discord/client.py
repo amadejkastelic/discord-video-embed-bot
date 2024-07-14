@@ -57,6 +57,11 @@ class DiscordClient(discord.Client):
                 description='(Un)Ban a user from using embed commands',
                 callback=self.silence_user,
             ),
+            app_commands.Command(
+                name='postfmt',
+                description='Fetches post format for specified site',
+                callback=self.get_post_format,
+            ),
         ]
 
         self.tree = app_commands.CommandTree(client=self)
@@ -96,7 +101,7 @@ class DiscordClient(discord.Client):
                 ),
                 new_message.add_reaction('❌'),
             )
-            return
+            raise e
 
         try:
             msg = await self._send_post(post=post, send_func=message.channel.send, author=message.author)
@@ -191,6 +196,19 @@ class DiscordClient(discord.Client):
 
         await interaction.followup.send(
             content=response,
+            ephemeral=True,
+        )
+
+    @checks.has_permissions(administrator=True)
+    async def get_post_format(self, interaction: discord.Interaction, site: constants.Integration) -> None:
+        await interaction.response.defer(ephemeral=True)
+
+        await interaction.followup.send(
+            content=service.get_post_format(
+                server_vendor=constants.ServerVendor.DISCORD,
+                server_uid=interaction.guild.id,
+                integration=site,
+            ),
             ephemeral=True,
         )
 

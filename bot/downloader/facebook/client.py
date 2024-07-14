@@ -1,6 +1,7 @@
 import logging
 import os
 import typing
+from urllib import parse as urllib_parse
 
 import facebook_scraper
 from django.conf import settings
@@ -35,11 +36,14 @@ class FacebookClient(base.BaseClient):
         self.cookies_path = cookies_path
 
     async def get_integration_data(self, url: str) -> typing.Tuple[constants.Integration, str, typing.Optional[int]]:
+        if url.split('?')[0].endswith('/watch') and 'v=' in url:
+            return self.INTEGRATION, urllib_parse.parse_qs(urllib_parse.urlparse(url).query).get('v', None), None
+
         return self.INTEGRATION, url.split('?')[0].split('/')[-1], None
 
     async def get_post(self, url: str) -> domain.Post:
         kwargs = {}
-        if os.path.exists(self.cookies_path):
+        if self.cookies_path and os.path.exists(self.cookies_path):
             kwargs['cookies'] = 'cookies.txt'
 
         fb_post = next(facebook_scraper.get_posts(post_urls=[url], **kwargs))
