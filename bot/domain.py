@@ -109,7 +109,10 @@ class Post(object):
     def set_format(self, format: typing.Optional[str]) -> None:
         self._format = format or DEFAULT_POST_FORMAT
 
-    def read_buffer(self) -> bytes:
+    def read_buffer(self) -> typing.Optional[bytes]:
+        if not self.buffer:
+            return None
+
         self.buffer.seek(0)
         res = self.buffer.read()
         self.buffer.seek(0)
