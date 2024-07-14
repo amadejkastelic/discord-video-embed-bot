@@ -12,6 +12,14 @@ def should_handle_url(url: str) -> bool:
     return registry.should_handle(url)
 
 
+async def get_server_info(
+    server_vendor: constants.ServerVendor,
+    server_uid: str,
+) -> typing.Optional[str]:
+    server = repository.get_server(vendor=server_vendor, vendor_uid=server_uid)
+    return str(server) if server else None
+
+
 async def get_post(
     url: str,
     server_vendor: constants.ServerVendor,

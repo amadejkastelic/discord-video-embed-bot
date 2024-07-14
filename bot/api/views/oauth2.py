@@ -8,11 +8,9 @@ from rest_framework import request
 from rest_framework import viewsets
 
 from bot.auth.oauth2.discord import oauth2
-from bot.auth.oauth2.discord import schemas
 
 
 class Oauth2ViewSet(viewsets.ViewSet):
-
     @decorators.action(detail=False, methods=[http.HTTPMethod.GET], url_path='login/')
     def login(self, _: request.Request):
         client = oauth2.DiscordOauth2Auth(config=settings.OAUTH2_CONFIGURATION['discord'])

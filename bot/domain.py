@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from bot import constants
 
 
-DEFAULT_FORMAT = """🔗 URL: {url}
+DEFAULT_POST_FORMAT = """🔗 URL: {url}
 🧑🏻‍🎨 Author: {author}
 📅 Created: {created}
 👀 Views: {views}
@@ -14,13 +14,29 @@ DEFAULT_FORMAT = """🔗 URL: {url}
 📕 Description: {description}\n
 """
 
+SERVER_INFO_FORMAT = """```yml
+Tier: {tier}
+Prefix: {prefix}
+Integrations:
+{integrations}
+```
+"""
+
+INTEGRATION_INFO_FORMAT = """  - {name}: {enabled}"""
+
 
 @dataclass
 class Integration(object):
     uid: str
     integration: constants.Integration
     enabled: bool
-    post_format: str = DEFAULT_FORMAT
+    post_format: str = DEFAULT_POST_FORMAT
+
+    def __str__(self) -> str:
+        return INTEGRATION_INFO_FORMAT.format(
+            name=self.integration.value.capitalize(),
+            enabled=self.enabled,
+        )
 
 
 @dataclass
@@ -34,6 +50,13 @@ class Server(object):
     prefix: typing.Optional[str]
     integrations: typing.Dict[constants.Integration, Integration]
     _internal_id: typing.Optional[int]
+
+    def __str__(self) -> str:
+        return SERVER_INFO_FORMAT.format(
+            tier=self.tier.name.capitalize(),
+            prefix=self.prefix or 'No prefix',
+            integrations='\n'.join([str(integration) for integration in self.integrations.values()]),
+        )
 
     def can_post(self, num_posts_in_one_day: int, integration: constants.Integration) -> bool:
         if self.status != constants.ServerStatus.ACTIVE:
@@ -69,7 +92,7 @@ class Post(object):
     spoiler: bool = False
     created: typing.Optional[datetime.datetime] = None
     _internal_id: typing.Optional[int] = None
-    _format: str = DEFAULT_FORMAT
+    _format: str = DEFAULT_POST_FORMAT
 
     def __str__(self) -> str:
         description = self.description or '❌'
@@ -84,7 +107,7 @@ class Post(object):
         )
 
     def set_format(self, format: typing.Optional[str]) -> None:
-        self._format = format or DEFAULT_FORMAT
+        self._format = format or DEFAULT_POST_FORMAT
 
     def read_buffer(self) -> bytes:
         self.buffer.seek(0)

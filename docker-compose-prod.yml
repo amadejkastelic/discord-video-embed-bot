@@ -1,0 +1,62 @@
+services:
+  api:
+    image: 'ghcr.io/amadejkastelic/discord-video-embed-bot:0.21.0'
+    command: runserver 8080
+    ports: 
+      - 8080:8080
+    environment:
+      - DJANGO_SETTINGS_MODULE=settings
+      - DJANGO_ALLOW_ASYNC_UNSAFE=true
+    volumes:
+      - ./settings.py:/app/settings.py
+    depends_on:
+      - db
+      - cache
+    restart: always
+  discord-bot:
+    image: 'ghcr.io/amadejkastelic/discord-video-embed-bot:0.21.0'
+    command: discord_bot
+    environment:
+      - DJANGO_SETTINGS_MODULE=settings
+      - DJANGO_ALLOW_ASYNC_UNSAFE=true
+    volumes:
+      - ./settings.py:/app/settings.py
+      - ./cookies.txt:/app/cookies.txt
+      # - ./instagram.sess:/app/instagram.sess
+    depends_on:
+      - db
+      - cache
+    restart: always
+  posts-purger:
+    image: 'ghcr.io/amadejkastelic/discord-video-embed-bot:0.21.0'
+    command: purge_posts --older-than 7d --batch-size 100 --sleep 3600
+    environment:
+      - DJANGO_SETTINGS_MODULE=settings
+      - DJANGO_ALLOW_ASYNC_UNSAFE=true
+    volumes:
+      - ./settings.py:/app/settings.py
+    depends_on:
+      - db
+      - cache
+    restart: always
+  db:
+    image: 'postgres:12.19'
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=bot
+      - POSTGRES_PASSWORD=bot
+      - POSTGRES_DB=embed_bot
+    volumes:
+      # Persistence
+      - ./docker/db/data/:/var/lib/postgresql/data/
+      # Init script
+      - ./docker/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: always
+  cache:
+    image: 'memcached:1.6.29'
+    ports:
+      - 11211:11211
+    command:
+      -- 'memory-limit=1024'
+    restart: always

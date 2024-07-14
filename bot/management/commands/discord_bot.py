@@ -2,8 +2,10 @@ import asyncio
 import logging
 import typing
 
+from django import db
 from django.core.management import base
 
+from bot.common import utils
 from bot.integrations.discord import bot
 
 
@@ -13,7 +15,12 @@ class Command(base.BaseCommand):
     def add_arguments(self, parser: base.CommandParser) -> None:
         return super().add_arguments(parser)
 
-    def handle(self, *args: typing.Any, **options: typing.Any) -> None:
+    def handle(self, *args: typing.Any, **options: typing.Any) -> typing.NoReturn:
         logging.info('Running discord bot command')
 
-        asyncio.run(bot.DiscordBot().run())
+        while True:
+            try:
+                asyncio.run(bot.DiscordBot().run())
+            except db.OperationalError as e:
+                logging.warning(f'DB Connection expired, reconnecting... {str(e)}')
+                utils.recover_from_db_error()

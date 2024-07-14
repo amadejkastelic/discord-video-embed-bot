@@ -7,6 +7,7 @@ import tempfile
 import typing
 
 import magic
+from django.db import connections
 
 emoji = ['😼', '😺', '😸', '😹', '😻', '🙀', '😿', '😾', '😩', '🙈', '🙉', '🙊', '😳']
 
@@ -53,3 +54,9 @@ async def resize(buffer: io.BytesIO, extension: str = 'mp4') -> io.BytesIO:
 
 def random_emoji() -> str:
     return random.choice(emoji)
+
+
+def recover_from_db_error():
+    for conn in connections.all():
+        conn.close()
+        conn.connect()

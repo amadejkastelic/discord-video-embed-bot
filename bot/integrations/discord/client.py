@@ -40,14 +40,22 @@ class DiscordClient(discord.Client):
     def __init__(self, *, intents: discord.Intents, **options: typing.Any) -> None:
         super().__init__(intents=intents, **options)
 
-        self.tree = app_commands.CommandTree(client=self)
-        self.tree.add_command(
+        commands = [
             app_commands.Command(
                 name='embed',
                 description='Embeds media directly into discord',
                 callback=self.command_embed,
-            )
-        )
+            ),
+            app_commands.Command(
+                name='help',
+                description='Prints configuration for this server',
+                callback=self.command_help,
+            ),
+        ]
+
+        self.tree = app_commands.CommandTree(client=self)
+        for command in commands:
+            self.tree.add_command(command)
 
     async def on_ready(self):
         await self.tree.sync()
@@ -120,7 +128,10 @@ class DiscordClient(discord.Client):
                 post.spoiler = spoiler
         except Exception as e:
             logging.error(f'Failed downloading {url}: {str(e)}')
-            await interaction.followup.send(f'Failed fetching {url} ({interaction.user.mention}).\nError: {str(e)}')
+            await interaction.followup.send(
+                content=f'Failed fetching {url} ({interaction.user.mention}).\nError: {str(e)}',
+                view=CustomView(),
+            )
             raise e
 
         await self._send_post(
@@ -128,6 +139,22 @@ class DiscordClient(discord.Client):
             send_func=partial(interaction.followup.send, view=CustomView()),
             author=interaction.user,
         )
+
+    async def command_help(self, interaction: discord.Interaction) -> None:
+        await interaction.response.defer()
+
+        response = await service.get_server_info(
+            server_vendor=constants.ServerVendor.DISCORD,
+            server_uid=str(interaction.guild.id),
+        )
+        if not response:
+            await interaction.followup.send(
+                content='Failed retreiving server configuration.',
+                view=CustomView(),
+            )
+            return
+
+        await interaction.followup.send(content=f'{interaction.user.mention}\n{response}', view=CustomView())
 
     async def _send_post(
         self,
