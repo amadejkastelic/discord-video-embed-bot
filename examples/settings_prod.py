@@ -11,6 +11,7 @@ LOGGING['handlers'].update(
             'class': 'logging.FileHandler',
             'filename': '/var/log/embed_bot.log',
             'formatter': 'simple',
+            'maxBytes': 1024 * 1024 * 5,  # 5 MiB
         }
     }
 )
