@@ -176,7 +176,7 @@ class DiscordClient(discord.Client):
                 service.change_server_member_banned_status(
                     server_vendor=constants.ServerVendor.DISCORD,
                     server_uid=interaction.guild.id,
-                    user_uid=member.id,
+                    member_uid=member.id,
                     banned=not unban,
                 )
                 response = 'User {display_name} {banned}banned.'

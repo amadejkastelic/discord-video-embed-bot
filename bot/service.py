@@ -71,7 +71,11 @@ async def get_post(
         raise Exception('Not allowed to post. Upgrade your tier.')
 
     # Check if user is banned
-    if repository.is_member_banned_from_server(server_vendor=server_vendor, server_uid=server_uid, user_uid=author_uid):
+    if repository.is_member_banned_from_server(
+        server_vendor=server_vendor,
+        server_uid=server_uid,
+        member_uid=author_uid,
+    ):
         logging.warning(f'User {author_uid} banned from server [{server_vendor.value} - {server_uid}]')
         raise Exception('Not allowed to post, you were banned')
 

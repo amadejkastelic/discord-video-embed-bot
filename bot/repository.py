@@ -240,9 +240,9 @@ def save_server_post(
 def is_member_banned_from_server(
     server_vendor: constants.ServerVendor,
     server_uid: str,
-    user_uid: str,
+    member_uid: str,
 ) -> bool:
-    cache_key = f'{server_vendor.value}_{server_uid}_{user_uid}'
+    cache_key = f'{server_vendor.value}_{server_uid}_{member_uid}'
     banned = cache.get(store=cache.Store.SERVER_USER_BANNED, key=cache_key)
     if banned != cache.NO_HIT:
         return banned is True
@@ -250,7 +250,7 @@ def is_member_banned_from_server(
     server_user = models.ServerMember.objects.filter(
         server__vendor=server_vendor,
         server__vendor_uid=server_uid,
-        vendor_uid=user_uid,
+        vendor_uid=member_uid,
     ).first()
 
     banned = server_user.banned if server_user else False
