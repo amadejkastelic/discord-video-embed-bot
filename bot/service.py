@@ -65,6 +65,9 @@ async def get_post(
     else:
         logging.debug(f'Post {url} already in DB, not downloading again...')
 
+    # Set formatting
+    post.set_format(server.integrations[integration].post_format)
+
     repository.save_server_post(
         server_vendor=server_vendor,
         server_uid=server_uid,

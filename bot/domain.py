@@ -69,14 +69,12 @@ class Post(object):
     spoiler: bool = False
     created: typing.Optional[datetime.datetime] = None
     _internal_id: typing.Optional[int] = None
+    _format: str = DEFAULT_FORMAT
 
     def __str__(self) -> str:
-        return self.to_str_with_format(DEFAULT_FORMAT)
-
-    def to_str_with_format(self, f: str) -> str:
         description = self.description or '❌'
 
-        return f.format(
+        return self._format.format(
             url=self.url,
             author=self.author or '❌',
             created=self._date_human_format(date=self.created) if self.created else '❌',
@@ -84,6 +82,9 @@ class Post(object):
             views=self._number_human_format(num=self.views) if self.views else '❌',
             likes=self._number_human_format(num=self.likes) if self.likes else '❌',
         )
+
+    def set_format(self, format: typing.Optional[str]) -> None:
+        self._format = format or DEFAULT_FORMAT
 
     def read_buffer(self) -> bytes:
         self.buffer.seek(0)

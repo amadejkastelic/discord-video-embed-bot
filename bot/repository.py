@@ -86,6 +86,21 @@ def get_number_of_posts_in_server_from_datetime(
     return post_cnt
 
 
+def update_post_format(
+    vendor: constants.ServerVendor,
+    vendor_uid: str,
+    integration: constants.Integration,
+    post_format: str,
+) -> None:
+    models.ServerIntegration.objects.filter(
+        server__vendor=vendor,
+        server__vendor_uid=vendor_uid,
+        integration=integration,
+    ).update(post_format=post_format)
+
+    cache.delete(cache.CacheKey.SERVER)
+
+
 def get_server(
     vendor: constants.ServerVendor,
     vendor_uid: str,

@@ -25,9 +25,6 @@
             "version": "==0.8.0"
         },
         "aiohttp": {
-            "extras": [
-                "speedups"
-            ],
             "hashes": [
                 "sha256:0605cc2c0088fcaae79f01c913a38611ad09ba68ff482402d3410bf59039bfb8",
                 "sha256:0a158704edf0abcac8ac371fbb54044f3270bdbc93e254a82b6c82be1ef08f3c",
