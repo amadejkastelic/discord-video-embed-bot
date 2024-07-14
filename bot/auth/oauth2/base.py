@@ -8,7 +8,7 @@ from bot.auth.oauth2 import types
 
 
 @dataclass
-class BaseOauth2Config(object):
+class BaseOauth2Config:
     client_id: str
     client_secret: str
     redirect_uri: str
@@ -26,7 +26,7 @@ class BaseOauth2ConfigSchema(marshmallow.Schema):
         return self._CONFIG_TYPE(**data)
 
 
-class BaseOauth2Auth(object):
+class BaseOauth2Auth:
     _CONFIG_SCHEMA = BaseOauth2ConfigSchema
 
     def __init__(self, config: typing.Dict[str, str]) -> None:

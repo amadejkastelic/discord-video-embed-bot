@@ -14,12 +14,6 @@ from bot import domain
 from bot import service
 from bot.common import utils
 
-"""
-This file needs to be refactored at some point.
-Logic needs to be split so we can easily add support for another server type
-without duplicating business logic. This is basically service layer code.
-"""
-
 
 class CustomView(ui.View):
     @ui.button(label='❌')
@@ -226,10 +220,7 @@ class DiscordClient(discord.Client):
             extension = utils.guess_extension_from_buffer(buffer=post.buffer)
             file = discord.File(
                 fp=post.buffer,
-                filename='{spoiler}file{extension}'.format(
-                    spoiler='SPOILER_' if post.spoiler else '',
-                    extension=extension,
-                ),
+                filename=f'{'SPOILER_' if post.spoiler else ''}file{extension}',
             )
             send_kwargs['file'] = file
 

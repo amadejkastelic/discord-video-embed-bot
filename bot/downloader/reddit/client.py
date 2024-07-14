@@ -12,6 +12,7 @@ from django.conf import settings
 
 from bot import constants
 from bot import domain
+from bot import exceptions
 from bot.downloader import base
 from bot.downloader.reddit import config
 
@@ -40,7 +41,7 @@ class RedditClient(base.BaseClient):
     INTEGRATION = constants.Integration.REDDIT
 
     def __init__(self, client_id: str, client_secret: str, user_agent: str):
-        super(RedditClient, self).__init__()
+        super().__init__()
         self.client = asyncpraw.Reddit(
             client_id=client_id,
             client_secret=client_secret,
@@ -55,7 +56,7 @@ class RedditClient(base.BaseClient):
 
         did_hydrate = await self._hydrate_post(post)
         if not did_hydrate:
-            raise Exception('Failed hydrating reddit post')
+            raise exceptions.IntegrationClientError('Failed hydrating reddit post')
 
         return post
 
@@ -68,7 +69,7 @@ class RedditClient(base.BaseClient):
         except praw_exceptions.InvalidURL:
             # Hack for new reddit urls generated in mobile app
             # Does another request, which redirects to the correct url
-            post.url = requests.get(post.url).url.split('?')[0]
+            post.url = requests.get(post.url, timeout=base.DEFAULT_TIMEOUT).url.split('?')[0]
             submission = await self.client.submission(url=post.url)
 
         content = ''
@@ -95,5 +96,5 @@ class RedditClient(base.BaseClient):
 
     @staticmethod
     def _is_nsfw(url: str) -> bool:
-        content = str(requests.get(url).content)
+        content = str(requests.get(url, timeout=base.DEFAULT_TIMEOUT).content)
         return 'nsfw&quot;:true' in content or 'isNsfw&quot;:true' in content

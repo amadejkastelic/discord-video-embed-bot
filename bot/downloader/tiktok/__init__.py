@@ -8,7 +8,7 @@ def patched_validate_python(*args, **kwargs):
     if getattr(args[0], 'title') == 'VideoPage':
         try:
             args[1]['itemInfo']['itemStruct']['video']['subtitleInfos'] = []
-        except Exception:
+        except KeyError:
             pass
 
     return old_validate_python(*args, **kwargs)

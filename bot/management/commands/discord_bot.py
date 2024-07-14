@@ -12,9 +12,6 @@ from bot.integrations.discord import bot
 class Command(base.BaseCommand):
     help = 'Runs discord bot'
 
-    def add_arguments(self, parser: base.CommandParser) -> None:
-        return super().add_arguments(parser)
-
     def handle(self, *args: typing.Any, **options: typing.Any) -> typing.NoReturn:
         logging.info('Running discord bot command')
 

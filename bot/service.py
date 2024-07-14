@@ -4,6 +4,7 @@ import typing
 
 from bot import constants
 from bot import domain
+from bot import exceptions
 from bot import repository
 from bot.downloader import registry
 
@@ -54,7 +55,7 @@ async def get_post(
 ) -> typing.Optional[domain.Post]:
     try:
         client = registry.get_instance(url)
-    except Exception as e:
+    except ValueError as e:
         logging.warning(f'No strategy for url {url}. Error: {str(e)}')
         return None
 
@@ -80,7 +81,7 @@ async def get_post(
 
     if not server.can_post(num_posts_in_one_day=num_posts_in_server, integration=integration):
         logging.warning(f'Server {server.uid} is not allowed to post')
-        raise Exception('Not allowed to post. Upgrade your tier.')
+        raise exceptions.NotAllowedError('Upgrade your tier')
 
     # Check if user is banned
     if repository.is_member_banned_from_server(
@@ -89,7 +90,7 @@ async def get_post(
         member_uid=author_uid,
     ):
         logging.warning(f'User {author_uid} banned from server [{server_vendor.value} - {server_uid}]')
-        raise Exception('Not allowed to post, you were banned')
+        raise exceptions.NotAllowedError('User banned')
 
     # Check if post stored in DB already
     post = repository.get_post(

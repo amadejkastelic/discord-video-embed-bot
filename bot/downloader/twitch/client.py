@@ -11,6 +11,7 @@ from twitchdl.commands import download as twitch_download
 
 from bot import constants
 from bot import domain
+from bot import exceptions
 from bot.downloader import base
 from bot.downloader.twitch import config
 
@@ -40,14 +41,14 @@ class TwitchClient(base.BaseClient):
     async def get_post(self, url: str) -> domain.Post:
         uid = twitch_utils.parse_clip_identifier(url)
         if not uid:
-            raise Exception('Only Twitch clips are supported')
+            raise exceptions.IntegrationClientError('Only Twitch clips are supported')
 
         clip = twitch.get_clip(uid)
 
         clip_url = twitch_download.get_clip_authenticated_url(
             slug=clip['slug'], quality=str(self._find_quality(qualities=clip['videoQualities']))
         )
-        with requests.get(url=clip_url) as resp:
+        with requests.get(url=clip_url, timeout=base.DEFAULT_TIMEOUT) as resp:
             return domain.Post(
                 url=url,
                 author=clip['broadcaster']['displayName'],

@@ -1,3 +1,4 @@
+# pylint: skip-file
 import re
 
 from pytube import cipher

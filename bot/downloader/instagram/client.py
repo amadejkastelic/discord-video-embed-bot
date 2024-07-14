@@ -44,7 +44,7 @@ class InstagramClient(base.BaseClient):
         session_file_path: typing.Optional[str],
         user_agent: typing.Optional[str],
     ):
-        super(InstagramClient, self).__init__()
+        super().__init__()
 
         self.client = instaloader.Instaloader(user_agent=user_agent)
         if username and os.path.exists(session_file_path):
@@ -62,9 +62,9 @@ class InstagramClient(base.BaseClient):
 
         match link_type:
             case constants.LinkType.STORY:
-                return self._get_story(url=url, uid=uid, index=index)
+                return self._get_story(url=url, uid=uid)
             case constants.LinkType.MEDIA:
-                return self._get_post(url=url, uid=uid)
+                return self._get_post(url=url, uid=uid, index=index)
             case constants.LinkType.PROFILE:
                 return self._get_profile(url=url, uid=uid)
 
@@ -94,7 +94,7 @@ class InstagramClient(base.BaseClient):
                 else:
                     download_url = node.display_url
 
-        with requests.get(url=download_url) as resp:
+        with requests.get(url=download_url, timeout=base.DEFAULT_TIMEOUT) as resp:
             return domain.Post(
                 url=url,
                 author=p.owner_profile.username,
@@ -112,7 +112,7 @@ class InstagramClient(base.BaseClient):
         else:
             url = story.url or story.video_url
 
-        with requests.get(url=url) as resp:
+        with requests.get(url=url, timeout=base.DEFAULT_TIMEOUT) as resp:
             return domain.Post(
                 url=url,
                 author=story.owner_profile.username,
@@ -124,7 +124,7 @@ class InstagramClient(base.BaseClient):
     def _get_profile(self, url: str, uid: str) -> domain.Post:
         profile = instaloader.Profile.from_username(context=self.client.context, username=uid)
 
-        with requests.get(url=profile.profile_pic_url) as resp:
+        with requests.get(url=profile.profile_pic_url, timeout=base.DEFAULT_TIMEOUT) as resp:
             return domain.Post(
                 url=url,
                 author=profile.username,

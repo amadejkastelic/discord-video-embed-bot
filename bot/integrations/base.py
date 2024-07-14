@@ -4,11 +4,11 @@ from dataclasses import dataclass
 import marshmallow
 from marshmallow import fields as marshmallow_fields
 
-import bot.constants as constants
+from bot import constants
 
 
 @dataclass
-class BaseBotConfig(object):
+class BaseBotConfig:
     enabled: bool = False
     api_token: typing.Optional[str] = None
 
@@ -24,7 +24,7 @@ class BaseBotConfigSchema(marshmallow.Schema):
         return self._CONFIG_CLASS(**data)
 
 
-class BaseBot(object):
+class BaseBot:
     VENDOR: constants.ServerVendor
     _CONFIG_SCHEMA: BaseBotConfigSchema = BaseBotConfigSchema
 

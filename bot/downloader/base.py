@@ -10,9 +10,10 @@ from bot import constants
 from bot import domain
 
 MISSING = -1
+DEFAULT_TIMEOUT = (3.0, 3.0)
 
 
-class BaseClient(object):
+class BaseClient:
     INTEGRATION: constants.Integration
 
     async def get_integration_data(self, url: str) -> typing.Tuple[constants.Integration, str, typing.Optional[int]]:
@@ -33,7 +34,7 @@ class BaseClient(object):
 
 
 @dataclass
-class BaseClientConfig(object):
+class BaseClientConfig:
     enabled: bool = False
 
 
@@ -47,7 +48,7 @@ class BaseClientConfigSchema(marshmallow.Schema):
         return self._CONFIG_CLASS(**data)
 
 
-class BaseClientSingleton(object):
+class BaseClientSingleton:
     DOMAINS: typing.List[str] = []
     _INSTANCE: typing.Optional[BaseClient] = None
     _CONFIG_SCHEMA: BaseClientConfigSchema = BaseClientConfigSchema

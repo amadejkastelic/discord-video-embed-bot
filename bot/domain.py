@@ -26,7 +26,7 @@ INTEGRATION_INFO_FORMAT = """  - {name}: {enabled}"""
 
 
 @dataclass
-class Integration(object):
+class Integration:
     uid: str
     integration: constants.Integration
     enabled: bool
@@ -40,7 +40,7 @@ class Integration(object):
 
 
 @dataclass
-class Server(object):
+class Server:
     uid: str
     vendor_uid: str
     vendor: constants.ServerVendor
@@ -82,7 +82,7 @@ class Server(object):
 
 
 @dataclass
-class Post(object):
+class Post:
     url: str
     author: typing.Optional[str] = None
     description: typing.Optional[str] = None
@@ -106,8 +106,8 @@ class Post(object):
             likes=self._number_human_format(num=self.likes) if self.likes else '❌',
         )
 
-    def set_format(self, format: typing.Optional[str]) -> None:
-        self._format = format or DEFAULT_POST_FORMAT
+    def set_format(self, fmt: typing.Optional[str]) -> None:
+        self._format = fmt or DEFAULT_POST_FORMAT
 
     def read_buffer(self) -> typing.Optional[bytes]:
         if not self.buffer:

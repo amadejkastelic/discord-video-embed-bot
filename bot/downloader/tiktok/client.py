@@ -11,10 +11,11 @@ import requests
 from django.conf import settings
 from tiktokapipy.async_api import AsyncTikTokAPI
 from tiktokapipy.models import user
-from tiktokapipy.models import video
+from tiktokapipy.models import video as tiktok_video
 
 from bot import constants
 from bot import domain
+from bot import exceptions
 from bot.downloader import base
 from bot.downloader.tiktok import config
 
@@ -73,7 +74,7 @@ class TiktokClient(base.BaseClient):
                 created=video.create_time.astimezone(),
             )
 
-    async def _download_slideshow(self, video: video.Video, cookies: typing.Dict[str, str]) -> io.BytesIO:
+    async def _download_slideshow(self, video: tiktok_video.Video, cookies: typing.Dict[str, str]) -> io.BytesIO:
         vf = (
             '"scale=iw*min(1080/iw\\,1920/ih):ih*min(1080/iw\\,1920/ih),'
             'pad=1080:1920:(1080-iw)/2:(1920-ih)/2,'
@@ -85,7 +86,7 @@ class TiktokClient(base.BaseClient):
             url = image_data.image_url.url_list[-1]
             urllib.request.urlretrieve(url, os.path.join(directory, f'temp_{video.id}_{i:02}.jpg'))
 
-        read = requests.get(video.music.play_url, cookies=cookies, headers=HEADERS)
+        read = requests.get(video.music.play_url, cookies=cookies, headers=HEADERS, timeout=base.DEFAULT_TIMEOUT)
         with open(os.path.join(directory, f'temp_{video.id}.mp3'), 'wb') as w:
             for chunk in read.iter_content(chunk_size=512):
                 if chunk:
@@ -133,7 +134,7 @@ class TiktokClient(base.BaseClient):
         if not os.path.exists(os.path.join(directory, f'temp_{video.id}.mp4')):
             for file in generated_files:
                 os.remove(file)
-            raise Exception('Something went wrong with piecing the slideshow together')
+            raise exceptions.IntegrationClientError('Something went wrong with piecing the slideshow together')
 
         with open(os.path.join(directory, f'temp_{video.id}.mp4'), 'rb') as f:
             ret = io.BytesIO(f.read())
@@ -149,11 +150,12 @@ class TiktokClient(base.BaseClient):
         if url.startswith('https://vm.') or url.startswith('https://www.tiktok.com/t/'):
             response = requests.get(
                 url,
-                {
+                params={
                     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) '
                     'AppleWebKit/537.36 (KHTML, like Gecko) '
                     'Chrome/39.0.2171.95 Safari/537.36'
                 },
+                timeout=base.DEFAULT_TIMEOUT,
             )
             clean_url = response.url
         return clean_url

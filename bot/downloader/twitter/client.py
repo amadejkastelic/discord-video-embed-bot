@@ -8,6 +8,7 @@ from django.conf import settings
 
 from bot import constants
 from bot import domain
+from bot import exceptions
 from bot.downloader import base
 from bot.downloader.twitter import config
 
@@ -58,7 +59,7 @@ class TwitterClient(base.BaseClient):
         email: typing.Optional[str],
         password: typing.Optional[str],
     ):
-        super(TwitterClient, self).__init__()
+        super().__init__()
 
         if not all([username, email, password]):
             self.client = None
@@ -121,11 +122,11 @@ class TwitterClient(base.BaseClient):
                 return p
 
             if details.media.videos:
-                url = max(details.media.videos[0].variants, key=lambda x: x.bitrate).url
+                url = max(details.media.videos[index].variants, key=lambda x: x.bitrate).url
             elif details.media.photos:
-                url = details.media.photos[0].url
+                url = details.media.photos[index].url
             elif details.media.animated:
-                url = details.media.animated[0].videoUrl
+                url = details.media.animated[index].videoUrl
             else:
                 return p
 
@@ -135,11 +136,11 @@ class TwitterClient(base.BaseClient):
             logging.error(f'Failed fetching from twitter, retrying: {str(e)}')
             if retry_count == 0:
                 await self.relogin()
-                return await self._get_post_login(client=self.client, retry_count=retry_count + 1)
-            elif retry_count == 1:
-                return await self._get_post_no_login()
-            else:
-                raise Exception('Failed fetching from twitter')
+                return await self._get_post_login(url=url, uid=uid, index=index, retry_count=retry_count + 1)
+            if retry_count == 1:
+                return await self._get_post_no_login(url=url, uid=uid, index=index)
+
+            raise exceptions.IntegrationClientError('Failed fetching from twitter') from e
 
     async def _get_post_no_login(self, url: str, uid: str, index: int = 0) -> domain.Post:
         tweet = json.loads(

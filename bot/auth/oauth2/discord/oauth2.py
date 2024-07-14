@@ -11,8 +11,8 @@ from bot.auth.oauth2.discord import schemas
 class DiscordOauth2Auth(base.BaseOauth2Auth):
     _CONFIG_SCHEMA = config.DiscordOauth2ConfigSchema
 
-    def __init__(self, config: typing.Dict[str, str]) -> None:
-        super().__init__(config)
+    def __init__(self, conf: typing.Dict[str, str]) -> None:
+        super().__init__(conf)
 
         self.client = discordoauth2.Client(
             id=int(self.config.client_id),

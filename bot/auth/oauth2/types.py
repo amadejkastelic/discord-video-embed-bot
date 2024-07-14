@@ -3,19 +3,19 @@ from dataclasses import dataclass
 
 
 @dataclass
-class User(object):
+class User:
     id: str
     username: str
 
 
 @dataclass
-class Server(object):
+class Server:
     id: str = None
     name: str = None
     owner: bool = False
 
 
 @dataclass
-class Identity(object):
+class Identity:
     user: User
     servers: typing.List[Server]

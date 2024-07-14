@@ -5,7 +5,12 @@ from django.db import models
 
 
 class StringEnumField(models.CharField):
-    def __init__(self, enum: enum.Enum, *args: typing.Any, **kwargs: typing.Any) -> None:
+    def __init__(
+        self,
+        enum: enum.Enum,  # pylint: disable=redefined-outer-name
+        *args: typing.Any,
+        **kwargs: typing.Any,
+    ) -> None:
         self.enum = enum
         kwargs['max_length'] = kwargs.get('max_lenght') or max(len(e.value) for e in enum)
         kwargs['choices'] = [(e.value, e.name) for e in enum]
@@ -33,7 +38,12 @@ class StringEnumField(models.CharField):
 
 
 class IntEnumField(models.PositiveSmallIntegerField):
-    def __init__(self, enum: enum.Enum, *args: typing.Any, **kwargs: typing.Any) -> None:
+    def __init__(
+        self,
+        enum: enum.Enum,  # pylint: disable=redefined-outer-name
+        *args: typing.Any,
+        **kwargs: typing.Any,
+    ) -> None:
         self.enum = enum
         kwargs['choices'] = [(e.value, e.name) for e in enum]
         super().__init__(*args, **kwargs)

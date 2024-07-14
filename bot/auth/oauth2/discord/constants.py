@@ -18,9 +18,8 @@ class UserFlag(enum.Enum):
     BOT_HTTP_INTERACTIONS = 19
     ACTIVE_DEVELOPER = 22
 
-    @property
     def value(self):
-        return 1 << self._value_
+        return 1 << self._value_  # pylint: disable=no-member
 
 
 class UserPremiumType(enum.Enum):

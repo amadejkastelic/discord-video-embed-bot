@@ -7,6 +7,7 @@ from django.db import transaction
 from bot import cache
 from bot import constants
 from bot import domain
+from bot import exceptions
 from bot import models
 
 
@@ -241,7 +242,7 @@ def save_server_post(
         vendor_uid=server_uid,
     ).first()
     if not server:
-        raise Exception('Server does not exist?!')
+        raise exceptions.RepositoryError('Server does not exist')
 
     if post._internal_id is not None:
         models.ServerPost.objects.create(

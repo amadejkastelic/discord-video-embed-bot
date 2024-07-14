@@ -21,7 +21,12 @@ def _build_key(store: Store, key: str) -> str:
     return _KEY_FORMAT.format(store=store.value, key=key)
 
 
-def set(store: Store, key: str, value: typing.Any, override_timeout: typing.Optional[int] = None) -> None:
+def set(  # pylint: disable=redefined-builtin
+    store: Store,
+    key: str,
+    value: typing.Any,
+    override_timeout: typing.Optional[int] = None,
+) -> None:
     cache.cache.set(key=_build_key(store=store, key=key), value=value, timeout=override_timeout or _DEFAULT_TTL)
 
 
