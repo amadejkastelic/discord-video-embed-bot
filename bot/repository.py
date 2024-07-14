@@ -64,7 +64,7 @@ def create_server(
         },
         _internal_id=server.pk,
     )
-    cache.set(key=cache.CacheKey.SERVER, value=server)
+    cache.set(store=cache.Store.SERVER, key=f'{vendor.value}_{vendor_uid}', value=server)
 
     return server
 
@@ -73,15 +73,15 @@ def get_number_of_posts_in_server_from_datetime(
     server_id: int,
     from_datetime: datetime.datetime,
 ) -> int:
-    post_cnt = cache.get(cache.CacheKey.SERVER_POST_COUNT)
-    if post_cnt is not cache.NO_HIT:
+    post_cnt = cache.get(store=cache.Store.SERVER_POST_COUNT, key=str(server_id))
+    if post_cnt != cache.NO_HIT:
         return post_cnt
 
     post_cnt = models.ServerPost.objects.filter(
         server_id=server_id,
         created__gt=from_datetime,
     ).count()
-    cache.set(key=cache.CacheKey.SERVER_POST_COUNT, value=post_cnt, override_timeout=60)
+    cache.set(store=cache.Store.SERVER_POST_COUNT, key=str(server_id), value=post_cnt)
 
     return post_cnt
 
@@ -98,7 +98,7 @@ def update_post_format(
         integration=integration,
     ).update(post_format=post_format)
 
-    cache.delete(cache.CacheKey.SERVER)
+    cache.delete(store=cache.Store.SERVER, key=f'{vendor.value}_{vendor_uid}')
 
 
 def get_server(
@@ -106,8 +106,8 @@ def get_server(
     vendor_uid: str,
     status: constants.ServerStatus = constants.ServerStatus.ACTIVE,
 ) -> typing.Optional[domain.Server]:
-    server = cache.get(key=cache.CacheKey.SERVER)
-    if server is not cache.NO_HIT:
+    server = cache.get(store=cache.Store.SERVER, key=f'{vendor.value}_{vendor_uid}')
+    if server != cache.NO_HIT:
         return server
 
     server = (
@@ -142,7 +142,7 @@ def get_server(
         },
         _internal_id=server.pk,
     )
-    cache.set(key=cache.CacheKey.SERVER, value=server)
+    cache.set(store=cache.Store.SERVER, key=f'{vendor.value}_{vendor_uid}', value=server)
 
     return server
 
@@ -218,7 +218,7 @@ def save_server_post(
             server=server,
             post_id=post._internal_id,
         )
-        cache.increment(cache.CacheKey.SERVER_POST_COUNT)
+        cache.increment(store=cache.Store.SERVER_POST_COUNT, key=str(server.pk))
         return
 
     with transaction.atomic():
@@ -234,4 +234,55 @@ def save_server_post(
             server=server,
             post=post_model,
         )
-        cache.increment(cache.CacheKey.SERVER_POST_COUNT)
+        cache.increment(store=cache.Store.SERVER_POST_COUNT, key=str(server.pk))
+
+
+def is_member_banned_from_server(
+    server_vendor: constants.ServerVendor,
+    server_uid: str,
+    user_uid: str,
+) -> bool:
+    cache_key = f'{server_vendor.value}_{server_uid}_{user_uid}'
+    banned = cache.get(store=cache.Store.SERVER_USER_BANNED, key=cache_key)
+    if banned != cache.NO_HIT:
+        return banned is True
+
+    server_user = models.ServerMember.objects.filter(
+        server__vendor=server_vendor,
+        server__vendor_uid=server_uid,
+        vendor_uid=user_uid,
+    ).first()
+
+    banned = server_user.banned if server_user else False
+    cache.set(store=cache.Store.SERVER_USER_BANNED, key=cache_key, value=banned)
+
+    return banned
+
+
+def change_server_member_banned_status(
+    server_vendor: constants.ServerVendor,
+    server_uid: str,
+    member_uid: str,
+    banned: bool,
+) -> None:
+    updated = models.ServerMember.objects.filter(
+        server__vendor=server_vendor,
+        server__vendor_uid=server_uid,
+        vendor_uid=member_uid,
+    ).update(banned=banned)
+
+    if updated == 0:
+        models.ServerMember.objects.create(
+            server=models.Server.objects.filter(
+                vendor=server_vendor,
+                vendor_uid=server_uid,
+            ).first(),
+            vendor_uid=member_uid,
+            banned=banned,
+        )
+
+    cache.set(
+        store=cache.Store.SERVER_USER_BANNED,
+        key=f'{server_vendor.value}_{server_uid}_{member_uid}',
+        value=banned,
+    )

@@ -12,12 +12,26 @@ def should_handle_url(url: str) -> bool:
     return registry.should_handle(url)
 
 
-async def get_server_info(
+def get_server_info(
     server_vendor: constants.ServerVendor,
     server_uid: str,
 ) -> typing.Optional[str]:
     server = repository.get_server(vendor=server_vendor, vendor_uid=server_uid)
     return str(server) if server else None
+
+
+def change_server_member_banned_status(
+    server_vendor: constants.ServerVendor,
+    server_uid: str,
+    member_uid: str,
+    banned: bool,
+) -> None:
+    repository.change_server_member_banned_status(
+        server_vendor=server_vendor,
+        server_uid=server_uid,
+        member_uid=member_uid,
+        banned=banned,
+    )
 
 
 async def get_post(
@@ -55,6 +69,11 @@ async def get_post(
     if not server.can_post(num_posts_in_one_day=num_posts_in_server, integration=integration):
         logging.warning(f'Server {server.uid} is not allowed to post')
         raise Exception('Not allowed to post. Upgrade your tier.')
+
+    # Check if user is banned
+    if repository.is_member_banned_from_server(server_vendor=server_vendor, server_uid=server_uid, user_uid=author_uid):
+        logging.warning(f'User {author_uid} banned from server [{server_vendor.value} - {server_uid}]')
+        raise Exception('Not allowed to post, you were banned')
 
     # Check if post stored in DB already
     post = repository.get_post(

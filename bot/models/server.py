@@ -58,6 +58,40 @@ class Server(models.Model):
         ]
 
 
+class ServerMember(models.Model):
+    uid = models.UUIDField(
+        unique=True,
+        editable=False,
+        default=uuid.uuid4,
+        null=False,
+    )
+
+    vendor_uid = models.CharField(
+        max_length=32,
+        null=False,
+        editable=False,
+    )
+    banned = models.BooleanField(
+        null=False,
+        default=False,
+    )
+
+    created = models.DateTimeField(auto_now_add=True, null=False)
+    updated = models.DateTimeField(auto_now=True, null=True)
+
+    server = models.ForeignKey(
+        Server,
+        related_name='users',
+        on_delete=models.CASCADE,
+    )
+
+    class Meta:
+        db_table = 'server_member'
+        constraints = [
+            models.UniqueConstraint(name='vendor_server_unique_idx', fields=['vendor_uid', 'server']),
+        ]
+
+
 class ServerIntegration(models.Model):
     uid = models.UUIDField(
         unique=True,

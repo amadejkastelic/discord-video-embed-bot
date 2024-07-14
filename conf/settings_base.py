@@ -165,6 +165,15 @@ BOT_CONFIGURATION = {
     },
 }
 
+OAUTH2_CONFIGURATION = {
+    'discord': {
+        'client_id': None,
+        'client_secret': None,
+        'redirect_uri': None,
+        'api_token': BOT_CONFIGURATION['discord']['api_token'],
+    },
+}
+
 INTEGRATION_CONFIGURATION = {
     'tiktok': {
         'enabled': False,
@@ -193,5 +202,8 @@ INTEGRATION_CONFIGURATION = {
         'username': None,
         'email': None,
         'password': None,
+    },
+    'twitch': {
+        'enabled': False,
     },
 }

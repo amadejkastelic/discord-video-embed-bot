@@ -29,4 +29,4 @@ COPY examples/settings_prod.py ./settings.py
 RUN pipenv install && pipenv run playwright install chromium && pipenv run playwright install-deps
 
 # Set this
-ENTRYPOINT ["pipenv", "run", "python", "manage.py", "discord_bot"]
+ENTRYPOINT ["pipenv", "run", "python", "manage.py"]

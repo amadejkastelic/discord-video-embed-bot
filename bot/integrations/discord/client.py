@@ -7,6 +7,7 @@ from functools import partial
 import discord
 from discord import app_commands
 from discord import ui
+from discord.app_commands import checks
 
 from bot import constants
 from bot import domain
@@ -51,6 +52,11 @@ class DiscordClient(discord.Client):
                 description='Prints configuration for this server',
                 callback=self.command_help,
             ),
+            app_commands.Command(
+                name='silence',
+                description='(Un)Ban a user from using embed commands',
+                callback=self.silence_user,
+            ),
         ]
 
         self.tree = app_commands.CommandTree(client=self)
@@ -84,10 +90,13 @@ class DiscordClient(discord.Client):
         except Exception as e:
             logging.error(f'Failed downloading {url}: {str(e)}')
             await asyncio.gather(
-                new_message.edit(content=f'Failed downloading {url}. Error: {str(e)}. {message.author.mention}'),
+                new_message.edit(
+                    content=f'{message.author.mention}\nFailed downloading {url}.\nError: {str(e)}.',
+                    suppress=True,
+                ),
                 new_message.add_reaction('❌'),
             )
-            raise e
+            return
 
         try:
             msg = await self._send_post(post=post, send_func=message.channel.send, author=message.author)
@@ -143,7 +152,7 @@ class DiscordClient(discord.Client):
     async def command_help(self, interaction: discord.Interaction) -> None:
         await interaction.response.defer()
 
-        response = await service.get_server_info(
+        response = service.get_server_info(
             server_vendor=constants.ServerVendor.DISCORD,
             server_uid=str(interaction.guild.id),
         )
@@ -155,6 +164,35 @@ class DiscordClient(discord.Client):
             return
 
         await interaction.followup.send(content=f'{interaction.user.mention}\n{response}', view=CustomView())
+
+    @checks.has_permissions(administrator=True)
+    async def silence_user(self, interaction: discord.Interaction, member: discord.Member, unban: bool = False) -> None:
+        await interaction.response.defer(ephemeral=True)
+
+        if interaction.user.guild.id == member.id:
+            response = 'Can\'t ban yourself..'
+        else:
+            try:
+                service.change_server_user_banned_status(
+                    server_vendor=constants.ServerVendor.DISCORD,
+                    server_uid=interaction.guild.id,
+                    user_uid=member.id,
+                    banned=not unban,
+                )
+                response = 'User {display_name} {banned}banned.'
+            except Exception as e:
+                logging.error(f'Failed banning user... {str(e)}')
+                response = 'Failed to {banned}ban user {display_name}.'
+
+            response = response.format(
+                display_name=member.display_name,
+                banned='un' if unban else '',
+            )
+
+        await interaction.followup.send(
+            content=response,
+            ephemeral=True,
+        )
 
     async def _send_post(
         self,
