@@ -52,7 +52,7 @@ class Command(base.BaseCommand):
                 ).delete()
             except db.OperationalError as e:
                 logging.warning(f'DB Connection expired, reconnecting... {str(e)}')
-                utils.recover_from_db_error()
+                utils.recover_from_db_error(e)
                 time.sleep(1)
                 continue
 

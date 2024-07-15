@@ -7,7 +7,7 @@ import tempfile
 import typing
 
 import magic
-from django.db import connections
+from django import db as django_db
 
 emoji = ['😼', '😺', '😸', '😹', '😻', '🙀', '😿', '😾', '😩', '🙈', '🙉', '🙊', '😳']
 
@@ -56,7 +56,7 @@ def random_emoji() -> str:
     return random.choice(emoji)
 
 
-def recover_from_db_error():
-    for conn in connections.all():
-        conn.close()
-        conn.connect()
+def recover_from_db_error(exc: Exception):
+    if isinstance(exc, django_db.OperationalError) and exc.args[0] in (2006, 2013):
+        django_db.reset_queries()
+        django_db.close_old_connections()

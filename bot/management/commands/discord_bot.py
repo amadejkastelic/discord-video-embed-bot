@@ -20,4 +20,4 @@ class Command(base.BaseCommand):
                 asyncio.run(bot.DiscordBot().run())
             except db.OperationalError as e:
                 logging.warning(f'DB Connection expired, reconnecting... {str(e)}')
-                utils.recover_from_db_error()
+                utils.recover_from_db_error(e)
