@@ -11,6 +11,7 @@ from discord.app_commands import checks
 
 from bot import constants
 from bot import domain
+from bot import exceptions
 from bot import service
 from bot.common import utils
 
@@ -22,6 +23,10 @@ class CustomView(ui.View):
         interaction: discord.Interaction,
         _: ui.Button,
     ) -> None:
+        if interaction.message is None:
+            logging.warning('Invoked delete on a missing message')
+            return
+
         if interaction.user.mentioned_in(interaction.message):
             await interaction.message.delete()
             logging.info(f'User {interaction.user.id} performed a delete action')
@@ -35,7 +40,7 @@ class DiscordClient(discord.Client):
     def __init__(self, *, intents: discord.Intents, **options: typing.Any) -> None:
         super().__init__(intents=intents, **options)
 
-        commands = [
+        commands: typing.List[app_commands.Command] = [
             app_commands.Command(
                 name='embed',
                 description='Embeds media directly into discord',
@@ -67,7 +72,7 @@ class DiscordClient(discord.Client):
         logging.info(f'Logged on as {self.user}')
 
     async def on_message(self, message: discord.Message):  # noqa: C901
-        if message.author == self.user:
+        if message.author == self.user or message.guild is None:
             return
 
         url = utils.find_first_url(message.content)
@@ -86,6 +91,8 @@ class DiscordClient(discord.Client):
                 server_uid=str(message.guild.id),
                 author_uid=str(message.author.id),
             )
+            if not post:
+                raise exceptions.IntegrationClientError('Failed to fetch post')
         except Exception as e:
             logging.error(f'Failed downloading {url}: {str(e)}')
             await asyncio.gather(
@@ -109,6 +116,10 @@ class DiscordClient(discord.Client):
         await asyncio.gather(msg.add_reaction('❌'), new_message.delete())
 
     async def on_reaction_add(self, reaction: discord.Reaction, user: discord.User):
+        if not self.user:
+            logging.warning('Discord bot not logged in')
+            return
+
         if (
             reaction.message.author.id == self.user.id
             and reaction.emoji == '❌'
@@ -126,12 +137,14 @@ class DiscordClient(discord.Client):
             return
 
         try:
-            post = service.get_post(
+            post = await service.get_post(
                 url=url,
                 server_vendor=constants.ServerVendor.DISCORD,
-                server_uid=str(interaction.guild.id),
+                server_uid=str(interaction.guild_id),
                 author_uid=str(interaction.user.id),
             )
+            if not post:
+                raise exceptions.IntegrationClientError('Failed to fetch post')
             if not post.spoiler:
                 post.spoiler = spoiler
         except Exception as e:
@@ -153,7 +166,7 @@ class DiscordClient(discord.Client):
 
         response = service.get_server_info(
             server_vendor=constants.ServerVendor.DISCORD,
-            server_uid=str(interaction.guild.id),
+            server_uid=str(interaction.guild_id),
         )
         if not response:
             await interaction.followup.send(
@@ -168,14 +181,21 @@ class DiscordClient(discord.Client):
     async def silence_user(self, interaction: discord.Interaction, member: discord.Member, unban: bool = False) -> None:
         await interaction.response.defer(ephemeral=True)
 
+        if not isinstance(interaction.user, discord.Member):
+            await interaction.followup.send(
+                content='Something went wrong',
+                ephemeral=True,
+            )
+            return
+
         if interaction.user.guild.id == member.id:
             response = 'Can\'t ban yourself..'
         else:
             try:
                 service.change_server_member_banned_status(
                     server_vendor=constants.ServerVendor.DISCORD,
-                    server_uid=interaction.guild.id,
-                    member_uid=member.id,
+                    server_uid=str(interaction.guild_id),
+                    member_uid=str(member.id),
                     banned=not unban,
                 )
                 response = 'User {display_name} {banned}banned.'
@@ -200,7 +220,7 @@ class DiscordClient(discord.Client):
         await interaction.followup.send(
             content=service.get_post_format(
                 server_vendor=constants.ServerVendor.DISCORD,
-                server_uid=interaction.guild.id,
+                server_uid=str(interaction.guild_id),
                 integration=site,
             ),
             ephemeral=True,
@@ -210,7 +230,7 @@ class DiscordClient(discord.Client):
         self,
         post: domain.Post,
         send_func: typing.Callable,
-        author: discord.User,
+        author: typing.Union[discord.User, discord.Member],
     ) -> discord.Message:
         send_kwargs = {
             'suppress_embeds': True,
@@ -238,7 +258,10 @@ class DiscordClient(discord.Client):
         except discord.HTTPException as e:
             if e.status != 413:  # Payload too large
                 raise e
-            logging.info('File too large, resizing...')
-            file.fp.seek(0)
-            post.buffer = await utils.resize(buffer=file.fp, extension=extension)
-            return await self._send_post(post=post, send_func=send_func, author=author)
+            if post.buffer is not None:
+                logging.info('File too large, resizing...')
+                post.buffer.seek(0)
+                post.buffer = await utils.resize(buffer=post.buffer, extension=extension)
+                return await self._send_post(post=post, send_func=send_func, author=author)
+
+            raise exceptions.BotError('Failed to send message') from e

@@ -61,10 +61,10 @@ class TwitterClient(base.BaseClient):
     ):
         super().__init__()
 
-        if not all([username, email, password]):
-            self.client = None
+        self.client: typing.Optional[twscrape.API] = None
+        if all([username, email, password]):
+            self.client = twscrape.API()
 
-        self.client = twscrape.API()
         self.logged_in = False
         self.username = (username,)
         self.email = email
@@ -86,7 +86,7 @@ class TwitterClient(base.BaseClient):
     async def get_post(self, url: str) -> domain.Post:
         uid, index = self._parse_url(url)
 
-        if not self.client:
+        if self.client is None:
             return await self._get_post_no_login(url=url, uid=uid, index=index)
 
         if not self.logged_in:

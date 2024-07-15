@@ -306,10 +306,10 @@ def change_server_member_banned_status(
 
     if updated == 0:
         models.ServerMember.objects.create(
-            server=models.Server.objects.filter(
+            server=models.Server.objects.get(
                 vendor=server_vendor,
                 vendor_uid=server_uid,
-            ).first(),
+            ),
             vendor_uid=member_uid,
             banned=banned,
         )

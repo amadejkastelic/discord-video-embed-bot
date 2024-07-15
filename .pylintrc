@@ -2,6 +2,9 @@
 
 ignore-paths=bot/migrations
 
+load-plugins=pylint_django
+django-settings-module=examples.settings_dev
+
 [FORMAT]
 
 max-line-length=120

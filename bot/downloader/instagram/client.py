@@ -47,7 +47,7 @@ class InstagramClient(base.BaseClient):
         super().__init__()
 
         self.client = instaloader.Instaloader(user_agent=user_agent)
-        if username and os.path.exists(session_file_path):
+        if username and session_file_path and os.path.exists(session_file_path):
             self.client.load_session_from_file(username=username, filename=session_file_path)
 
     async def get_integration_data(

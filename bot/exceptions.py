@@ -15,3 +15,11 @@ class IntegrationClientError(BaseError):
 class NotAllowedError(BaseError):
     def __init__(self, action: str) -> None:
         super().__init__(f'Action not allowed: {action}')
+
+
+class ConfigurationError(BaseError):
+    pass
+
+
+class BotError(BaseError):
+    pass

@@ -47,7 +47,7 @@ def get_post_format(
     )
 
 
-async def get_post(
+async def get_post(  # noqa: C901
     url: str,
     server_vendor: constants.ServerVendor,
     server_uid: str,
@@ -61,7 +61,7 @@ async def get_post(
 
     if not client:
         logging.warning(f'Integration for url {url} not enabled or client init failure')
-        return
+        return None
 
     integration, integration_uid, integration_index = await client.get_integration_data(url=url)
 
@@ -73,6 +73,10 @@ async def get_post(
     if not server:
         logging.info(f'Server {server_uid} not configured, creating a default config')
         server = repository.create_server(vendor=server_vendor, vendor_uid=server_uid)
+
+    if not server._internal_id:
+        logging.error('Internal id for server not set')
+        raise exceptions.BotError('Internal server error')
 
     num_posts_in_server = repository.get_number_of_posts_in_server_from_datetime(
         server_id=server._internal_id,

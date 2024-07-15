@@ -25,6 +25,11 @@ class FacebookClientSingleton(base.BaseClientSingleton):
             cls._INSTANCE = base.MISSING
             return
 
+        if conf.cookies_file_path is None:
+            logging.warning('Not enabling facebook integration due to missing cookies')
+            cls._INSTANCE = base.MISSING
+            return
+
         cls._INSTANCE = FacebookClient(cookies_path=conf.cookies_file_path)
 
 
@@ -37,7 +42,7 @@ class FacebookClient(base.BaseClient):
 
     async def get_integration_data(self, url: str) -> typing.Tuple[constants.Integration, str, typing.Optional[int]]:
         if url.split('?')[0].endswith('/watch') and 'v=' in url:
-            return self.INTEGRATION, urllib_parse.parse_qs(urllib_parse.urlparse(url).query).get('v', None), None
+            return self.INTEGRATION, urllib_parse.parse_qs(urllib_parse.urlparse(url).query)['v'][0], None
 
         return self.INTEGRATION, url.split('?')[0].split('/')[-1], None
 

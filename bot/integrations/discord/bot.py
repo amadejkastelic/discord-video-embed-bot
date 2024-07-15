@@ -1,9 +1,9 @@
-import logging
 import typing
 
 import discord
 from django.conf import settings
 
+from bot import exceptions
 from bot.integrations import base
 from bot.integrations.discord import client
 
@@ -22,5 +22,5 @@ class DiscordBot(base.BaseBot):
     async def run(self) -> typing.NoReturn:
         if self.config.enabled and self.config.api_token:
             await self.client.start(token=self.config.api_token)
-        else:
-            logging.info('Discord bot not enabled or missing API token')
+
+        raise exceptions.ConfigurationError('Discord bot not enabled or missing API token')

@@ -10,7 +10,7 @@ from bot.downloader.twitter import client as twitter_client
 from bot.downloader.youtube import client as youtube_client
 
 
-CLASSES: typing.Set[base.BaseClientSingleton] = {
+CLASSES: typing.Set[typing.Type[base.BaseClientSingleton]] = {
     facebook_client.FacebookClientSingleton,
     instagram_client.InstagramClientSingleton,
     reddit_client.RedditClientSingleton,
@@ -29,7 +29,7 @@ def should_handle(url: str) -> bool:
     return False
 
 
-def get_instance(url: str) -> base.BaseClient:
+def get_instance(url: str) -> typing.Optional[base.BaseClient]:
     for klass in CLASSES:
         if any(domain in url for domain in klass.DOMAINS):
             return klass.get_instance()

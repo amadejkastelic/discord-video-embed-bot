@@ -50,15 +50,15 @@ class BaseClientConfigSchema(marshmallow.Schema):
 
 class BaseClientSingleton:
     DOMAINS: typing.List[str] = []
-    _INSTANCE: typing.Optional[BaseClient] = None
-    _CONFIG_SCHEMA: BaseClientConfigSchema = BaseClientConfigSchema
+    _INSTANCE: typing.Optional[typing.Union[BaseClient, int]] = None
+    _CONFIG_SCHEMA = BaseClientConfigSchema
 
     @classmethod
     def _create_instance(cls) -> None:
         raise NotImplementedError()
 
     @classmethod
-    def _load_config(cls, conf: typing.Dict) -> BaseClientConfig:
+    def _load_config(cls, conf: object) -> _CONFIG_SCHEMA._CONFIG_CLASS:
         return cls._CONFIG_SCHEMA().load(conf)
 
     @classmethod
