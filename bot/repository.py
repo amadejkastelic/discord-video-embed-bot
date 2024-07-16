@@ -214,6 +214,9 @@ def save_post(
     integration_uid: str,
     integration_index: typing.Optional[int] = None,
 ) -> models.Post:
+    if not integration_uid:
+        raise exceptions.RepositoryError('Error occured, contact support.')
+
     return models.Post.objects.create(
         integration=integration,
         integration_uid=integration_uid,
