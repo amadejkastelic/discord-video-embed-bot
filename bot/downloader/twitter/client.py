@@ -66,13 +66,13 @@ class TwitterClient(base.BaseClient):
             self.client = twscrape.API()
 
         self.logged_in = False
-        self.username = (username,)
+        self.username = username
         self.email = email
         self.password = password
 
     @staticmethod
     def _parse_url(url: str) -> typing.Tuple[str, int]:
-        metadata = url.split('/status/')[-1].split('?')[0].split('/')
+        metadata = url.strip('/').split('/status/')[-1].split('?')[0].split('/')
         return metadata[0], int(metadata[2]) - 1 if len(metadata) == 3 and metadata[1] == 'photo' else 0
 
     async def get_integration_data(self, url: str) -> typing.Tuple[constants.Integration, str, typing.Optional[int]]:

@@ -43,7 +43,7 @@ class TiktokClient(base.BaseClient):
 
     async def get_integration_data(self, url: str) -> typing.Tuple[constants.Integration, str, typing.Optional[int]]:
         clean_url = self._clean_url(url)
-        return self.INTEGRATION, clean_url.split('?')[0].split('/')[-1], None
+        return self.INTEGRATION, clean_url.strip('/').split('?')[0].split('/')[-1], None
 
     async def get_post(self, url: str) -> domain.Post:
         clean_url = self._clean_url(url)

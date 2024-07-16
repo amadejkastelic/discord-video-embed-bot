@@ -41,10 +41,10 @@ class FacebookClient(base.BaseClient):
         self.cookies_path = cookies_path
 
     async def get_integration_data(self, url: str) -> typing.Tuple[constants.Integration, str, typing.Optional[int]]:
-        if url.split('?')[0].endswith('/watch') and 'v=' in url:
+        if '/watch' in url.split('?')[0] and 'v=' in url:
             return self.INTEGRATION, urllib_parse.parse_qs(urllib_parse.urlparse(url).query)['v'][0], None
 
-        return self.INTEGRATION, url.split('?')[0].split('/')[-1], None
+        return self.INTEGRATION, url.strip('/').split('?')[0].split('/')[-1], None
 
     async def get_post(self, url: str) -> domain.Post:
         kwargs = {}

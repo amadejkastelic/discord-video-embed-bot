@@ -49,7 +49,7 @@ class RedditClient(base.BaseClient):
         )
 
     async def get_integration_data(self, url: str) -> typing.Tuple[constants.Integration, str, typing.Optional[int]]:
-        return self.INTEGRATION, url.split('?')[0].split('/')[-2], None
+        return self.INTEGRATION, url.strip('/').split('?')[0].split('/')[-2], None
 
     async def get_post(self, url: str) -> domain.Post:
         post = domain.Post(url=url)

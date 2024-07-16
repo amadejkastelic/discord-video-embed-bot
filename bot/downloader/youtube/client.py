@@ -31,7 +31,7 @@ class YoutubeClient(base.BaseClient):
     INTEGRATION = constants.Integration.YOUTUBE
 
     async def get_integration_data(self, url: str) -> typing.Tuple[constants.Integration, str, typing.Optional[int]]:
-        return self.INTEGRATION, url.split('?')[0].split('/')[-1], None
+        return self.INTEGRATION, url.strip('/').split('?')[0].split('/')[-1], None
 
     async def get_post(self, url: str) -> domain.Post:
         vid = pytube.YouTube(url)
