@@ -147,10 +147,11 @@ class Post(models.Model):
         null=True,
         default=None,
     )
-    description = models.CharField(
+    description = model_fields.CustomCharField(
         max_length=2000,
         null=True,
         default=None,
+        auto_trim=True,
     )
     views = models.BigIntegerField(
         null=True,

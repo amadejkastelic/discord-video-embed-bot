@@ -67,3 +67,17 @@ class IntEnumField(models.PositiveSmallIntegerField):
         name, path, args, kwargs = super().deconstruct()
         kwargs['enum'] = self.enum
         return name, path, args, kwargs
+
+
+class CustomCharField(models.CharField):
+    def __init__(self, *args, **kwargs) -> None:
+        self.auto_trim = kwargs.pop('auto_trim', False)
+        super().__init__(*args, **kwargs)
+
+    def get_prep_value(self, value: str) -> str:
+        value = super().get_prep_value(value)
+
+        if self.auto_trim is True and len(value) > self.max_length:
+            return value[: self.max_length]
+
+        return value
