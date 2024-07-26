@@ -2,6 +2,7 @@ import datetime
 import io
 import logging
 import os
+import re
 import typing
 
 import asyncpraw
@@ -15,6 +16,8 @@ from bot import domain
 from bot import exceptions
 from bot.downloader import base
 from bot.downloader.reddit import config
+
+NEW_REDDIT_URL_PATTERN = '^https://www.reddit.com/r/[^/]+/s/[^/]+$'
 
 
 class RedditClientSingleton(base.BaseClientSingleton):
@@ -49,7 +52,11 @@ class RedditClient(base.BaseClient):
         )
 
     async def get_integration_data(self, url: str) -> typing.Tuple[constants.Integration, str, typing.Optional[int]]:
-        return self.INTEGRATION, url.strip('/').split('?')[0].split('/')[-2], None
+        id_url_index = -2
+        if re.match(NEW_REDDIT_URL_PATTERN, url):  # New pattern contains id as last element
+            id_url_index = -1
+
+        return self.INTEGRATION, url.strip('/').split('?')[0].split('/')[id_url_index], None
 
     async def get_post(self, url: str) -> domain.Post:
         post = domain.Post(url=url)
