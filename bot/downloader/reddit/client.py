@@ -53,7 +53,9 @@ class RedditClient(base.BaseClient):
 
     async def get_integration_data(self, url: str) -> typing.Tuple[constants.Integration, str, typing.Optional[int]]:
         id_url_index = -2
-        if re.match(NEW_REDDIT_URL_PATTERN, url):  # New pattern contains id as last element
+        if re.match(NEW_REDDIT_URL_PATTERN, url) or url.startswith(
+            'https://redd.it/'
+        ):  # New and short url contains id as last element
             id_url_index = -1
 
         return self.INTEGRATION, url.strip('/').split('?')[0].split('/')[id_url_index], None
