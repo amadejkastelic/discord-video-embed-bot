@@ -77,7 +77,7 @@ class CustomCharField(models.CharField):
     def get_prep_value(self, value: str) -> str:
         value = super().get_prep_value(value)
 
-        if self.auto_trim is True and len(value) > self.max_length:
+        if value and self.auto_trim and len(value) > self.max_length:
             return value[: self.max_length]
 
         return value
