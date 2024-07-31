@@ -3,17 +3,21 @@ import io
 import logging
 import os
 import re
+import shutil
 import typing
+import uuid
 
 import asyncpraw
 import redvid
 import requests
+from RedDownloader import RedDownloader as reddit_downloader
 from asyncpraw import exceptions as praw_exceptions
 from django.conf import settings
 
 from bot import constants
 from bot import domain
 from bot import exceptions
+from bot.common import utils
 from bot.downloader import base
 from bot.downloader.reddit import config
 
@@ -45,11 +49,15 @@ class RedditClient(base.BaseClient):
 
     def __init__(self, client_id: str, client_secret: str, user_agent: str):
         super().__init__()
-        self.client = asyncpraw.Reddit(
-            client_id=client_id,
-            client_secret=client_secret,
-            user_agent=user_agent,
-        )
+        self.client = None
+        if all([client_id, client_secret, user_agent]):
+            self.client = asyncpraw.Reddit(
+                client_id=client_id,
+                client_secret=client_secret,
+                user_agent=user_agent,
+            )
+
+        self.downloader = reddit_downloader
 
     async def get_integration_data(self, url: str) -> typing.Tuple[constants.Integration, str, typing.Optional[int]]:
         id_url_index = -2
@@ -100,8 +108,31 @@ class RedditClient(base.BaseClient):
             with open(f'/tmp/{submission.id}.mp4', 'rb') as f:
                 post.buffer = io.BytesIO(f.read())
             os.remove(f'/tmp/{submission.id}.mp4')
+        elif submission.url.startswith('https://www.reddit.com/gallery/'):
+            post.buffer = self.download_and_merge_gallery(url=submission.url)
 
         return True
+
+    def download_and_merge_gallery(self, url: str) -> typing.Optional[io.BytesIO]:
+        path = f'/tmp/{uuid.uuid4()}'
+        os.mkdir(path)
+
+        self.downloader.Download(url=url, destination=path, verbose=False)
+        files = os.listdir(path)
+        if len(files) == 0:
+            return None
+        if len(files) == 1:
+            fp = f'{path}/{files[0]}'
+            if not os.path.isdir(fp):
+                with open(fp, 'rb') as f:
+                    return io.BytesIO(f.read())
+
+        path = f'{path}/downloaded'
+        files = os.listdir(path)
+        image_buffer = utils.combine_images([f'{path}/{f}' for f in files])
+
+        shutil.rmtree(path)
+        return image_buffer
 
     @staticmethod
     def _is_nsfw(url: str) -> bool:
