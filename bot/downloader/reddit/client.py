@@ -109,11 +109,11 @@ class RedditClient(base.BaseClient):
                 post.buffer = io.BytesIO(f.read())
             os.remove(f'/tmp/{submission.id}.mp4')
         elif submission.url.startswith('https://www.reddit.com/gallery/'):
-            post.buffer = self.download_and_merge_gallery(url=submission.url)
+            post.buffer = self._download_and_merge_gallery(url=submission.url)
 
         return True
 
-    def download_and_merge_gallery(self, url: str) -> typing.Optional[io.BytesIO]:
+    def _download_and_merge_gallery(self, url: str) -> typing.Optional[io.BytesIO]:
         path = f'/tmp/{uuid.uuid4()}'
         os.mkdir(path)
 
@@ -128,7 +128,8 @@ class RedditClient(base.BaseClient):
                     return io.BytesIO(f.read())
 
         downloaded_path = f'{path}/downloaded'
-        files = os.listdir(downloaded_path)
+        files = sorted(os.listdir(downloaded_path))
+
         image_buffer = utils.combine_images([f'{downloaded_path}/{f}' for f in files])
 
         shutil.rmtree(path)
