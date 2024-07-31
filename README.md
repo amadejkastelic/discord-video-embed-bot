@@ -48,3 +48,10 @@ INSTAGRAM_USERNAME=<your_instagram_username>
 ```bash
 python bin/fetch_instagram_session.py
 ```
+
+### Additional Options
+
+| Env Var           | Default Value | Description                                                                                                              |
+|-------------------|---------------|--------------------------------------------------------------------------------------------------------------------------|
+| `MINIMALIST_POST` | false         | If set to true, only the url and video will post instead of additional details such as description, author, created, etc |
+|                   |               |                                                                                                                          |
