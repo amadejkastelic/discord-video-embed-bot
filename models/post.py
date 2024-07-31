@@ -15,12 +15,12 @@ class Post:
     buffer: typing.Optional[io.BytesIO] = None
     spoiler: bool = False
     created: typing.Optional[datetime.datetime] = None
-    minimalist_post = os.environ.get('MINIMALIST_POST') or 'false'
+    compact_post = os.environ.get('COMPACT_POST') or 'false'
 
     def __str__(self) -> str:
         description = self.description or '❌'
 
-        if self.minimalist_post:
+        if self.compact_post:
             return ('🔗 URL: {url}\n').format(url=self.url)
 
         return (
