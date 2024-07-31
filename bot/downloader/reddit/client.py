@@ -124,12 +124,12 @@ class RedditClient(base.BaseClient):
         if len(files) == 1:
             fp = f'{path}/{files[0]}'
             if not os.path.isdir(fp):
-                with open(fp, 'rb') as f:
+                with utils.temp_open(fp, 'rb') as f:
                     return io.BytesIO(f.read())
 
-        path = f'{path}/downloaded'
-        files = os.listdir(path)
-        image_buffer = utils.combine_images([f'{path}/{f}' for f in files])
+        downloaded_path = f'{path}/downloaded'
+        files = os.listdir(downloaded_path)
+        image_buffer = utils.combine_images([f'{downloaded_path}/{f}' for f in files])
 
         shutil.rmtree(path)
         return image_buffer

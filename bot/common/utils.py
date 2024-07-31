@@ -1,10 +1,12 @@
 import asyncio
 import io
 import mimetypes
+import os
 import random
 import re
 import tempfile
 import typing
+from contextlib import contextmanager
 
 import magic
 from PIL import Image as pil_image
@@ -97,3 +99,14 @@ def resize_image(buffer: io.BytesIO, factor: float = 0.75) -> io.BytesIO:
     image_bytes.seek(0)
 
     return image_bytes
+
+
+@contextmanager
+def temp_open(path: str, mode: str = 'rb'):
+    f = open(path, mode)  # pylint: disable=unspecified-encoding
+
+    try:
+        yield f
+    finally:
+        f.close()
+        os.remove(path)
