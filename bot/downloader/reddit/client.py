@@ -1,6 +1,5 @@
 import datetime
 import io
-import logging
 import os
 import re
 import shutil
@@ -17,6 +16,7 @@ from django.conf import settings
 from bot import constants
 from bot import domain
 from bot import exceptions
+from bot import logger
 from bot.common import utils
 from bot.downloader import base
 from bot.downloader.reddit import config
@@ -33,7 +33,7 @@ class RedditClientSingleton(base.BaseClientSingleton):
         conf: config.RedditConfig = cls._load_config(conf=settings.INTEGRATION_CONFIGURATION.get('reddit', {}))
 
         if not conf.enabled and not all([conf.client_id, conf.client_secret, conf.user_agent]):
-            logging.info('Reddit integration not enabled or missing credentials')
+            logger.info('Reddit integration not enabled or missing credentials')
             cls._INSTANCE = base.MISSING
             return
 

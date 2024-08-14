@@ -1,6 +1,5 @@
 import datetime
 import json
-import logging
 import typing
 
 import twscrape
@@ -9,6 +8,7 @@ from django.conf import settings
 from bot import constants
 from bot import domain
 from bot import exceptions
+from bot import logger
 from bot.downloader import base
 from bot.downloader.twitter import config
 
@@ -39,7 +39,7 @@ class TwitterClientSingleton(base.BaseClientSingleton):
         conf: config.TwitterConfig = cls._load_config(conf=settings.INTEGRATION_CONFIGURATION.get('twitter', {}))
 
         if not conf.enabled:
-            logging.info('Twitter / X integration not enabled')
+            logger.info('Twitter / X integration not enabled')
             cls._INSTANCE = base.MISSING
             return
 
@@ -133,7 +133,7 @@ class TwitterClient(base.BaseClient):
             p.buffer = await self._download(url=url, cookies=(await self.client.pool.get_all())[0].cookies)
             return p
         except Exception as e:
-            logging.error(f'Failed fetching from twitter, retrying: {str(e)}')
+            logger.error('Failed fetching from twitter, retrying', error=str(e))
             if retry_count == 0:
                 await self.relogin()
                 return await self._get_post_login(url=url, uid=uid, index=index, retry_count=retry_count + 1)

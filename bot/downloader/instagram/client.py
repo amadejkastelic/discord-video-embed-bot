@@ -1,5 +1,4 @@
 import io
-import logging
 import os
 import typing
 from urllib.parse import parse_qs, urlparse
@@ -10,6 +9,7 @@ from django.conf import settings
 
 from bot import constants as bot_constants
 from bot import domain
+from bot import logger
 from bot.downloader import base
 from bot.downloader.instagram import config
 from bot.downloader.instagram import constants
@@ -24,7 +24,7 @@ class InstagramClientSingleton(base.BaseClientSingleton):
         conf: config.InstagramConfig = cls._load_config(conf=settings.INTEGRATION_CONFIGURATION.get('instagram', {}))
 
         if not conf.enabled:
-            logging.info('Instagram integration not enabled')
+            logger.info('Instagram integration not enabled')
             cls._INSTANCE = base.MISSING
             return
 

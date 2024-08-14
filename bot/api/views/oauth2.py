@@ -11,6 +11,9 @@ from bot.auth.oauth2.discord import oauth2
 
 
 class Oauth2ViewSet(viewsets.ViewSet):
+    permission_classes = []
+    authentication_classes = []
+
     @decorators.action(detail=False, methods=[http.HTTPMethod.GET], url_path='login/')
     def login(self, _: request.Request):
         client = oauth2.DiscordOAuth2Auth(conf=settings.OAUTH2_CONFIGURATION['discord'])

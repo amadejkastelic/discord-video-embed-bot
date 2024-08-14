@@ -1,10 +1,10 @@
 import datetime
-import logging
 import typing
 
 from bot import constants
 from bot import domain
 from bot import exceptions
+from bot import logger
 from bot import repository
 from bot.downloader import registry
 
@@ -56,11 +56,11 @@ async def get_post(  # noqa: C901
     try:
         client = registry.get_instance(url)
     except ValueError as e:
-        logging.warning(f'No strategy for url {url}. Error: {str(e)}')
+        logger.warning('No strategy for url', url=url, error=str(e))
         return None
 
     if not client:
-        logging.warning(f'Integration for url {url} not enabled or client init failure')
+        logger.warning('Integration for url not enabled or client init failure', url=url)
         return None
 
     integration, integration_uid, integration_index = await client.get_integration_data(url=url)
@@ -71,11 +71,15 @@ async def get_post(  # noqa: C901
         vendor_uid=server_uid,
     )
     if not server:
-        logging.info(f'Server {server_uid} not configured, creating a default config')
+        logger.info(
+            'Server not configured, creating a default config',
+            server_vendor_uid=server_uid,
+            server_vendor=server_vendor.value,
+        )
         server = repository.create_server(vendor=server_vendor, vendor_uid=server_uid)
 
     if not server._internal_id:
-        logging.error('Internal id for server not set')
+        logger.error('Internal id for server not set')
         raise exceptions.BotError('Internal server error')
 
     num_posts_in_server = repository.get_number_of_posts_in_server_from_datetime(
@@ -84,7 +88,12 @@ async def get_post(  # noqa: C901
     )
 
     if not server.can_post(num_posts_in_one_day=num_posts_in_server, integration=integration):
-        logging.warning(f'Server {server.uid} is not allowed to post')
+        logger.warning(
+            'Server is not allowed to post',
+            server_vendor=server_vendor.value,
+            server_vendor_uid=server_uid,
+            server_tier=server.tier.name,
+        )
         raise exceptions.NotAllowedError('Upgrade your tier')
 
     # Check if user is banned
@@ -93,7 +102,12 @@ async def get_post(  # noqa: C901
         server_uid=server_uid,
         member_uid=author_uid,
     ):
-        logging.warning(f'User {author_uid} banned from server [{server_vendor.value} - {server_uid}]')
+        logger.warning(
+            'User banned from server',
+            user=author_uid,
+            server_vendor=server_vendor.value,
+            server_vendor_uid=server_uid,
+        )
         raise exceptions.NotAllowedError('User banned')
 
     # Check if post stored in DB already
@@ -108,10 +122,10 @@ async def get_post(  # noqa: C901
         try:
             post = await client.get_post(url)
         except Exception as e:
-            logging.error(f'Failed downloading {url}: {str(e)}')
+            logger.error('Failed downloading', url=url, error=str(e))
             raise e
     else:
-        logging.debug(f'Post {url} already in DB, not downloading again...')
+        logger.debug('Post already in DB, not downloading again...', url=url)
 
     # Set formatting
     post.set_format(server.integrations[integration].post_format)

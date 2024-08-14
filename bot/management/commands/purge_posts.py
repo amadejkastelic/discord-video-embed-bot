@@ -1,11 +1,11 @@
 import datetime
-import logging
 import time
 import typing
 
 from django import db
 from django.core.management import base
 
+from bot import logger
 from bot import models
 from bot.common import utils
 
@@ -37,11 +37,13 @@ class Command(base.BaseCommand):
         )
 
     def handle(self, *args: typing.Any, **options: typing.Any) -> typing.NoReturn:
-        logging.info('Running purge posts command')
-
         older_than = self._parse_older_than(options.get('older_than', '1d'))
         batch_size = options.get('batch_size', 10)
         sleep = options.get('sleep', 60 * 60 * 1)
+
+        logger.info(
+            'Running purge posts command', older_than=older_than.isoformat(), batch_size=batch_size, sleep=sleep
+        )
 
         while True:
             try:
@@ -51,12 +53,12 @@ class Command(base.BaseCommand):
                     )
                 ).delete()
             except db.OperationalError as e:
-                logging.warning(f'DB Connection expired, reconnecting... {str(e)}')
+                logger.warning('DB Connection expired, reconnecting', str(e))
                 utils.recover_from_db_error(e)
                 time.sleep(1)
                 continue
 
-            logging.info(f'Deleted {num_deleted} expired posts')
+            logger.info('Deleted expired posts', count=num_deleted)
 
             time.sleep(sleep)
 

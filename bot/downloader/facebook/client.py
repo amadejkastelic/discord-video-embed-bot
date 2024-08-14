@@ -1,4 +1,3 @@
-import logging
 import os
 import typing
 from urllib import parse as urllib_parse
@@ -8,6 +7,7 @@ from django.conf import settings
 
 from bot import constants
 from bot import domain
+from bot import logger
 from bot.downloader import base
 from bot.downloader.facebook import config
 
@@ -21,12 +21,12 @@ class FacebookClientSingleton(base.BaseClientSingleton):
         conf: config.FacebookConfig = cls._load_config(settings.INTEGRATION_CONFIGURATION.get('facebook', {}))
 
         if not conf.enabled:
-            logging.info('Facebook integration not enabled')
+            logger.info('Facebook integration not enabled')
             cls._INSTANCE = base.MISSING
             return
 
         if conf.cookies_file_path is None:
-            logging.warning('Not enabling facebook integration due to missing cookies')
+            logger.warning('Not enabling facebook integration due to missing cookies')
             cls._INSTANCE = base.MISSING
             return
 

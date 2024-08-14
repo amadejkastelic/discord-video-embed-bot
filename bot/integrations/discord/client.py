@@ -1,6 +1,5 @@
 import asyncio
 import datetime
-import logging
 import typing
 from functools import partial
 
@@ -12,6 +11,7 @@ from discord.app_commands import checks
 from bot import constants
 from bot import domain
 from bot import exceptions
+from bot import logger
 from bot import service
 from bot.common import utils
 
@@ -24,15 +24,17 @@ class CustomView(ui.View):
         _: ui.Button,
     ) -> None:
         if interaction.message is None:
-            logging.warning('Invoked delete on a missing message')
+            logger.warning('Invoked delete on a missing message')
             return
 
         if interaction.user.mentioned_in(interaction.message):
             await interaction.message.delete()
-            logging.info(f'User {interaction.user.id} performed a delete action')
+            logger.info('User performed a delete action', user=interaction.user.id, message=interaction.message.id)
         else:
-            logging.warning(
-                f'User {interaction.user.id} tried to perform an illegal delete action on {interaction.message.id}'
+            logger.warning(
+                'User tried to perform an illegal delete action',
+                user=interaction.user.id,
+                message=interaction.message.id,
             )
 
 
@@ -69,7 +71,7 @@ class DiscordClient(discord.Client):
 
     async def on_ready(self):
         await self.tree.sync()
-        logging.info(f'Logged on as {self.user}')
+        logger.info('Logged on', bot_user=self.user)
 
     async def on_message(self, message: discord.Message):  # noqa: C901
         if message.author == self.user or message.guild is None:
@@ -94,7 +96,7 @@ class DiscordClient(discord.Client):
             if not post:
                 raise exceptions.IntegrationClientError('Failed to fetch post')
         except Exception as e:
-            logging.error(f'Failed downloading {url}: {str(e)}')
+            logger.error('Failed downloading', url=url, error=str(e))
             await asyncio.gather(
                 new_message.edit(
                     content=f'{message.author.mention}\nFailed downloading {url}.\nError: {str(e)}.',
@@ -106,9 +108,9 @@ class DiscordClient(discord.Client):
 
         try:
             msg = await self._send_post(post=post, send_func=message.channel.send, author=message.author)
-            logging.info(f'User {message.author.display_name} sent message with url {url}')
+            logger.info('User sent message with url', user=message.author.display_name, url=url)
         except Exception as e:
-            logging.error(f'Failed sending message {url}: {str(e)}')
+            logger.error('Failed sending message', url=url, error=str(e))
             msg = await message.channel.send(
                 content=f'Failed sending discord message for {url} ({message.author.mention}).\nError: {str(e)}'
             )
@@ -117,7 +119,7 @@ class DiscordClient(discord.Client):
 
     async def on_reaction_add(self, reaction: discord.Reaction, user: discord.User):
         if not self.user:
-            logging.warning('Discord bot not logged in')
+            logger.warning('Discord bot not logged in')
             return
 
         if (
@@ -127,7 +129,11 @@ class DiscordClient(discord.Client):
             and reaction.message.created_at.replace(tzinfo=None)
             >= (datetime.datetime.utcnow() - datetime.timedelta(minutes=5))
         ):
-            logging.info(f'User {user.display_name} deleted message {utils.find_first_url(reaction.message.content)}')
+            logger.info(
+                'User deleted message',
+                user=reaction.message.author.id,
+                url=utils.find_first_url(reaction.message.content),
+            )
             await reaction.message.delete()
 
     async def command_embed(self, interaction: discord.Interaction, url: str, spoiler: bool = False) -> None:
@@ -148,7 +154,7 @@ class DiscordClient(discord.Client):
             if not post.spoiler:
                 post.spoiler = spoiler
         except Exception as e:
-            logging.error(f'Failed downloading {url}: {str(e)}')
+            logger.error('Failed downloading', url=url, error=str(e))
             await interaction.followup.send(
                 content=f'Failed fetching {url} ({interaction.user.mention}).\nError: {str(e)}',
                 view=CustomView(),
@@ -200,7 +206,7 @@ class DiscordClient(discord.Client):
                 )
                 response = 'User {display_name} {banned}banned.'
             except Exception as e:
-                logging.error(f'Failed banning user... {str(e)}')
+                logger.error('Failed banning user', error=str(e))
                 response = 'Failed to {banned}ban user {display_name}.'
 
             response = response.format(
@@ -259,7 +265,7 @@ class DiscordClient(discord.Client):
             if e.status != 413:  # Payload too large
                 raise e
             if post.buffer is not None:
-                logging.info('File too large, resizing...')
+                logger.info('File too large, resizing...')
                 post.buffer.seek(0)
                 post.buffer = await utils.resize(buffer=post.buffer, extension=extension)
                 return await self._send_post(post=post, send_func=send_func, author=author)

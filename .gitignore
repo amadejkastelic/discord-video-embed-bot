@@ -6,3 +6,4 @@ instagram.sess
 accounts.db
 settings.py
 docker/db/data
+*.log

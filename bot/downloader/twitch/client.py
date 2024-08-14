@@ -1,6 +1,5 @@
 import datetime
 import io
-import logging
 import typing
 
 import requests
@@ -12,6 +11,7 @@ from twitchdl.commands import download as twitch_download
 from bot import constants
 from bot import domain
 from bot import exceptions
+from bot import logger
 from bot.downloader import base
 from bot.downloader.twitch import config
 
@@ -25,7 +25,7 @@ class TwitchClientSingleton(base.BaseClientSingleton):
         conf: config.TwitchConfig = cls._load_config(conf=settings.INTEGRATION_CONFIGURATION.get('twitch', {}))
 
         if not conf.enabled:
-            logging.info('Twitch integration not enabled')
+            logger.info('Twitch integration not enabled')
             cls._INSTANCE = base.MISSING
             return
 

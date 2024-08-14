@@ -1,5 +1,4 @@
 import io
-import logging
 import typing
 
 import pytube
@@ -7,6 +6,7 @@ from django.conf import settings
 
 from bot import constants
 from bot import domain
+from bot import logger
 from bot.downloader import base
 from bot.downloader.youtube import config
 
@@ -20,7 +20,7 @@ class YoutubeClientSingleton(base.BaseClientSingleton):
         conf: config.YoutubeConfig = cls._load_config(conf=settings.INTEGRATION_CONFIGURATION.get('youtube', {}))
 
         if not conf.enabled:
-            logging.info('Youtube integration not enabled')
+            logger.info('Youtube integration not enabled')
             cls._INSTANCE = base.MISSING
             return
 

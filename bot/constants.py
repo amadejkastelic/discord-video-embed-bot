@@ -11,6 +11,16 @@ class ServerTier(enum.Enum):
     PREMIUM = 3
     ULTRA = 4
 
+    def __str__(self) -> str:
+        return self.name
+
+    @staticmethod
+    def from_string(s: str) -> 'ServerTier':
+        try:
+            return ServerTier[s]
+        except KeyError as e:
+            raise ValueError() from e
+
 
 class ServerStatus(enum.Enum):
     ACTIVE = 1

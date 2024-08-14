@@ -1,7 +1,6 @@
 import asyncio
 import glob
 import io
-import logging
 import os
 import typing
 import urllib
@@ -16,6 +15,7 @@ from tiktokapipy.models import video as tiktok_video
 from bot import constants
 from bot import domain
 from bot import exceptions
+from bot import logger
 from bot.downloader import base
 from bot.downloader.tiktok import config
 
@@ -31,7 +31,7 @@ class TiktokClientSingleton(base.BaseClientSingleton):
         conf: config.TiktokConfig = cls._load_config(conf=settings.INTEGRATION_CONFIGURATION.get('tiktok', {}))
 
         if not conf.enabled:
-            logging.info('Tiktok integration not enabled')
+            logger.info('Tiktok integration not enabled')
             cls._INSTANCE = base.MISSING
             return
 
@@ -48,7 +48,7 @@ class TiktokClient(base.BaseClient):
     async def get_post(self, url: str) -> domain.Post:
         clean_url = self._clean_url(url)
 
-        logging.debug(f'Trying to download tiktok video {clean_url}...')
+        logger.debug('Trying to download tiktok video', url=clean_url)
 
         async with AsyncTikTokAPI() as api:
             video = await api.video(clean_url)
