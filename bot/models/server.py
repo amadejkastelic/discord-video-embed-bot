@@ -41,13 +41,6 @@ class Server(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=False)
     updated = models.DateTimeField(auto_now=True, null=True)
 
-    owner = models.ForeignKey(
-        'User',
-        on_delete=models.SET_NULL,
-        null=True,
-        default=None,
-    )
-
     class Meta:
         db_table = 'server'
         indexes = [

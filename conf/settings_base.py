@@ -206,6 +206,8 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_LIFETIME_LATE_USER': datetime.timedelta(days=30),
 }
 
+AUTH_USER_MODEL = 'bot.User'
+
 
 ##########################
 #       APP CONFIG       #
