@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "8c50b12eb7f1962c9bc8ece05c59d51072ce699b42af9fb2cab39d4902c44ca1"
+            "sha256": "2c554f343629f85f9dbf072a6d147d9977aff2229b9489e86f2885d033476387"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -617,11 +617,11 @@
         },
         "instaloader": {
             "hashes": [
-                "sha256:0e3fa65dd4b033f2ef6022a04f95fec18e0258535aee985d0643895713f2eec3"
+                "sha256:49b15c3c41ba9287ddecacb57c5fdd1ee706107117b4b8ddd9ccb56ab75c573c"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.8'",
-            "version": "==4.12"
+            "version": "==4.13"
         },
         "loguru": {
             "hashes": [
