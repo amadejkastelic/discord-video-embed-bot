@@ -26,7 +26,7 @@ NEW_REDDIT_URL_PATTERN = '^https://www.reddit.com/r/[^/]+/s/[^/]+$'
 
 class RedditClientSingleton(base.BaseClientSingleton):
     DOMAINS = ['reddit.com', 'redd.it']
-    _CONFIG_SCHEMA = config.RedditConfigSchema
+    _CONFIG_CLASS = config.RedditConfig
 
     @classmethod
     def _create_instance(cls) -> None:

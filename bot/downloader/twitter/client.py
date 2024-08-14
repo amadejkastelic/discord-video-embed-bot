@@ -32,7 +32,7 @@ HEADERS = {
 
 class TwitterClientSingleton(base.BaseClientSingleton):
     DOMAINS = ['twitter.com', 'x.com']
-    _CONFIG_SCHEMA = config.TwitterConfigSchema
+    _CONFIG_CLASS = config.TwitterConfig
 
     @classmethod
     def _create_instance(cls) -> None:

@@ -17,7 +17,7 @@ from bot.downloader.instagram import constants
 
 class InstagramClientSingleton(base.BaseClientSingleton):
     DOMAINS = ['instagram.com', 'ddinstagram.com']
-    _CONFIG_SCHEMA = config.InstagramConfigSchema
+    _CONFIG_CLASS = config.InstagramConfig
 
     @classmethod
     def _create_instance(cls) -> None:

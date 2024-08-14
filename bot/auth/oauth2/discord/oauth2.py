@@ -5,11 +5,10 @@ import discordoauth2
 from bot.auth.oauth2 import base
 from bot.auth.oauth2 import types
 from bot.auth.oauth2.discord import config
-from bot.auth.oauth2.discord import schemas
 
 
-class DiscordOauth2Auth(base.BaseOauth2Auth):
-    _CONFIG_SCHEMA = config.DiscordOauth2ConfigSchema
+class DiscordOAuth2Auth(base.BaseOauth2Auth):
+    _CONFIG_CLASS = config.DiscordOAuth2Config
 
     def __init__(self, conf: typing.Dict[str, str]) -> None:
         super().__init__(conf)
@@ -29,7 +28,9 @@ class DiscordOauth2Auth(base.BaseOauth2Auth):
 
         access_token.update_metadata('EmbedBot', 'Username')
 
-        return types.Identity(
-            user=schemas.DiscordUserSchema().load(access_token.fetch_identify()),
-            servers=schemas.GuildSchema(many=True).load(access_token.fetch_guilds()),
+        return types.Identity.model_validate(
+            {
+                'user': access_token.fetch_identify(),
+                'servers': access_token.fetch_guilds(),
+            }
         )

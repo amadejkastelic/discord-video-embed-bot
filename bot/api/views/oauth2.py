@@ -13,7 +13,7 @@ from bot.auth.oauth2.discord import oauth2
 class Oauth2ViewSet(viewsets.ViewSet):
     @decorators.action(detail=False, methods=[http.HTTPMethod.GET], url_path='login/')
     def login(self, _: request.Request):
-        client = oauth2.DiscordOauth2Auth(conf=settings.OAUTH2_CONFIGURATION['discord'])
+        client = oauth2.DiscordOAuth2Auth(conf=settings.OAUTH2_CONFIGURATION['discord'])
         return shortcuts.redirect(
             client.generate_uri(
                 scope=[
@@ -29,7 +29,7 @@ class Oauth2ViewSet(viewsets.ViewSet):
     def redirect(self, req: request.Request):
         code = req.query_params.get('code')
 
-        client = oauth2.DiscordOauth2Auth(conf=settings.OAUTH2_CONFIGURATION['discord'])
+        client = oauth2.DiscordOAuth2Auth(conf=settings.OAUTH2_CONFIGURATION['discord'])
         identity = client.exchange_code(code)
 
         return django_http.JsonResponse(

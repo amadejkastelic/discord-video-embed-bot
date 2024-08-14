@@ -18,7 +18,7 @@ from bot.downloader.twitch import config
 
 class TwitchClientSingleton(base.BaseClientSingleton):
     DOMAINS = ['twitch.tv']
-    _CONFIG_SCHEMA = config.TwitchConfigSchema
+    _CONFIG_SCHEMA = config.TwitchConfig
 
     @classmethod
     def _create_instance(cls) -> None:

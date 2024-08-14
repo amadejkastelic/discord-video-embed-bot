@@ -1,36 +1,21 @@
 import typing
-from dataclasses import dataclass
 
-import marshmallow
-from marshmallow import fields
+import pydantic
 
 from bot.auth.oauth2 import types
 
 
-@dataclass
-class BaseOauth2Config:
+class BaseOAuth2Config(pydantic.BaseModel):
     client_id: str
     client_secret: str
     redirect_uri: str
 
 
-class BaseOauth2ConfigSchema(marshmallow.Schema):
-    _CONFIG_TYPE = BaseOauth2Config
-
-    client_id = fields.Str()
-    client_secret = fields.Str()
-    redirect_uri = fields.Str()
-
-    @marshmallow.post_load
-    def to_obj(self, data: typing.Dict[str, str], **kwargs) -> _CONFIG_TYPE:
-        return self._CONFIG_TYPE(**data)
-
-
 class BaseOauth2Auth:
-    _CONFIG_SCHEMA = BaseOauth2ConfigSchema
+    _CONFIG_CLASS: BaseOAuth2Config = BaseOAuth2Config
 
     def __init__(self, config: typing.Dict[str, str]) -> None:
-        self.config: BaseOauth2Config = self._CONFIG_SCHEMA().load(config)
+        self.config: BaseOAuth2Config = self._CONFIG_CLASS.model_validate(config)
 
     def generate_uri(self, scope: typing.List[str]) -> str:
         raise NotImplementedError()

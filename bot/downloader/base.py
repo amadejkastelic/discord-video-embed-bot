@@ -1,10 +1,8 @@
 import io
 import typing
-from dataclasses import dataclass
 
 import aiohttp
-import marshmallow
-from marshmallow import fields as marshmallow_fields
+import pydantic
 
 from bot import constants
 from bot import domain
@@ -33,33 +31,22 @@ class BaseClient:
                 return await resp.text()
 
 
-@dataclass
-class BaseClientConfig:
+class BaseClientConfig(pydantic.BaseModel):
     enabled: bool = False
-
-
-class BaseClientConfigSchema(marshmallow.Schema):
-    _CONFIG_CLASS: typing.Type = BaseClientConfig
-
-    enabled = marshmallow_fields.Bool(allow_none=True, load_default=False)
-
-    @marshmallow.post_load
-    def to_obj(self, data, **kwargs) -> BaseClientConfig:
-        return self._CONFIG_CLASS(**data)
 
 
 class BaseClientSingleton:
     DOMAINS: typing.List[str] = []
     _INSTANCE: typing.Optional[typing.Union[BaseClient, int]] = None
-    _CONFIG_SCHEMA = BaseClientConfigSchema
+    _CONFIG_CLASS = BaseClientConfig
 
     @classmethod
     def _create_instance(cls) -> None:
         raise NotImplementedError()
 
     @classmethod
-    def _load_config(cls, conf: object) -> _CONFIG_SCHEMA._CONFIG_CLASS:
-        return cls._CONFIG_SCHEMA().load(conf)
+    def _load_config(cls, conf: object) -> _CONFIG_CLASS:
+        return cls._CONFIG_CLASS.model_validate(conf)
 
     @classmethod
     def get_instance(cls) -> typing.Optional[BaseClient]:

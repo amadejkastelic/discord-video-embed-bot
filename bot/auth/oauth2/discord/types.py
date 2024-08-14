@@ -1,11 +1,9 @@
 import typing
-from dataclasses import dataclass
 
 from bot.auth.oauth2 import types
 from bot.auth.oauth2.discord import constants
 
 
-@dataclass
 class DiscordUser(types.User):
     discriminator: typing.Optional[str] = None
     global_name: typing.Optional[str] = None
@@ -24,7 +22,6 @@ class DiscordUser(types.User):
     avatar_decoration_data: typing.Optional[object] = None  # I don't care
 
 
-@dataclass
 class Guild(types.Server):
     icon: typing.Optional[str] = None
     permissions: typing.Optional[str] = None

@@ -13,7 +13,7 @@ from bot.downloader.youtube import config
 
 class YoutubeClientSingleton(base.BaseClientSingleton):
     DOMAINS = ['youtube.com/shorts']
-    _CONFIG_SCHEMA = config.YoutubeConfigSchema
+    _CONFIG_CLASS = config.YoutubeConfig
 
     @classmethod
     def _create_instance(cls) -> None:

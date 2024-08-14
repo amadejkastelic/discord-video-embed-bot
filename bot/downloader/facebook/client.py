@@ -14,7 +14,7 @@ from bot.downloader.facebook import config
 
 class FacebookClientSingleton(base.BaseClientSingleton):
     DOMAINS = ['facebook.com', 'fb.watch']
-    _CONFIG_SCHEMA = config.FacebookConfigSchema
+    _CONFIG_CLASS = config.FacebookConfig
 
     @classmethod
     def _create_instance(cls) -> None:

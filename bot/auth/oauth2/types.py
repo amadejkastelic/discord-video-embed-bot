@@ -1,21 +1,19 @@
 import typing
-from dataclasses import dataclass
+
+import pydantic
 
 
-@dataclass
-class User:
+class User(pydantic.BaseModel):
     id: str
     username: str
 
 
-@dataclass
-class Server:
+class Server(pydantic.BaseModel):
     id: str = None
     name: str = None
     owner: bool = False
 
 
-@dataclass
-class Identity:
+class Identity(pydantic.BaseModel):
     user: User
     servers: typing.List[Server]
