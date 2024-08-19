@@ -14,7 +14,6 @@ from bot import models
 def create_server(
     vendor_uid: str,
     vendor: constants.ServerVendor,
-    owner_id: typing.Optional[int] = None,
     tier: constants.ServerTier = constants.ServerTier.FREE,
     status: constants.ServerStatus = constants.ServerStatus.ACTIVE,
 ) -> domain.Server:
@@ -24,7 +23,6 @@ def create_server(
             vendor=vendor,
             tier=tier,
             status=status,
-            owner_id=owner_id,
         )
         # Add some default integrations to server
         integrations = models.ServerIntegration.objects.bulk_create(

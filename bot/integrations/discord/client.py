@@ -14,6 +14,7 @@ from bot import exceptions
 from bot import logger
 from bot import service
 from bot.common import utils
+from bot.integrations import mixins
 
 
 class CustomView(ui.View):
@@ -38,7 +39,9 @@ class CustomView(ui.View):
             )
 
 
-class DiscordClient(discord.Client):
+class DiscordClient(mixins.BotMixin, discord.Client):
+    VENDOR = constants.ServerVendor.DISCORD
+
     def __init__(self, *, intents: discord.Intents, **options: typing.Any) -> None:
         super().__init__(intents=intents, **options)
 
@@ -46,22 +49,27 @@ class DiscordClient(discord.Client):
             app_commands.Command(
                 name='embed',
                 description='Embeds media directly into discord',
-                callback=self.command_embed,
+                callback=self.embed_cmd,
             ),
             app_commands.Command(
                 name='help',
                 description='Prints configuration for this server',
-                callback=self.command_help,
+                callback=self.help_cmd,
             ),
             app_commands.Command(
                 name='silence',
                 description='(Un)Ban a user from using embed commands',
-                callback=self.silence_user,
+                callback=self.silence_user_cmd,
             ),
             app_commands.Command(
                 name='postfmt',
                 description='Fetches post format for specified site',
-                callback=self.get_post_format,
+                callback=self.get_post_format_cmd,
+            ),
+            app_commands.Command(
+                name='clear_cache',
+                description='Clears post cache for server',
+                callback=self.clear_cache_cmd,
             ),
         ]
 
@@ -136,7 +144,7 @@ class DiscordClient(discord.Client):
             )
             await reaction.message.delete()
 
-    async def command_embed(self, interaction: discord.Interaction, url: str, spoiler: bool = False) -> None:
+    async def embed_cmd(self, interaction: discord.Interaction, url: str, spoiler: bool = False) -> None:
         await interaction.response.defer()
 
         if service.should_handle_url(url) is False:
@@ -167,7 +175,7 @@ class DiscordClient(discord.Client):
             author=interaction.user,
         )
 
-    async def command_help(self, interaction: discord.Interaction) -> None:
+    async def help_cmd(self, interaction: discord.Interaction) -> None:
         await interaction.response.defer()
 
         response = service.get_server_info(
@@ -184,7 +192,9 @@ class DiscordClient(discord.Client):
         await interaction.followup.send(content=f'{interaction.user.mention}\n{response}', view=CustomView())
 
     @checks.has_permissions(administrator=True)
-    async def silence_user(self, interaction: discord.Interaction, member: discord.Member, unban: bool = False) -> None:
+    async def silence_user_cmd(
+        self, interaction: discord.Interaction, member: discord.Member, unban: bool = False
+    ) -> None:
         await interaction.response.defer(ephemeral=True)
 
         if not isinstance(interaction.user, discord.Member):
@@ -220,15 +230,36 @@ class DiscordClient(discord.Client):
         )
 
     @checks.has_permissions(administrator=True)
-    async def get_post_format(self, interaction: discord.Interaction, site: constants.Integration) -> None:
+    async def get_post_format_cmd(self, interaction: discord.Interaction, integration: constants.Integration) -> None:
         await interaction.response.defer(ephemeral=True)
 
         await interaction.followup.send(
             content=service.get_post_format(
                 server_vendor=constants.ServerVendor.DISCORD,
                 server_uid=str(interaction.guild_id),
-                integration=site,
+                integration=integration,
             ),
+            ephemeral=True,
+        )
+
+    @checks.has_permissions(administrator=True)
+    async def clear_cache_cmd(
+        self,
+        interaction: discord.Interaction,
+        integration: typing.Optional[constants.Integration],
+    ) -> None:
+        await interaction.response.defer(ephemeral=True)
+
+        res = self.clear_cache(server_vendor_uid=str(interaction.guild_id), integration=integration)
+        logger.info(
+            'Admin cleared post cache',
+            deleted_cnt=res,
+            integration=integration.value if integration else 'all',
+            admin=interaction.user.id,
+        )
+
+        await interaction.followup.send(
+            content=f'Deleted {res} posts from cache.',
             ephemeral=True,
         )
 
