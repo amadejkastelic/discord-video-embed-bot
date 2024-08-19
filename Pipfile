@@ -4,8 +4,8 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-tiktokapipy = "==0.2.4.post2"
-playwright = "==1.45.0"
+"tiktokapipy[download]" = "==0.2.4.post2"
+playwright = "==1.46.0"
 "discord.py" = "==2.4.0"
 instaloader = "==4.13"
 facebook-scraper = "==0.2.59"
