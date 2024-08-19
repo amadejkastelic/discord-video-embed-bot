@@ -34,7 +34,6 @@ class Command(base.BaseCommand):
             nargs='*',
             default=None,
             action='store',
-            type=list,
             help='List of supported integrations',
         )
 
