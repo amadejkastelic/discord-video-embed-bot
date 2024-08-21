@@ -1,5 +1,6 @@
 import datetime
 import io
+import glob
 import os
 import re
 import shutil
@@ -32,8 +33,8 @@ class RedditClientSingleton(base.BaseClientSingleton):
     def _create_instance(cls) -> None:
         conf: config.RedditConfig = cls._load_config(conf=settings.INTEGRATION_CONFIGURATION.get('reddit', {}))
 
-        if not conf.enabled and not all([conf.client_id, conf.client_secret, conf.user_agent]):
-            logger.info('Reddit integration not enabled or missing credentials')
+        if not conf.enabled:
+            logger.info('Reddit integration not enabled')
             cls._INSTANCE = base.MISSING
             return
 
@@ -56,6 +57,8 @@ class RedditClient(base.BaseClient):
                 client_secret=client_secret,
                 user_agent=user_agent,
             )
+        else:
+            logger.warning('Basic reddit integration (no credentials)')
 
         self.downloader = reddit_downloader
 
@@ -79,7 +82,7 @@ class RedditClient(base.BaseClient):
 
     async def _hydrate_post(self, post: domain.Post) -> bool:
         if not self.client:
-            return False
+            return self._hydrate_post_no_login(post)
 
         try:
             submission = await self.client.submission(url=post.url)
@@ -110,6 +113,38 @@ class RedditClient(base.BaseClient):
             os.remove(f'/tmp/{submission.id}.mp4')
         elif submission.url.startswith('https://www.reddit.com/gallery/'):
             post.buffer = self._download_and_merge_gallery(url=submission.url)
+
+        return True
+
+    def _hydrate_post_no_login(self, post: domain.Post) -> bool:
+        try:
+            media = self.downloader.Download(url=post.url, quality=720, destination='/tmp/', output=str(uuid.uuid4()))
+        except Exception as e:
+            logger.error('Failed to fetch reddit post', error=str(e))
+            return False
+
+        post.description = media.GetPostTitle().Get()
+        post.author = media.GetPostAuthor().Get()
+        post.spoiler = self._is_nsfw(post.url)
+
+        files = glob.glob(os.path.join(media.destination, f'{media.output}*'))
+        if not files:
+            return True
+
+        if os.path.isfile(files[0]):
+            with open(files[0], 'rb') as f:
+                post.buffer = io.BytesIO(f.read())
+        else:
+            photos = [os.path.join(files[0], photo) for photo in os.listdir(files[0])]
+            post.buffer = utils.combine_images(photos)
+            for photo in photos:
+                os.remove(photo)
+
+        for file in files:
+            if os.path.isfile(file):
+                os.remove(file)
+            else:
+                os.rmdir(file)
 
         return True
 
