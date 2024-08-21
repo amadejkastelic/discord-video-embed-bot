@@ -68,8 +68,8 @@ def recover_from_db_error(exc: Exception):
         django_db.close_old_connections()
 
 
-def combine_images(image_paths: typing.List[str], gap: int = 10, quality: int = 85) -> io.BytesIO:
-    images = [pil_image.open(path) for path in image_paths]
+def combine_images(image_fps: typing.List[str | io.BytesIO], gap: int = 10, quality: int = 85) -> io.BytesIO:
+    images = [pil_image.open(path) for path in image_fps]
     widths, heights = zip(*(im.size for im in images))
 
     new_image = pil_image.new('RGBA', (sum(widths), max(heights)))

@@ -9,6 +9,7 @@ from bot import constants
 from bot import domain
 from bot import exceptions
 from bot import logger
+from bot.common import utils
 from bot.downloader import base
 from bot.downloader.twitter import config
 
@@ -71,9 +72,9 @@ class TwitterClient(base.BaseClient):
         self.password = password
 
     @staticmethod
-    def _parse_url(url: str) -> typing.Tuple[str, int]:
+    def _parse_url(url: str) -> typing.Tuple[str, typing.Optional[int]]:
         metadata = url.strip('/').split('/status/')[-1].split('?')[0].split('/')
-        return metadata[0], int(metadata[2]) - 1 if len(metadata) == 3 and metadata[1] == 'photo' else 0
+        return metadata[0], int(metadata[2]) - 1 if len(metadata) == 3 and metadata[1] == 'photo' else None
 
     async def get_integration_data(self, url: str) -> typing.Tuple[constants.Integration, str, typing.Optional[int]]:
         uid, index = self._parse_url(url)
@@ -87,7 +88,7 @@ class TwitterClient(base.BaseClient):
         uid, index = self._parse_url(url)
 
         if self.client is None:
-            return await self._get_post_no_login(url=url, uid=uid, index=index)
+            return await self._get_post_no_login(url=url, uid=uid, index=index or 0)
 
         if not self.logged_in:
             await self.client.pool.add_account(
@@ -104,7 +105,7 @@ class TwitterClient(base.BaseClient):
         self,
         url: str,
         uid: str,
-        index: int = 0,
+        index: typing.Optional[int] = None,
         retry_count: int = 0,
     ) -> domain.Post:
         try:
@@ -122,15 +123,23 @@ class TwitterClient(base.BaseClient):
                 return p
 
             if details.media.videos:
-                url = max(details.media.videos[index].variants, key=lambda x: x.bitrate).url
+                media_url = max(details.media.videos[index or 0].variants, key=lambda x: x.bitrate).url
             elif details.media.photos:
-                url = details.media.photos[index].url
+                # Download all photos if index not specified
+                if index is None:
+                    cookies = (await self.client.pool.get_all())[0].cookies
+                    p.buffer = utils.combine_images(
+                        [await self._download(url=photo.url, cookies=cookies) for photo in details.media.photos]
+                    )
+                    return p
+
+                media_url = details.media.photos[index].url
             elif details.media.animated:
-                url = details.media.animated[index].videoUrl
+                media_url = details.media.animated[index or 0].videoUrl
             else:
                 return p
 
-            p.buffer = await self._download(url=url, cookies=(await self.client.pool.get_all())[0].cookies)
+            p.buffer = await self._download(url=media_url, cookies=(await self.client.pool.get_all())[0].cookies)
             return p
         except Exception as e:
             logger.error('Failed fetching from twitter, retrying', error=str(e))
