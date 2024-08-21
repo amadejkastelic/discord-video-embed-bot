@@ -48,11 +48,12 @@ class TiktokClient(base.BaseClient):
     async def get_post(self, url: str) -> domain.Post:
         clean_url = self._clean_url(url)
 
-        logger.debug('Trying to download tiktok video', url=clean_url)
-
         async with AsyncTikTokAPI() as api:
             video = await api.video(clean_url)
             cookies = {cookie['name']: cookie['value'] for cookie in await api.context.cookies()}
+
+            logger.debug('Trying to download tiktok video', url=video.video.play_addr, cookies=str(cookies))
+
             if video.image_post:
                 buffer = await self._download_slideshow(
                     video=video,
@@ -60,10 +61,11 @@ class TiktokClient(base.BaseClient):
                 )
             else:
                 buffer = await self._download(
-                    url=video.video.download_addr,
+                    url=video.video.play_addr or video.video.download_addr,
                     cookies=cookies,
                     headers=HEADERS,
                 )
+
             return domain.Post(
                 url=url,
                 author=video.author.unique_id if isinstance(video.author, user.LightUser) else video.author,
