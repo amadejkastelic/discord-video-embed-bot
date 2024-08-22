@@ -6,7 +6,6 @@ pkgs.mkShell {
     python312
     python312Packages.pip
     python312Packages.python-magic
-    python312Packages.playwright
     playwright
     playwright-driver.browsers
     docker-compose

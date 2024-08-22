@@ -90,6 +90,12 @@ class DiscordClient(mixins.BotMixin, discord.Client):
             return
 
         if service.should_handle_url(url) is False:
+            logger.debug(
+                'Handling for URL not implemented',
+                url=url,
+                server_uid=str(message.guild.id),
+                server_vendor=self.VENDOR.value,
+            )
             return
 
         new_message = (await asyncio.gather(message.delete(), message.channel.send('🔥 Working on it 🥵')))[1]
