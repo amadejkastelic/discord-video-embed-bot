@@ -1,6 +1,14 @@
+import enum
 import typing
 
 import pydantic
+
+
+class MediaType(enum.IntEnum):
+    IMAGE = 1
+    VIDEO = 2
+    CAROUSEL = 8
+    COMMENT = 19
 
 
 class BaseModel(pydantic.BaseModel):
@@ -17,9 +25,9 @@ class User(BaseModel):
 
 
 class Candidate(BaseModel):
-    height: typing.Optional[int]
+    height: typing.Optional[int] = None
     url: typing.Optional[str]
-    width: typing.Optional[int]
+    width: typing.Optional[int] = None
 
 
 class ImageVersions2(BaseModel):
@@ -35,6 +43,17 @@ class Caption(BaseModel):
     text: typing.Optional[str]
 
 
+class CarouselMedia(BaseModel):
+    image_versions2: typing.Optional[ImageVersions2]
+    video_versions: typing.Optional[typing.List[VideoVersion]]
+    accessibility_caption: typing.Optional[str]
+    has_audio: typing.Optional[bool]
+    original_height: typing.Optional[int]
+    original_width: typing.Optional[int]
+    pk: typing.Optional[str]
+    id: typing.Optional[str]
+
+
 class Post(BaseModel):
     user: typing.Optional[User]
     accessibility_caption: typing.Optional[str]
@@ -43,10 +62,10 @@ class Post(BaseModel):
     original_height: typing.Optional[int]
     code: typing.Optional[str]
     video_versions: typing.Optional[typing.List[VideoVersion]]
-    carousel_media: typing.Optional[str]
+    carousel_media: typing.Optional[typing.List[CarouselMedia]]
     pk: typing.Optional[str]
     id: typing.Optional[str]
-    media_type: typing.Optional[int]
+    media_type: typing.Optional[typing.Union[MediaType, int]]
     has_audio: typing.Optional[bool]
     audio: typing.Optional[str]
     taken_at: typing.Optional[int]
