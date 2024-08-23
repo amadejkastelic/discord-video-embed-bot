@@ -1,12 +1,15 @@
 import asyncio
 import io
+import os
 import mimetypes
 import random
 import re
 import tempfile
 import typing
+from contextlib import contextmanager
 
 import magic
+from PIL import Image as pil_image
 
 emoji = ['😼', '😺', '😸', '😹', '😻', '🙀', '😿', '😾', '😩', '🙈', '🙉', '🙊', '😳']
 
@@ -53,3 +56,47 @@ async def resize(buffer: io.BytesIO, extension: str = 'mp4') -> io.BytesIO:
 
 def random_emoji() -> str:
     return random.choice(emoji)
+
+
+def combine_images(image_fps: typing.List[str | io.BytesIO], gap: int = 10, quality: int = 85) -> io.BytesIO:
+    images = [pil_image.open(path) for path in image_fps]
+    widths, heights = zip(*(im.size for im in images))
+
+    new_image = pil_image.new('RGBA', (sum(widths), max(heights)))
+    offset = 0
+    for image in images:
+        new_image.paste(image, (offset, 0))
+        offset += image.size[0] + gap
+
+    image_bytes = io.BytesIO()
+    new_image.save(image_bytes, format='PNG', quality=quality, optimize=True)
+    image_bytes.seek(0)
+
+    return image_bytes
+
+
+def resize_image(buffer: io.BytesIO, factor: float = 0.75) -> io.BytesIO:
+    if factor == 1.0:
+        return buffer
+
+    image = pil_image.open(buffer)
+    width, height = image.size
+
+    new_image = image.resize((int(width * factor), int(height * factor)), pil_image.Resampling.NEAREST)
+
+    image_bytes = io.BytesIO()
+    new_image.save(image_bytes, format='PNG', optimize=True)
+    image_bytes.seek(0)
+
+    return image_bytes
+
+
+@contextmanager
+def temp_open(path: str, mode: str = 'rb'):
+    f = open(path, mode)  # pylint: disable=unspecified-encoding
+
+    try:
+        yield f
+    finally:
+        f.close()
+        os.remove(path)

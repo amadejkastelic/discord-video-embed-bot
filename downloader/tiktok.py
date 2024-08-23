@@ -37,7 +37,7 @@ class TiktokClient(base.BaseClient):
                 )
             else:
                 buffer = await self._download(
-                    url=video.video.download_addr,
+                    url=video.video.play_addr or video.video.download_addr,
                     cookies=cookies,
                     headers=headers,
                 )

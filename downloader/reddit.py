@@ -1,14 +1,19 @@
 import datetime
+import glob
 import io
 import os
+import shutil
 import typing
+import uuid
 
 import asyncpraw
 import redvid
 import requests
+from RedDownloader import RedDownloader as reddit_downloader
 from asyncpraw import exceptions as praw_exceptions
 
 import models
+import utils
 from downloader import base
 
 
@@ -39,6 +44,7 @@ class RedditClient(base.BaseClient):
     def __init__(self, url: str):
         super(RedditClient, self).__init__(url=url)
         self.client = RedditClientSingleton.get_instance()
+        self.downloader = reddit_downloader
 
     async def get_post(self) -> models.Post:
         post = models.Post(url=self.url)
@@ -79,8 +85,63 @@ class RedditClient(base.BaseClient):
             with open(f'/tmp/{submission.id}.mp4', 'rb') as f:
                 post.buffer = io.BytesIO(f.read())
             os.remove(f'/tmp/{submission.id}.mp4')
+        elif submission.url.startswith('https://www.reddit.com/gallery/'):
+            post.buffer = self._download_and_merge_gallery(url=submission.url)
 
         return True
+
+    def _hydrate_post_no_login(self, post: models.Post) -> bool:
+        try:
+            media = self.downloader.Download(url=post.url, quality=720, destination='/tmp/', output=str(uuid.uuid4()))
+        except Exception:
+            return False
+
+        post.description = media.GetPostTitle().Get()
+        post.author = media.GetPostAuthor().Get()
+        post.spoiler = self._is_nsfw()
+
+        files = glob.glob(os.path.join(media.destination, f'{media.output}*'))
+        if not files:
+            return True
+
+        if os.path.isfile(files[0]):
+            with open(files[0], 'rb') as f:
+                post.buffer = io.BytesIO(f.read())
+        else:
+            photos = [os.path.join(files[0], photo) for photo in os.listdir(files[0])]
+            post.buffer = utils.combine_images(photos)
+            for photo in photos:
+                os.remove(photo)
+
+        for file in files:
+            if os.path.isfile(file):
+                os.remove(file)
+            else:
+                os.rmdir(file)
+
+        return True
+
+    def _download_and_merge_gallery(self, url: str) -> typing.Optional[io.BytesIO]:
+        path = f'/tmp/{uuid.uuid4()}'
+        os.mkdir(path)
+
+        self.downloader.Download(url=url, destination=path, verbose=False)
+        files = os.listdir(path)
+        if len(files) == 0:
+            return None
+        if len(files) == 1:
+            fp = f'{path}/{files[0]}'
+            if not os.path.isdir(fp):
+                with utils.temp_open(fp, 'rb') as f:
+                    return io.BytesIO(f.read())
+
+        downloaded_path = f'{path}/downloaded'
+        files = sorted(os.listdir(downloaded_path))
+
+        image_buffer = utils.combine_images([f'{downloaded_path}/{f}' for f in files])
+
+        shutil.rmtree(path)
+        return image_buffer
 
     def _is_nsfw(self) -> bool:
         content = str(requests.get(self.url).content)
