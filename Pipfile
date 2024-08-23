@@ -5,9 +5,9 @@ name = "pypi"
 
 [packages]
 tiktokapipy = "==0.2.4.post2"
-playwright = "==1.43.0"
+playwright = "==1.46.0"
 "discord.py" = "==2.4.0"
-instaloader = "==4.12"
+instaloader = "==4.13"
 facebook-scraper = "==0.2.59"
 python-magic = "0.4.27"
 redvid = "==2.0.5"
@@ -17,6 +17,7 @@ asyncpraw = "==7.7.1"
 twscrape = "==0.13"
 pytube2 = "==15.0.6"
 lxml-html-clean = "==0.1.1"
+RedDownloader = "==4.3.0"
 
 [dev-packages]
 black = "==24.4.2"
