@@ -6,6 +6,7 @@ from bot.downloader.instagram import client as instagram_client
 from bot.downloader.reddit import client as reddit_client
 from bot.downloader.threads import client as threads_client
 from bot.downloader.tiktok import client as tiktok_client
+from bot.downloader.twenty4ur import client as twenty4ur_client
 from bot.downloader.twitch import client as twitch_client
 from bot.downloader.twitter import client as twitter_client
 from bot.downloader.youtube import client as youtube_client
@@ -17,6 +18,7 @@ CLASSES: typing.Set[typing.Type[base.BaseClientSingleton]] = {
     reddit_client.RedditClientSingleton,
     threads_client.ThreadsClientSingleton,
     tiktok_client.TiktokClientSingleton,
+    twenty4ur_client.Twenty4UrClientSingleton,
     twitch_client.TwitchClientSingleton,
     twitter_client.TwitterClientSingleton,
     youtube_client.YoutubeClientSingleton,

@@ -252,6 +252,12 @@ INTEGRATION_CONFIGURATION = {
     'youtube': {
         'enabled': False,
     },
+    'threads': {
+        'enable': False,
+    },
+    '24ur': {
+        'enable': False,
+    },
     'twitter': {
         'enabled': False,
         'username': None,
