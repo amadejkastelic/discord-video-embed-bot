@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "4362fa2160bebdcf876c73cc88c0134c3ee86ed173e1c730c6e90051402b762b"
+            "sha256": "5f554dda5077e7df95761b86a0112977633635e10d719cd35974b9aa0fd83a97"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,6 +16,17 @@
         ]
     },
     "default": {
+        "24ur-api": {
+            "extras": [
+                "download"
+            ],
+            "hashes": [
+                "sha256:5d489d7ba4337d17ffc30305bce7edce96f76019efc3eefb12a9e6717aedb4a1",
+                "sha256:d4900befb9937dc03fd46f6bc8deeeb804ef87e6bfe9db609379353d1b5290f0"
+            ],
+            "markers": "python_version ~= '3.8'",
+            "version": "==0.1.4"
+        },
         "aiofiles": {
             "hashes": [
                 "sha256:7a973fc22b29e9962d0897805ace5856e6a566ab1f0c8e5c91ff6c866519c937",
@@ -711,11 +722,11 @@
         },
         "idna": {
             "hashes": [
-                "sha256:028ff3aadf0609c1fd278d8ea3089299412a7a8b9bd005dd08b9f8285bcb5cfc",
-                "sha256:82fee1fc78add43492d3a1898bfa6d8a904cc97d8427f683ed8e798d07761aa0"
+                "sha256:050b4e5baadcd44d760cedbd2b8e639f2ff89bbc7a5730fcc662954303377aac",
+                "sha256:d838c2c0ed6fced7693d5e8ab8e734d5f8fda53a039c0164afb0b82e771e3603"
             ],
-            "markers": "python_version >= '3.5'",
-            "version": "==3.7"
+            "markers": "python_version >= '3.6'",
+            "version": "==3.8"
         },
         "imageio": {
             "hashes": [
@@ -912,6 +923,13 @@
             ],
             "markers": "python_version >= '3.7'",
             "version": "==4.1.0"
+        },
+        "m3u8downloader": {
+            "hashes": [
+                "sha256:51a47018425357a185e8d2a92588471884e87ce038ad6a3c149043bd78f88764",
+                "sha256:753f91bba49c34e6f5288321631e82ef90aac414a207bbce151842a2529e7e3a"
+            ],
+            "version": "==0.10.1"
         },
         "moviepy": {
             "hashes": [
@@ -1850,6 +1868,13 @@
             ],
             "markers": "python_version >= '3.8'",
             "version": "==13.0"
+        },
+        "wells": {
+            "hashes": [
+                "sha256:5ba4c3d6b5f991ff542070f582b2f695951997d165d414eb6e219f29bc71742c",
+                "sha256:a6c936aeb45e9742b49c603ef1d247e71ca81b8b1f94b12e0a6ae7e48757ba8a"
+            ],
+            "version": "==1.5.0"
         },
         "yarl": {
             "hashes": [

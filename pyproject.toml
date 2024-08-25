@@ -10,7 +10,7 @@ dev = ["black", "flake8"]
 
 [tool.black]
 line-length = 120
-target-version = ['py311']
+target-version = ['py312']
 include = '\.pyi?$'
 skip-string-normalization = true
 

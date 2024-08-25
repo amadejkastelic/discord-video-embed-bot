@@ -13,6 +13,7 @@ pkgs.mkShell {
     curl
     jq
     file
+    ffmpeg
   ];
 
   shellHook = ''

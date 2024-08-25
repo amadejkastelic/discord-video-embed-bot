@@ -34,6 +34,7 @@ class Integration(enum.Enum):
     TIKTOK = 'tiktok'
     REDDIT = 'reddit'
     THREADS = 'threads'
+    TWENTY4_UR = '24ur'
     TWITCH = 'twitch'
     TWITTER = 'twitter'
     YOUTUBE = 'youtube'
