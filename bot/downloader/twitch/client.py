@@ -58,6 +58,9 @@ class TwitchClient(base.BaseClient):
                 buffer=io.BytesIO(resp.content),
             )
 
+    async def get_comments(self, url: str, n: int = 5) -> typing.List[domain.Comment]:
+        raise exceptions.NotSupportedError('get_comments')
+
     @staticmethod
     def _find_quality(qualities: typing.List[twitch.VideoQuality], max_quality: int = 720) -> int:
         """

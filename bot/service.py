@@ -141,3 +141,76 @@ async def get_post(  # noqa: C901
     )
 
     return post
+
+
+async def get_comments(  # noqa: C901
+    url: str,
+    n: int,
+    server_vendor: constants.ServerVendor,
+    server_uid: str,
+    author_uid: str,
+) -> typing.List[domain.Comment]:
+    # TODO: Refactor
+    if n > 15:
+        raise exceptions.NotAllowedError('Can\'t fetch more than 15 comments')
+
+    try:
+        client = registry.get_instance(url)
+    except ValueError as e:
+        logger.warning('No strategy for url', url=url, error=str(e))
+        return None
+
+    if not client:
+        logger.warning('Integration for url not enabled or client init failure', url=url)
+        return None
+
+    # Check if server is throttled and allowed to post
+    server = repository.get_server(
+        vendor=server_vendor,
+        vendor_uid=server_uid,
+    )
+    if not server:
+        logger.info(
+            'Server not configured, creating a default config',
+            server_vendor_uid=server_uid,
+            server_vendor=server_vendor.value,
+        )
+        server = repository.create_server(vendor=server_vendor, vendor_uid=server_uid)
+
+    if not server._internal_id:
+        logger.error('Internal id for server not set')
+        raise exceptions.BotError('Internal server error')
+
+    num_posts_in_server = repository.get_number_of_posts_in_server_from_datetime(
+        server_id=server._internal_id,
+        from_datetime=datetime.datetime.now() - datetime.timedelta(days=1),
+    )
+
+    if not server.can_post(num_posts_in_one_day=num_posts_in_server, integration=client.INTEGRATION):
+        logger.warning(
+            'Server is not allowed to post',
+            server_vendor=server_vendor.value,
+            server_vendor_uid=server_uid,
+            server_tier=server.tier.name,
+        )
+        raise exceptions.NotAllowedError('Upgrade your tier')
+
+    # Check if user is banned
+    if repository.is_member_banned_from_server(
+        server_vendor=server_vendor,
+        server_uid=server_uid,
+        member_uid=author_uid,
+    ):
+        logger.warning(
+            'User banned from server',
+            user=author_uid,
+            server_vendor=server_vendor.value,
+            server_vendor_uid=server_uid,
+        )
+        raise exceptions.NotAllowedError('User banned')
+
+    try:
+        return await client.get_comments(url=url, n=n)
+    except Exception as e:
+        logger.error('Failed downloading', url=url, num_comments=n, error=str(e))
+        raise e

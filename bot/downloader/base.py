@@ -20,6 +20,9 @@ class BaseClient:
     async def get_post(self, url: str) -> domain.Post:
         raise NotImplementedError()
 
+    async def get_comments(self, url: str, n: int = 5) -> typing.List[domain.Comment]:
+        raise NotImplementedError()
+
     async def _download(self, url: str, cookies: typing.Optional[typing.Dict[str, str]] = None, **kwargs) -> io.BytesIO:
         async with aiohttp.ClientSession(cookies=cookies) as session:
             async with session.get(url=url, **kwargs) as resp:

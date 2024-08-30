@@ -17,6 +17,11 @@ class NotAllowedError(BaseError):
         super().__init__(f'Action not allowed: {action}')
 
 
+class NotSupportedError(BaseError):
+    def __init__(self, action: str) -> None:
+        super().__init__(f'Action not supported: {action}')
+
+
 class ConfigurationError(BaseError):
     pass
 

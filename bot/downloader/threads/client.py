@@ -97,6 +97,9 @@ class ThreadsClient(base.BaseClient):
 
         return post
 
+    async def get_comments(self, url: str, n: int = 5) -> typing.List[domain.Comment]:
+        raise exceptions.NotSupportedError('get_comments')
+
     def _get_thread_id(self, url_id: str) -> str:
         alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_'
 

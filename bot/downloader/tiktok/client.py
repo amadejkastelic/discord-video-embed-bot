@@ -76,6 +76,23 @@ class TiktokClient(base.BaseClient):
                 created=video.create_time.astimezone(),
             )
 
+    async def get_comments(self, url: str, n: int = 5) -> typing.List[domain.Comment]:
+        clean_url = self._clean_url(url)
+
+        async with AsyncTikTokAPI() as api:
+            video = await api.video(clean_url)
+
+            logger.debug('Trying to fetch tiktok comments', url=url)
+
+            return [
+                domain.Comment(
+                    author=comment.user.unique_id if isinstance(comment.user, user.LightUser) else comment.user,
+                    likes=comment.digg_count,
+                    comment=comment.text,
+                )
+                async for comment in video.comments.limit(n)
+            ]
+
     async def _download_slideshow(self, video: tiktok_video.Video, cookies: typing.Dict[str, str]) -> io.BytesIO:
         vf = (
             '"scale=iw*min(1080/iw\\,1920/ih):ih*min(1080/iw\\,1920/ih),'

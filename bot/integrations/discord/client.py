@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import typing
 from functools import partial
+from itertools import batched
 
 import discord
 from discord import app_commands
@@ -50,6 +51,11 @@ class DiscordClient(mixins.BotMixin, discord.Client):
                 name='embed',
                 description='Embeds media directly into discord',
                 callback=self.embed_cmd,
+            ),
+            app_commands.Command(
+                name='comments',
+                description='Fetches comments for a post',
+                callback=self.get_comments_cmd,
             ),
             app_commands.Command(
                 name='help',
@@ -181,6 +187,47 @@ class DiscordClient(mixins.BotMixin, discord.Client):
             author=interaction.user,
         )
 
+    async def get_comments_cmd(
+        self,
+        interaction: discord.Interaction,
+        url: str,
+        n: int = 5,
+        spoiler: bool = False,
+    ) -> None:
+        await interaction.response.defer()
+
+        if service.should_handle_url(url) is False:
+            return
+
+        try:
+            comments = await service.get_comments(
+                url=url,
+                n=n,
+                server_vendor=constants.ServerVendor.DISCORD,
+                server_uid=str(interaction.guild_id),
+                author_uid=str(interaction.user.id),
+            )
+        except Exception as e:
+            logger.error('Failed downloading', url=url, error=str(e))
+            await interaction.followup.send(
+                content=f'Failed fetching {url} ({interaction.user.mention}).\nError: {str(e)}',
+                view=CustomView(),
+            )
+            raise e
+
+        # Override spoiler
+        for comment in comments:
+            if not comment.spoiler:
+                comment.spoiler = spoiler
+
+        for batch in batched(comments, 5):
+            await self._send_comments(
+                url=url,
+                comments=batch,
+                send_func=partial(interaction.followup.send, view=CustomView()),
+                author=interaction.user,
+            )
+
     async def help_cmd(self, interaction: discord.Interaction) -> None:
         await interaction.response.defer()
 
@@ -307,4 +354,29 @@ class DiscordClient(mixins.BotMixin, discord.Client):
                 post.buffer = await utils.resize(buffer=post.buffer, extension=extension)
                 return await self._send_post(post=post, send_func=send_func, author=author)
 
+            raise exceptions.BotError('Failed to send message') from e
+
+    async def _send_comments(
+        self,
+        url: str,
+        comments: typing.List[domain.Comment],
+        send_func: typing.Callable,
+        author: typing.Union[discord.User, discord.Member],
+    ) -> discord.Message:
+        send_kwargs = {
+            'suppress_embeds': True,
+        }
+
+        content = f'Here you go {author.mention} {utils.random_emoji()}.\n{url}\n{domain.comments_to_string(comments)}'
+        if len(content) > 2000:
+            if any(comment.spoiler is True for comment in comments):
+                content = content[:1995] + '||...'
+            else:
+                content = content[:1997] + '...'
+
+        send_kwargs['content'] = content
+
+        try:
+            return await send_func(**send_kwargs)
+        except discord.HTTPException as e:
             raise exceptions.BotError('Failed to send message') from e
