@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "5f554dda5077e7df95761b86a0112977633635e10d719cd35974b9aa0fd83a97"
+            "sha256": "06e68deac28dbd90e12cd46668596d6249d670d06099796ba4f96a346cfc6d9b"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -18,14 +18,15 @@
     "default": {
         "24ur-api": {
             "extras": [
-                "download"
+                "download",
+                "video"
             ],
             "hashes": [
-                "sha256:5d489d7ba4337d17ffc30305bce7edce96f76019efc3eefb12a9e6717aedb4a1",
-                "sha256:d4900befb9937dc03fd46f6bc8deeeb804ef87e6bfe9db609379353d1b5290f0"
+                "sha256:18968818cc06d6c99e3cf70c107f902e5bf725b05de4a517320893cc7b2aff1c",
+                "sha256:8ee54fb5d8d56d1be6ad688bc4fa6d30a3eec5cd46d3e6c0bafd8fe512b83f13"
             ],
             "markers": "python_version ~= '3.8'",
-            "version": "==0.1.4"
+            "version": "==0.1.5"
         },
         "aiofiles": {
             "hashes": [
@@ -1480,10 +1481,10 @@
         },
         "pyquery": {
             "hashes": [
-                "sha256:8dfc9b4b7c5f877d619bbae74b1898d5743f6ca248cfd5d72b504dd614da312f",
-                "sha256:963e8d4e90262ff6d8dec072ea97285dc374a2f69cad7776f4082abcf6a1d8ae"
+                "sha256:0194bb2706b12d037db12c51928fe9ebb36b72d9e719565daba5a6c595322faf",
+                "sha256:aedfa0bd0eb9afc94b3ddbec8f375a6362b32bc9662f46e3e0d866483f4771b0"
             ],
-            "version": "==2.0.0"
+            "version": "==2.0.1"
         },
         "python-dateutil": {
             "hashes": [
@@ -1743,7 +1744,7 @@
                 "sha256:04e5ca0351e0f3f85c6853954072df659d0d13fac324d0072316b67d7794700d",
                 "sha256:1a7ead55c7e559dd4dee8856e3a88b41225abfe1ce8df57b7c13915fe121ffb8"
             ],
-            "markers": "python_version >= '3.8'",
+            "markers": "python_version < '3.13'",
             "version": "==4.12.2"
         },
         "tzlocal": {

@@ -27,7 +27,7 @@ pymemcache = "==4.0.0"
 "discord-oauth2.py" = "==1.2.1"
 twitch-dl = "==2.3.1"
 pydantic = "==2.8.2"
-"24ur-api[download]" = "==0.1.4"
+"24ur-api[video]" = "==0.1.5"
 
 [dev-packages]
 black = "==24.8.0"

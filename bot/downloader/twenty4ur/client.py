@@ -12,7 +12,16 @@ from bot.downloader.twenty4ur import config
 
 
 class Twenty4UrClientSingleton(base.BaseClientSingleton):
-    DOMAINS = ['24ur.com']
+    DOMAINS = [
+        '24ur.com',
+        'zadovoljna.si',
+        'bibaleze.si',
+        'vizita.si',
+        'cekin.si',
+        'moskisvet.com',
+        'dominvrt.si',
+        'okusno.je',
+    ]
     _CONFIG_SCHEMA = config.Twenty4UrConfig
 
     @classmethod
