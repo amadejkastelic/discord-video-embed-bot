@@ -70,6 +70,25 @@ class InstagramClient(base.BaseClient):
 
         raise NotImplementedError(f'Not yet implemented for {url}')
 
+    async def get_comments(self, url: str, n: int = 5) -> typing.List[domain.Comment]:
+        uid, _, _ = self._parse_url(url)
+        p = instaloader.Post.from_shortcode(context=self.client.context, shortcode=uid)
+
+        comments = []
+        for i, comment in enumerate(p.get_comments()):
+            comments.append(
+                domain.Comment(
+                    author=comment.owner.username,
+                    created=comment.created_at_utc,
+                    likes=comment.likes_count,
+                    comment=comment.text,
+                )
+            )
+            if i + 1 == n:
+                break
+
+        return comments
+
     @staticmethod
     def _parse_url(url: str) -> typing.Tuple[str, int, constants.LinkType]:
         parsed_url = urlparse(url)

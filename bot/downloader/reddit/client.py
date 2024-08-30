@@ -1,6 +1,6 @@
 import datetime
-import io
 import glob
+import io
 import os
 import re
 import shutil
@@ -79,6 +79,28 @@ class RedditClient(base.BaseClient):
             raise exceptions.IntegrationClientError('Failed hydrating reddit post')
 
         return post
+
+    async def get_comments(self, url: str, n: int = 5) -> typing.List[domain.Comment]:
+        if not self.client:
+            raise exceptions.ConfigurationError('Reddit credentials not configured')
+
+        try:
+            submission = await self.client.submission(url=url)
+        except praw_exceptions.InvalidURL:
+            # Hack for new reddit urls generated in mobile app
+            # Does another request, which redirects to the correct url
+            url = requests.get(url, timeout=base.DEFAULT_TIMEOUT).url.split('?')[0]
+            submission = await self.client.submission(url=url)
+
+        return [
+            domain.Comment(
+                author=comment.author,
+                created=datetime.datetime.fromtimestamp(comment.created_utc).astimezone(),
+                likes=comment.score,
+                comment=comment.body,
+            )
+            for comment in submission.comments[:n]
+        ]
 
     async def _hydrate_post(self, post: domain.Post) -> bool:
         if not self.client:

@@ -7,6 +7,7 @@ from django.conf import settings
 
 from bot import constants
 from bot import domain
+from bot import exceptions
 from bot import logger
 from bot.downloader import base
 from bot.downloader.facebook import config
@@ -68,3 +69,6 @@ class FacebookClient(base.BaseClient):
             post.buffer = await self._download(url=fb_post['images'][0])
 
         return post
+
+    async def get_comments(self, url: str, n: int = 5) -> typing.List[domain.Comment]:
+        raise exceptions.NotSupportedError('get_comments')

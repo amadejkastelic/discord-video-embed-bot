@@ -12,7 +12,16 @@ from bot.downloader.twenty4ur import config
 
 
 class Twenty4UrClientSingleton(base.BaseClientSingleton):
-    DOMAINS = ['24ur.com']
+    DOMAINS = [
+        '24ur.com',
+        'zadovoljna.si',
+        'bibaleze.si',
+        'vizita.si',
+        'cekin.si',
+        'moskisvet.com',
+        'dominvrt.si',
+        'okusno.je',
+    ]
     _CONFIG_SCHEMA = config.Twenty4UrConfig
 
     @classmethod
@@ -54,3 +63,14 @@ class Twenty4UrClient(base.BaseClient):
             views=article.num_views,
             buffer=buffer,
         )
+
+    async def get_comments(self, url: str, n: int = 5) -> typing.List[domain.Comment]:
+        return [
+            domain.Comment(
+                author=comment.author,
+                created=comment.posted_at,
+                likes=comment.score,
+                comment=comment.content,
+            )
+            for comment in (await self.client.get_article_by_url(url=url, num_comments=n)).comments
+        ]

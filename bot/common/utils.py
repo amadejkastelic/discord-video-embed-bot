@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import io
 import mimetypes
 import os
@@ -110,3 +111,19 @@ def temp_open(path: str, mode: str = 'rb'):
     finally:
         f.close()
         os.remove(path)
+
+
+def number_to_human_format(number: int) -> str:
+    num = float('{:.3g}'.format(number))
+    magnitude = 0
+    while abs(num) >= 1000:
+        magnitude += 1
+        num /= 1000.0
+    return '{}{}'.format('{:f}'.format(num).rstrip('0').rstrip('.'), ['', 'K', 'M', 'B', 'T'][magnitude])
+
+
+def date_to_human_format(date: datetime.datetime) -> str:
+    if date.hour == 0 and date.minute == 0:
+        return date.strftime('%b %-d, %Y')
+
+    return date.strftime('%H:%M · %b %-d, %Y')

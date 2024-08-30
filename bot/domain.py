@@ -4,6 +4,7 @@ import typing
 from dataclasses import dataclass
 
 from bot import constants
+from bot.common import utils
 
 
 DEFAULT_POST_FORMAT = """🔗 URL: {url}
@@ -12,6 +13,12 @@ DEFAULT_POST_FORMAT = """🔗 URL: {url}
 👀 Views: {views}
 👍🏻 Likes: {likes}
 📕 Description: {description}\n
+"""
+
+DEFAULT_COMMENT_FORMAT = """🧑🏻‍🎨 Author: {author}
+📅 Created: {created}
+👍🏻 Likes: {likes}
+📕 Comment: {comment}\n
 """
 
 SERVER_INFO_FORMAT = """```yml
@@ -100,10 +107,10 @@ class Post:
         return self._format.format(
             url=self.url,
             author=self.author or '❌',
-            created=self._date_human_format(date=self.created) if self.created else '❌',
+            created=utils.date_to_human_format(self.created) if self.created else '❌',
             description=description if not self.spoiler else f'||{description}||',
-            views=self._number_human_format(num=self.views) if self.views else '❌',
-            likes=self._number_human_format(num=self.likes) if self.likes else '❌',
+            views=utils.number_to_human_format(self.views) if self.views else '❌',
+            likes=utils.number_to_human_format(self.likes) if self.likes else '❌',
         )
 
     def set_format(self, fmt: typing.Optional[str]) -> None:
@@ -118,16 +125,29 @@ class Post:
         self.buffer.seek(0)
         return res
 
-    def _number_human_format(self, num: int) -> str:
-        num = float('{:.3g}'.format(num))
-        magnitude = 0
-        while abs(num) >= 1000:
-            magnitude += 1
-            num /= 1000.0
-        return '{}{}'.format('{:f}'.format(num).rstrip('0').rstrip('.'), ['', 'K', 'M', 'B', 'T'][magnitude])
 
-    def _date_human_format(self, date: datetime.datetime) -> str:
-        if date.hour == 0 and date.minute == 0:
-            return date.strftime('%b %-d, %Y')
+@dataclass
+class Comment:
+    author: typing.Optional[str] = None
+    created: typing.Optional[datetime.datetime] = None
+    likes: typing.Optional[int] = None
+    comment: typing.Optional[str] = None
+    spoiler: bool = False
+    _format: str = DEFAULT_COMMENT_FORMAT
 
-        return date.strftime('%H:%M · %b %-d, %Y')
+    def __str__(self) -> str:
+        comment = self.comment or '❌'
+
+        return self._format.format(
+            author=self.author or '❌',
+            created=utils.date_to_human_format(self.created) if self.created else '❌',
+            likes=utils.number_to_human_format(self.likes) if self.likes else '❌',
+            comment=comment if not self.spoiler else f'||{comment}||',
+        )
+
+    def set_format(self, fmt: typing.Optional[str]) -> None:
+        self._format = fmt or DEFAULT_COMMENT_FORMAT
+
+
+def comments_to_string(comments: typing.List[Comment]) -> str:
+    return ''.join([str(comment) for comment in comments])

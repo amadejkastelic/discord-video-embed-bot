@@ -84,12 +84,7 @@ class TwitterClient(base.BaseClient):
         if self.client:
             await self.client.pool.relogin(usernames=[self.username])
 
-    async def get_post(self, url: str) -> domain.Post:
-        uid, index = self._parse_url(url)
-
-        if self.client is None:
-            return await self._get_post_no_login(url=url, uid=uid, index=index or 0)
-
+    async def login(self) -> None:
         if not self.logged_in:
             await self.client.pool.add_account(
                 username=self.username,
@@ -99,7 +94,47 @@ class TwitterClient(base.BaseClient):
             )
             await self.client.pool.login_all()
 
+    async def get_post(self, url: str) -> domain.Post:
+        uid, index = self._parse_url(url)
+
+        if self.client is None:
+            return await self._get_post_no_login(url=url, uid=uid, index=index or 0)
+
+        await self.login()
+
         return await self._get_post_login(url=url, uid=uid, index=index)
+
+    async def get_comments(
+        self,
+        url: str,
+        n: int = 5,
+        retry_count: int = 0,
+    ) -> typing.List[domain.Comment]:
+        if not self.client:
+            raise exceptions.NotAllowedError('Twitter credentials not configured')
+
+        await self.login()
+
+        uid, _ = self._parse_url(url)
+        try:
+            replies = self.client.tweet_replies(twid=int(uid), limit=n)
+        except Exception as e:
+            logger.error('Failed fetching from twitter, retrying', error=str(e))
+            if retry_count == 0:
+                await self.relogin()
+                return await self.get_comments(url=url, n=n, retry_count=retry_count + 1)
+
+            raise exceptions.IntegrationClientError('Failed fetching from twitter') from e
+
+        return [
+            domain.Comment(
+                author=f'{reply.user.displayname} ({reply.user.username})',
+                created=reply.date.astimezone(),
+                likes=reply.likeCount,
+                comment=reply.rawContent,
+            )
+            async for reply in replies
+        ][:n]
 
     async def _get_post_login(
         self,
