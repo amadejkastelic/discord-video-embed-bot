@@ -30,6 +30,7 @@ class InstagramClientSingleton(base.BaseClientSingleton):
 
         cls._INSTANCE = InstagramClient(
             username=conf.username,
+            password=conf.password,
             session_file_path=conf.session_file_path,
             user_agent=conf.user_agent,
         )
@@ -41,6 +42,7 @@ class InstagramClient(base.BaseClient):
     def __init__(
         self,
         username: typing.Optional[str],
+        password: typing.Optional[str],
         session_file_path: typing.Optional[str],
         user_agent: typing.Optional[str],
     ):
@@ -49,6 +51,8 @@ class InstagramClient(base.BaseClient):
         self.client = instaloader.Instaloader(user_agent=user_agent)
         if username and session_file_path and os.path.exists(session_file_path):
             self.client.load_session_from_file(username=username, filename=session_file_path)
+        elif username and password:
+            self.client.login(username, password)
 
     async def get_integration_data(
         self,
