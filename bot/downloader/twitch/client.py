@@ -4,6 +4,7 @@ import typing
 
 import requests
 from django.conf import settings
+from twitchdl import entities as twitch_entities
 from twitchdl import twitch
 from twitchdl import utils as twitch_utils
 from twitchdl.commands import download as twitch_download
@@ -62,7 +63,7 @@ class TwitchClient(base.BaseClient):
         raise exceptions.NotSupportedError('get_comments')
 
     @staticmethod
-    def _find_quality(qualities: typing.List[twitch.VideoQuality], max_quality: int = 720) -> int:
+    def _find_quality(qualities: typing.List[twitch_entities.VideoQuality], max_quality: int = 720) -> int:
         """
         Filters out qualities higher than max_quality and returns the highest one left.
         """
