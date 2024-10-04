@@ -16,12 +16,12 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install pipenv
-          pipenv install --dev
+          python -m pip install poetry
+          poetry install
       - name: flake8
         uses: py-actions/flake8@v2
       - name: pylint
         run: |
-          pipenv run pylint ./bot/**/*.py
+          poetry run pylint ./bot/**/*.py
       - name: black formatting
         uses: psf/black@stable

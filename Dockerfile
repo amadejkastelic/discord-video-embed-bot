@@ -16,17 +16,17 @@ RUN apt -y update -oAcquire::AllowInsecureRepositories=true && \
     apt -y remove wget && \
     apt -y autoremove && apt -y clean
 
-RUN pip install "pipenv"
+RUN pip install "poetry"
 
 WORKDIR /app
-COPY Pipfile ./
-COPY Pipfile.lock ./
+COPY pyproject.toml ./
+COPY poetry.lock ./
 COPY *.py ./
 COPY bot/ ./bot/
 COPY conf/ ./conf/
 COPY examples/settings_prod.py ./settings.py
 
-RUN pipenv install && pipenv run playwright install chromium && pipenv run playwright install-deps
+RUN poetry install && poetry run playwright install chromium && poetry run playwright install-deps
 
 # Set this
-ENTRYPOINT ["pipenv", "run", "python", "manage.py"]
+ENTRYPOINT ["poetry", "run", "python", "manage.py"]
