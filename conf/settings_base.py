@@ -268,4 +268,7 @@ INTEGRATION_CONFIGURATION = {
     'twitch': {
         'enabled': False,
     },
+    '4chan': {
+        'enabled': False,
+    },
 }

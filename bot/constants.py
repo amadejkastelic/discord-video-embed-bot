@@ -38,3 +38,4 @@ class Integration(enum.Enum):
     TWITCH = 'twitch'
     TWITTER = 'twitter'
     YOUTUBE = 'youtube'
+    FOUR_CHAN = '4chan'

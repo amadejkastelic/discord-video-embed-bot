@@ -6,6 +6,7 @@ import pydantic
 
 from bot import constants
 from bot import domain
+from bot import logger
 
 MISSING = -1
 DEFAULT_TIMEOUT = (3.0, 3.0)
@@ -24,11 +25,13 @@ class BaseClient:
         raise NotImplementedError()
 
     async def _download(self, url: str, cookies: typing.Optional[typing.Dict[str, str]] = None, **kwargs) -> io.BytesIO:
+        logger.debug('Downloading data', integration=self.INTEGRATION.value, url=url)
         async with aiohttp.ClientSession(cookies=cookies) as session:
             async with session.get(url=url, **kwargs) as resp:
                 return io.BytesIO(await resp.read())
 
     async def _fetch_content(self, url: str, cookies: typing.Optional[typing.Dict[str, str]] = None, **kwargs) -> str:
+        logger.debug('Fetching content', integration=self.INTEGRATION.value, url=url)
         async with aiohttp.ClientSession(cookies=cookies) as session:
             async with session.get(url=url, **kwargs) as resp:
                 return await resp.text()
