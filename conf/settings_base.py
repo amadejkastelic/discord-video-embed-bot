@@ -270,5 +270,5 @@ INTEGRATION_CONFIGURATION = {
     },
     '4chan': {
         'enabled': False,
-    }
+    },
 }

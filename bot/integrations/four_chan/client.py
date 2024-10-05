@@ -32,6 +32,7 @@ class FourChanClientSingleton(base.BaseClientSingleton):
         cls._INSTANCE = FourChanClient()
 
 
+# https://github.com/4chan/4chan-API
 class FourChanClient(base.BaseClient):
     INTEGRATION = constants.Integration.FOUR_CHAN
 
