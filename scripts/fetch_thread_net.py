@@ -1,7 +1,7 @@
 import json
 import sys
 
-from bot.downloader.threads import client
+from bot.integrations.threads import client
 
 c = client.ThreadsClientSingleton.get_instance()
 
