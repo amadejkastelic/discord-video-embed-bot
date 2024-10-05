@@ -3,8 +3,7 @@ import typing
 from django.core.management import base
 
 from bot import constants
-from bot import logger
-from bot import models
+from bot import service
 
 
 class Command(base.BaseCommand):
@@ -37,42 +36,18 @@ class Command(base.BaseCommand):
             help='List of supported integrations',
         )
 
-    def handle(self, *args: typing.Any, **options: typing.Any) -> typing.NoReturn:
-        server_vendor_uid = options.get('server_vendor_uid')
+    def handle(self, *args: typing.Any, **options: typing.Any) -> None:
+        server_vendor_uid = options.get('server_vendor_uid', '')
         server_vendor = options.get('server_vendor', constants.ServerVendor.DISCORD)
         integrations = self._parse_integrations(options.get('integrations', []))
         tier = options.get('server_tier', constants.ServerTier.FREE)
 
-        logger.info(
-            'Provisioning integrations for server',
-            integrations=[integration.value for integration in integrations] or 'all',
-            server_vendor=server_vendor.value,
+        service.provision_server(
+            server_vendor=server_vendor,
             server_vendor_uid=server_vendor_uid,
+            tier=tier,
+            integrations=integrations,
         )
-
-        server = models.Server.objects.filter(
-            vendor=server_vendor,
-            vendor_uid=server_vendor_uid,
-        ).first()
-        if not server:
-            server = models.Server.objects.create(
-                vendor=server_vendor,
-                vendor_uid=server_vendor_uid,
-                tier=tier,
-            )
-
-        models.ServerIntegration.objects.bulk_create(
-            [
-                models.ServerIntegration(
-                    integration=integration,
-                    server=server,
-                    enabled=True,
-                )
-                for integration in integrations
-            ]
-        )
-
-        logger.info('Successfully created server with integrations')
 
     @staticmethod
     def _parse_integrations(integrations: typing.List[str]) -> typing.List[constants.Integration]:

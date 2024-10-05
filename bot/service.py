@@ -1,10 +1,12 @@
 import datetime
 import typing
 
+from bot import cache
 from bot import constants
 from bot import domain
 from bot import exceptions
 from bot import logger
+from bot import models
 from bot import repository
 from bot.integrations import registry
 
@@ -214,3 +216,43 @@ async def get_comments(  # noqa: C901
     except Exception as e:
         logger.error('Failed downloading', url=url, num_comments=n, error=str(e))
         raise e
+
+
+def provision_server(
+    server_vendor: constants.ServerVendor,
+    server_vendor_uid: str,
+    tier: constants.ServerTier,
+    integrations: typing.List[constants.Integration],
+) -> None:
+    logger.info(
+        'Provisioning integrations for server',
+        integrations=[integration.value for integration in integrations] or 'all',
+        server_vendor=server_vendor.value,
+        server_vendor_uid=server_vendor_uid,
+    )
+
+    server = models.Server.objects.filter(
+        vendor=server_vendor,
+        vendor_uid=server_vendor_uid,
+    ).first()
+    if not server:
+        server = models.Server.objects.create(
+            vendor=server_vendor,
+            vendor_uid=server_vendor_uid,
+            tier=tier,
+        )
+
+    models.ServerIntegration.objects.bulk_create(
+        [
+            models.ServerIntegration(
+                integration=integration,
+                server=server,
+                enabled=True,
+            )
+            for integration in integrations or list(constants.Integration)
+        ]
+    )
+
+    cache.delete(store=cache.Store.SERVER, key=f'{server_vendor.value}_{server_vendor_uid}')
+
+    logger.info('Successfully created server with integrations')

@@ -77,6 +77,11 @@ class DiscordClient(mixins.BotMixin, discord.Client):
                 description='Clears post cache for server',
                 callback=self.clear_cache_cmd,
             ),
+            app_commands.Command(
+                name='provision',
+                description='Provisions a server',
+                callback=self.provision_cmd,
+            ),
         ]
 
         self.tree = app_commands.CommandTree(client=self)
@@ -313,6 +318,35 @@ class DiscordClient(mixins.BotMixin, discord.Client):
 
         await interaction.followup.send(
             content=f'Deleted {res} posts from cache.',
+            ephemeral=True,
+        )
+
+    @checks.has_permissions(administrator=True)
+    async def provision_cmd(
+        self,
+        interaction: discord.Interaction,
+        tier: constants.ServerTier,
+        integration: typing.Optional[constants.Integration] = None,
+    ) -> None:
+        await interaction.response.defer(ephemeral=True)
+
+        service.provision_server(
+            server_vendor=constants.ServerVendor.DISCORD,
+            server_vendor_uid=str(interaction.guild_id),
+            tier=tier,
+            integrations=[integration] if integration else [],
+        )
+
+        logger.info(
+            'Admin provisioned server',
+            tier=tier.value,
+            integration=integration.value if integration else 'all',
+            admin=interaction.user.id,
+            server_id=interaction.guild_id,
+        )
+
+        await interaction.followup.send(
+            content='Provisioned server',
             ephemeral=True,
         )
 
