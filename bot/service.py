@@ -6,7 +6,7 @@ from bot import domain
 from bot import exceptions
 from bot import logger
 from bot import repository
-from bot.downloader import registry
+from bot.integrations import registry
 
 
 def should_handle_url(url: str) -> bool:

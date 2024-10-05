@@ -6,7 +6,7 @@ from django.core.management import base
 
 from bot import logger
 from bot.common import utils
-from bot.integrations.discord import bot
+from bot.adapters.discord import bot
 
 
 class Command(base.BaseCommand):
