@@ -1,12 +1,45 @@
-[project]
+[tool.poetry]
 name = "discord-video-embed-bot"
 description = "Discord bot that reads messages and embeds videos from various websited that don't support this"
 version = "0.1.0"
-authors = [{ name = "Amadej Kastelic", email = "amadejkastelic7@gmail.com" }]
-dependencies = ["tiktokapipy", "playwright"]
+authors = ["Amadej Kastelic <amadejkastelic7@gmail.com>"]
+package-mode = false
 
-[project.optional-dependencies]
-dev = ["black", "flake8"]
+[tool.poetry.dependencies]
+python = "^3.12"
+playwright = "^1.47.0"
+"discord.py" = "^2.4.0"
+instaloader = "^4.13.1"
+facebook-scraper = "^0.2.59"
+python-magic = "0.4.27"
+redvid = "^2.0.5"
+RedDownloader = "^4.3.0"
+ffmpeg-python = "^0.2.0"
+opencv-python = "^4.10.0.84"
+asyncpraw = "^7.7.1"
+twscrape = "^0.13"
+pytube2 = "^15.0.10"
+lxml-html-clean = "^0.1.1"
+Django = "^5.1.1"
+djangorestframework = "^3.15.2"
+djangorestframework-simplejwt = "^5.3.1"
+django-structlog = "^8.1.0"
+pymemcache = "^4.0.0"
+"discord-oauth2.py" = "^1.2.1"
+twitch-dl = "^2.9.2"
+pydantic = "^2.7.1"
+24ur-api = { extras = ["video"], version = "^0.1.5" }
+tiktokapipy = { extras = ["download"], version = "^0.2.4.post2" }
+psycopg = { extras = ["binary"], version = "^3.2.3" }
+aiograpi = "^0.0.3"
+
+[tool.poetry.dev-dependencies]
+black = "^24.8.0"
+flake8 = "^7.1.1"
+flake8-import-order = "^0.18.2"
+pylint = "^3.3.1"
+pylint-django = "^2.5.5"
+isort = "^5.13.2"
 
 [tool.black]
 line-length = 120

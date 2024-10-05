@@ -8,3 +8,4 @@ class InstagramConfig(base.BaseClientConfig):
     username: typing.Optional[str] = None
     user_agent: typing.Optional[str] = None
     password: typing.Optional[str] = None
+    version: int = 1

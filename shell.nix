@@ -9,7 +9,7 @@ pkgs.mkShell {
     playwright
     playwright-driver.browsers
     docker-compose
-    pipenv
+    poetry
     curl
     jq
     file

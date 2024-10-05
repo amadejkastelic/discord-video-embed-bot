@@ -2,7 +2,7 @@ import typing
 
 from bot.downloader import base
 from bot.downloader.facebook import client as facebook_client
-from bot.downloader.instagram import client as instagram_client
+from bot.downloader.instagram import singleton as instagram_client
 from bot.downloader.reddit import client as reddit_client
 from bot.downloader.threads import client as threads_client
 from bot.downloader.tiktok import client as tiktok_client

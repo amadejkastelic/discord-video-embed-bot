@@ -10,4 +10,4 @@ lint:
 format:
 	python -m black **/*.py
 nix-env:
-	@nix-shell --command 'source "$$(pipenv --venv)/bin/activate"; return'
+	@nix-shell --command 'source "$$(poetry env info --path)/bin/activate"; return'
