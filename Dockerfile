@@ -26,7 +26,7 @@ COPY bot/ ./bot/
 COPY conf/ ./conf/
 COPY examples/settings_prod.py ./settings.py
 
-RUN poetry install && poetry run playwright install chromium && poetry run playwright install-deps
+RUN poetry install --without dev && poetry run playwright install chromium && poetry run playwright install-deps
 
 # Set this
 ENTRYPOINT ["poetry", "run", "python", "manage.py"]

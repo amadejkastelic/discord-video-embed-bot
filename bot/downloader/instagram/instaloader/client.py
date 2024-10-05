@@ -9,7 +9,7 @@ import requests
 from bot import constants as bot_constants
 from bot import domain
 from bot.downloader import base
-from bot.downloader.instagram import constants
+from bot.downloader.instagram.instaloader import constants
 
 
 class InstagramClient(base.BaseClient):
@@ -18,6 +18,7 @@ class InstagramClient(base.BaseClient):
     def __init__(
         self,
         username: typing.Optional[str],
+        password: typing.Optional[str],
         session_file_path: typing.Optional[str],
         user_agent: typing.Optional[str],
     ):
@@ -26,6 +27,8 @@ class InstagramClient(base.BaseClient):
         self.client = instaloader.Instaloader(user_agent=user_agent)
         if username and session_file_path and os.path.exists(session_file_path):
             self.client.load_session_from_file(username=username, filename=session_file_path)
+        elif username and password:
+            self.client.login(username, password)
 
     async def get_integration_data(
         self,

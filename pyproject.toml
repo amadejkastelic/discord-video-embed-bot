@@ -1,10 +1,8 @@
-[project]
+[tool.poetry]
 name = "discord-video-embed-bot"
 description = "Discord bot that reads messages and embeds videos from various websited that don't support this"
 version = "0.1.0"
-authors = [{ name = "Amadej Kastelic", email = "amadejkastelic7@gmail.com" }]
-
-[tool.poetry]
+authors = ["Amadej Kastelic <amadejkastelic7@gmail.com>"]
 package-mode = false
 
 [tool.poetry.dependencies]
@@ -29,10 +27,11 @@ django-structlog = "^8.1.0"
 pymemcache = "^4.0.0"
 "discord-oauth2.py" = "^1.2.1"
 twitch-dl = "^2.9.2"
-pydantic = "^2.9.2"
+pydantic = "^2.7.1"
 24ur-api = { extras = ["video"], version = "^0.1.5" }
 tiktokapipy = { extras = ["download"], version = "^0.2.4.post2" }
 psycopg = { extras = ["binary"], version = "^3.2.3" }
+aiograpi = "^0.0.3"
 
 [tool.poetry.dev-dependencies]
 black = "^24.8.0"
