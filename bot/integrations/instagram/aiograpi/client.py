@@ -5,7 +5,6 @@ from aiograpi import exceptions as aiograpi_exceptions
 
 from bot import constants as bot_constants
 from bot import domain
-from bot import logger
 from bot.integrations import base
 
 
