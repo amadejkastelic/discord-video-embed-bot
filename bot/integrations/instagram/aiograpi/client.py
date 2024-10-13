@@ -5,6 +5,7 @@ from aiograpi import exceptions as aiograpi_exceptions
 
 from bot import constants as bot_constants
 from bot import domain
+from bot import logger
 from bot.integrations import base
 
 
@@ -47,6 +48,8 @@ class InstagramClient(base.BaseClient):
             await self.login()
         except aiograpi_exceptions.LoginRequired:
             await self.login(relogin=True)
+        except aiograpi_exceptions.ReloginAttemptExceeded:
+            await self.login()
 
         return await self._get_post(url)
 
@@ -67,12 +70,24 @@ class InstagramClient(base.BaseClient):
             created=media_info.taken_at,
         )
 
+        media_url = None
         if media_info.video_url:
-            post.buffer = await self._download(url=str(media_info.video_url), cookies=self.client.cookie_dict)
+            media_url = str(media_info.video_url)
+        elif len(media_info.video_versions) > 0:
+            media_url = media_info.video_versions[0].get('url')
+        elif len(media_info.resources) > 0:
+            for resource in media_info.resources:
+                if resource.video_url:
+                    media_url = resource.video_url
+                    break
+            for resource in media_info.resources:
+                if len(resource.video_versions) > 0:
+                    media_url = resource.video_versions[0].get('url')
         elif len(media_info.image_versions2.get('candidates', [])) > 0:
-            post.buffer = await self._download(
-                url=media_info.image_versions2['candidates'][0]['url'], cookies=self.client.cookie_dict
-            )
+            media_url = media_info.image_versions2['candidates'][0]['url']
+
+        if media_url:
+            post.buffer = await self._download(url=media_url, cookies=self.client.cookie_dict)
 
         return post
 
