@@ -52,7 +52,7 @@ class InstagramClient(base.BaseClient):
 
         return await self._get_post(url)
 
-    async def _get_post(self, url: str) -> domain.Post:
+    async def _get_post(self, url: str) -> domain.Post:  # noqa: C901
         _, pk, _ = await self.get_integration_data(url)
 
         if 'stories' in url:
