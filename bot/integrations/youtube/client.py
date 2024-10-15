@@ -1,7 +1,7 @@
 import io
 import typing
 
-import pytube
+import pytubefix as pytube
 from django.conf import settings
 
 from bot import constants
