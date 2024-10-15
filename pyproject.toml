@@ -18,7 +18,6 @@ ffmpeg-python = "^0.2.0"
 opencv-python = "^4.10.0.84"
 asyncpraw = "^7.7.1"
 twscrape = "^0.13"
-pytube2 = "^15.0.10"
 lxml-html-clean = "^0.1.1"
 Django = "^5.1.1"
 djangorestframework = "^3.15.2"
@@ -32,6 +31,7 @@ pydantic = "^2.7.1"
 tiktokapipy = { extras = ["download"], version = "^0.2.4.post2" }
 psycopg = { extras = ["binary"], version = "^3.2.3" }
 aiograpi = "^0.0.3"
+pytubefix = "^8.1.1"
 
 [tool.poetry.dev-dependencies]
 black = "^24.8.0"
