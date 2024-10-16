@@ -7,7 +7,7 @@ name = "pypi"
 tiktokapipy = "==0.2.4.post2"
 playwright = "==1.46.0"
 "discord.py" = "==2.4.0"
-instaloader = "==4.13"
+instaloader = { git = "https://github.com/malicious/instaloader.git", ref = "2384"}
 facebook-scraper = "==0.2.59"
 python-magic = "0.4.27"
 redvid = "==2.0.5"

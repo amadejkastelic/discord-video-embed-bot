@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "62e482c4316621ea5be52f6961a7a903dbcdf9550ffaee48c24f72c9b7b5594d"
+            "sha256": "147e90632cb22722ad521ecc892dfdce3731d8151d6ab31bdd4a7a29e5a50aea"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -607,12 +607,9 @@
             "version": "==8.5.0"
         },
         "instaloader": {
-            "hashes": [
-                "sha256:49b15c3c41ba9287ddecacb57c5fdd1ee706107117b4b8ddd9ccb56ab75c573c"
-            ],
-            "index": "pypi",
+            "git": "https://github.com/malicious/instaloader.git",
             "markers": "python_version >= '3.8'",
-            "version": "==4.13"
+            "ref": "3264774edc906a555132a46b76a607cb30c32bf0"
         },
         "loguru": {
             "hashes": [

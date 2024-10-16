@@ -36,8 +36,10 @@ class InstagramClientSingleton(object):
         cls.INSTANCE = instaloader.Instaloader(
             user_agent='Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0'
         )
-        if os.path.exists('instagram.sess') and os.getenv('INSTAGRAM_USERNAME') is not None:
-            cls.INSTANCE.load_session_from_file(username=os.getenv('INSTAGRAM_USERNAME'), filename='instagram.sess')
+
+        username = os.getenv('INSTAGRAM_USERNAME')
+        if os.path.exists('instagram.sess') and username:
+            cls.INSTANCE.load_session_from_file(username=username, filename='instagram.sess')
 
         return cls.INSTANCE
 
@@ -68,28 +70,32 @@ class InstagramClient(base.BaseClient):
     def _get_post(self) -> models.Post:
         p = instaloader.Post.from_shortcode(context=self.client.context, shortcode=self.id)
 
+        download_url = None
         match p.typename:
-            case 'GraphImage':
+            case 'GraphImage' | 'XDTGraphImage':
                 download_url = p.url
-            case 'GraphVideo':
+            case 'GraphVideo' | 'XDTGraphVideo':
                 download_url = p.video_url
-            case 'GraphSidecar':
+            case 'GraphSidecar' | 'XDTGraphSidecar':
                 node = next(p.get_sidecar_nodes(start=self.index, end=self.index))
                 if node.is_video:
                     download_url = node.video_url
                 else:
                     download_url = node.display_url
 
-        with requests.get(url=download_url) as resp:
-            return models.Post(
-                url=self.url,
-                author=p.owner_profile.username,
-                description=p.title or p.caption,
-                likes=p.likes,
-                views=p.video_view_count,
-                buffer=io.BytesIO(resp.content),
-                created=p.date_local,
-            )
+        res = models.Post(
+            url=self.url,
+            author=p.owner_profile.username,
+            description=p.title or p.caption,
+            likes=p.likes,
+            views=p.video_view_count,
+            created=p.date_local,
+        )
+        if download_url:
+            with requests.get(url=download_url) as resp:
+                res.buffer = io.BytesIO(resp.content)
+
+        return res
 
     def _get_story(self) -> models.Post:
         story = instaloader.StoryItem.from_mediaid(context=self.client.context, mediaid=int(self.id))
