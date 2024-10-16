@@ -12,7 +12,7 @@ RUN apt -y update -oAcquire::AllowInsecureRepositories=true && \
     rm deb-multimedia-keyring_2016.8.1_all.deb && \
     echo "deb https://www.deb-multimedia.org bookworm main non-free" >> /etc/apt/sources.list && \
     apt -y update && apt -y upgrade && \
-    apt -y install ffmpeg && \
+    apt -y install ffmpeg gcc git && \
     apt -y remove wget && \
     apt -y autoremove && apt -y clean
 
@@ -26,7 +26,8 @@ COPY downloader/ ./downloader/
 COPY models/ ./models/
 COPY bots/ ./bots/
 
-RUN pipenv install && pipenv run playwright install chromium && pipenv run playwright install-deps
+RUN pipenv install && pipenv run playwright install chromium && pipenv run playwright install-deps && \
+    apt -y remove gcc git
 
 # Set this
 ENTRYPOINT ["pipenv", "run", "python", "main.py"]
