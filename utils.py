@@ -1,7 +1,7 @@
 import asyncio
 import io
-import os
 import mimetypes
+import os
 import random
 import re
 import tempfile
@@ -58,8 +58,13 @@ def random_emoji() -> str:
     return random.choice(emoji)
 
 
-def combine_images(image_fps: typing.List[str | io.BytesIO], gap: int = 10, quality: int = 85) -> io.BytesIO:
-    images = [pil_image.open(path) for path in image_fps]
+def combine_images(
+    image_fps: typing.List[str | io.BytesIO],
+    gap: int = 10,
+    quality: int = 85,
+    max_images: int = 3,
+) -> io.BytesIO:
+    images = [pil_image.open(path) for path in image_fps[:max_images]]
     widths, heights = zip(*(im.size for im in images))
 
     new_image = pil_image.new('RGBA', (sum(widths), max(heights)))
