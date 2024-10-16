@@ -12,6 +12,7 @@ A Discord bot that automatically embeds media and metadata of messages containin
 - Reddit ✅
 - Twitter ✅
 - Youtube Shorts ✅
+- Threads ✅
 
 ## How to run
 
