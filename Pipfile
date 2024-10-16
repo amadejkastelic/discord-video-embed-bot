@@ -18,6 +18,7 @@ twscrape = "==0.13"
 pytube2 = "==15.0.6"
 lxml-html-clean = "==0.1.1"
 RedDownloader = "==4.3.0"
+pytubefix = "==8.1.1"
 
 [dev-packages]
 black = "==24.4.2"
