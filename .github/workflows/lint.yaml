@@ -1,6 +1,10 @@
 name: Lint
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
   lint:
@@ -12,8 +16,8 @@ jobs:
       - name: Set up Python environment
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
-      - name: flake8 Lint
+          python-version: "3.12.6"
+      - name: flake8
         uses: py-actions/flake8@v2
       - name: black formatting
         uses: psf/black@stable

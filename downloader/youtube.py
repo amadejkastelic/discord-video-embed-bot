@@ -1,7 +1,7 @@
 import io
 
-import pytube
-from pytube.innertube import _default_clients
+import pytubefix as pytube
+from pytubefix.innertube import _default_clients
 
 import models
 from downloader import base
