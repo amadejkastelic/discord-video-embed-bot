@@ -12,6 +12,7 @@ DEFAULT_POST_FORMAT = """🔗 URL: {url}
 📅 Created: {created}
 👀 Views: {views}
 👍🏻 Likes: {likes}
+👎🏻 Dislikes: {dislikes}
 📕 Description: {description}\n
 """
 
@@ -95,6 +96,7 @@ class Post:
     description: typing.Optional[str] = None
     views: typing.Optional[int] = None
     likes: typing.Optional[int] = None
+    dislikes: typing.Optional[int] = None
     buffer: typing.Optional[io.BytesIO] = None
     spoiler: bool = False
     created: typing.Optional[datetime.datetime] = None
@@ -109,8 +111,9 @@ class Post:
             author=self.author or '❌',
             created=utils.date_to_human_format(self.created) if self.created else '❌',
             description=description if not self.spoiler else f'||{description}||',
-            views=utils.number_to_human_format(self.views) if self.views else '❌',
-            likes=utils.number_to_human_format(self.likes) if self.likes else '❌',
+            views=utils.number_to_human_format(self.views) if self.views is not None else '❌',
+            likes=utils.number_to_human_format(self.likes) if self.likes is not None else '❌',
+            dislikes=utils.number_to_human_format(self.dislikes) if self.dislikes is not None else '❌',
         )
 
     def set_format(self, fmt: typing.Optional[str]) -> None:
