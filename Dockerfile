@@ -29,4 +29,5 @@ COPY examples/settings_prod.py ./settings.py
 RUN poetry install --without dev && poetry run playwright install chromium && poetry run playwright install-deps
 
 # Set this
-ENTRYPOINT ["poetry", "run", "python", "manage.py"]
+ENTRYPOINT ["poetry", "run", "python"]
+CMD ["manage.py"]
