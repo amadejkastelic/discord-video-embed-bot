@@ -8,6 +8,7 @@ import typing
 import uuid
 
 import asyncpraw
+import asyncpraw.models
 import redvid
 import requests
 from RedDownloader import RedDownloader as reddit_downloader
@@ -107,7 +108,7 @@ class RedditClient(base.BaseClient):
             return self._hydrate_post_no_login(post)
 
         try:
-            submission = await self.client.submission(url=post.url)
+            submission: asyncpraw.models.Submission = await self.client.submission(url=post.url)
         except praw_exceptions.InvalidURL:
             # Hack for new reddit urls generated in mobile app
             # Does another request, which redirects to the correct url
@@ -120,7 +121,7 @@ class RedditClient(base.BaseClient):
 
         post.author = submission.author
         post.description = f'{submission.title}{content}'
-        post.likes = submission.score
+        post.likes, post.dislikes = self._calculate_votes(upvotes=submission.score, ratio=submission.upvote_ratio)
         post.spoiler = submission.over_18 or submission.spoiler
         post.created = datetime.datetime.fromtimestamp(submission.created_utc).astimezone()
 
@@ -196,3 +197,8 @@ class RedditClient(base.BaseClient):
     def _is_nsfw(url: str) -> bool:
         content = str(requests.get(url, timeout=base.DEFAULT_TIMEOUT).content)
         return 'nsfw&quot;:true' in content or 'isNsfw&quot;:true' in content
+
+    @staticmethod
+    def _calculate_votes(upvotes: int, ratio: float) -> typing.Tuple[int, int]:
+        downvotes = (upvotes / ratio) - upvotes
+        return (upvotes, int(downvotes))

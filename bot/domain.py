@@ -11,8 +11,7 @@ DEFAULT_POST_FORMAT = """🔗 URL: {url}
 🧑🏻‍🎨 Author: {author}
 📅 Created: {created}
 👀 Views: {views}
-👍🏻 Likes: {likes}
-👎🏻 Dislikes: {dislikes}
+👍🏻 Likes: {likes} 👎🏻 Dislikes: {dislikes}
 📕 Description: {description}\n
 """
 

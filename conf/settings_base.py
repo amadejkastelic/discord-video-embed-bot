@@ -252,6 +252,7 @@ INTEGRATION_CONFIGURATION = {
     },
     'youtube': {
         'enabled': False,
+        'external_likes_api': False,
     },
     'threads': {
         'enable': False,
