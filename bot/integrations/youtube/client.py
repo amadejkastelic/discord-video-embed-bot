@@ -1,6 +1,7 @@
 import io
 import typing
 
+import aiohttp
 import pytubefix as pytube
 from django.conf import settings
 
@@ -10,6 +11,9 @@ from bot import exceptions
 from bot import logger
 from bot.integrations import base
 from bot.integrations.youtube import config
+from bot.integrations.youtube import types
+
+LIKES_API_URL_TEMPLATE = 'https://returnyoutubedislikeapi.com/votes?videoId={video_id}'
 
 
 class YoutubeClientSingleton(base.BaseClientSingleton):
@@ -25,11 +29,14 @@ class YoutubeClientSingleton(base.BaseClientSingleton):
             cls._INSTANCE = base.MISSING
             return
 
-        cls._INSTANCE = YoutubeClient()
+        cls._INSTANCE = YoutubeClient(fetch_likes=conf.external_likes_api)
 
 
 class YoutubeClient(base.BaseClient):
     INTEGRATION = constants.Integration.YOUTUBE
+
+    def __init__(self, fetch_likes: bool) -> None:
+        self.fetch_likes = fetch_likes
 
     async def get_integration_data(self, url: str) -> typing.Tuple[constants.Integration, str, typing.Optional[int]]:
         return self.INTEGRATION, url.strip('/').split('?')[0].split('/')[-1], None
@@ -47,6 +54,11 @@ class YoutubeClient(base.BaseClient):
             spoiler=vid.age_restricted is True,
         )
 
+        if self.fetch_likes:
+            likes = await self._get_likes(video_id=vid.video_id)
+            post.likes = likes.likes
+            post.dislikes = likes.dislikes
+
         vid.streams.filter(progressive=True, file_extension='mp4').order_by(
             'resolution'
         ).desc().first().stream_to_buffer(post.buffer)
@@ -55,3 +67,8 @@ class YoutubeClient(base.BaseClient):
 
     async def get_comments(self, url: str, n: int = 5) -> typing.List[domain.Comment]:
         raise exceptions.NotSupportedError('get_comments')
+
+    async def _get_likes(self, video_id: str) -> types.Likes:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url=LIKES_API_URL_TEMPLATE.format(video_id=video_id)) as resp:
+                return types.Likes.model_validate(await resp.json())

@@ -154,6 +154,10 @@ class Post(models.Model):
         null=True,
         default=None,
     )
+    dislikes = models.BigIntegerField(
+        null=True,
+        default=None,
+    )
     spoiler = models.BooleanField(
         null=False,
         default=False,
