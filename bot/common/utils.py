@@ -9,11 +9,19 @@ import tempfile
 import typing
 from contextlib import contextmanager
 
+import aiohttp
 import magic
 from PIL import Image as pil_image
 from django import db as django_db
+from requests import exceptions as requests_exceptions
 
 emoji = ['😼', '😺', '😸', '😹', '😻', '🙀', '😿', '😾', '😩', '🙈', '🙉', '🙊', '😳']
+
+SSL_ERRORS = (
+    requests_exceptions.SSLError,
+    aiohttp.ClientSSLError,
+    aiohttp.ClientConnectorSSLError,
+)
 
 
 def find_first_url(string: str) -> typing.Optional[str]:

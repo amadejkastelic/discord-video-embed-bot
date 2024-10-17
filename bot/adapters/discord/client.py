@@ -383,12 +383,16 @@ class DiscordClient(mixins.BotMixin, discord.Client):
             if e.status != 413:  # Payload too large
                 raise e
             if post.buffer is not None:
-                logger.info('File too large, resizing...')
+                logger.info('File too large, resizing...', size=len(post.buffer))
                 post.buffer.seek(0)
                 post.buffer = await utils.resize(buffer=post.buffer, extension=extension)
                 return await self._send_post(post=post, send_func=send_func, author=author)
 
             raise exceptions.BotError('Failed to send message') from e
+        except utils.SSL_ERRORS as e:
+            # Retry on SSL errors
+            logger.error("SSL Error, retrying", error=str(e))
+            return await self._send_post(post=post, send_func=send_func, author=author)
 
     async def _send_comments(
         self,
