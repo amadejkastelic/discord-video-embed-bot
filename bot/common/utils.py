@@ -3,6 +3,7 @@ import datetime
 import io
 import mimetypes
 import os
+import ssl
 import random
 import re
 import tempfile
@@ -21,6 +22,9 @@ SSL_ERRORS = (
     requests_exceptions.SSLError,
     aiohttp.ClientSSLError,
     aiohttp.ClientConnectorSSLError,
+    ssl.SSLError,
+    requests_exceptions.Timeout,
+    requests_exceptions.ConnectionError,
 )
 
 
