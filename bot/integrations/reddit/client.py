@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import glob
 import io
@@ -107,13 +108,7 @@ class RedditClient(base.BaseClient):
         if not self.client:
             return self._hydrate_post_no_login(post)
 
-        try:
-            submission: asyncpraw.models.Submission = await self.client.submission(url=post.url)
-        except praw_exceptions.InvalidURL:
-            # Hack for new reddit urls generated in mobile app
-            # Does another request, which redirects to the correct url
-            post.url = requests.get(post.url, timeout=base.DEFAULT_TIMEOUT).url.split('?')[0]
-            submission = await self.client.submission(url=post.url)
+        submission: asyncpraw.models.Submission = await self.client.submission(url=post.url)
 
         content = ''
         if submission.selftext:
@@ -135,11 +130,21 @@ class RedditClient(base.BaseClient):
                 post.buffer = io.BytesIO(f.read())
             os.remove(f'/tmp/{submission.id}.mp4')
         elif submission.url.startswith('https://www.reddit.com/gallery/'):
-            post.buffer = self._download_and_merge_gallery(url=submission.url)
+            image_urls = []
+            for media_id in [item['media_id'] for item in submission.gallery_data['items']]:
+                image_urls.append(
+                    submission.media_metadata[media_id]['p'][0]['u'].split('?')[0].replace('preview', 'i')
+                )
+            post.buffer = utils.combine_images(
+                await asyncio.gather(*[self._download(url=image_url) for image_url in image_urls[:3]])
+            )
 
         return True
 
     def _hydrate_post_no_login(self, post: domain.Post) -> bool:
+        if self._is_mobile_url(url=post.url):
+            post.url = requests.get(post.url, timeout=base.DEFAULT_TIMEOUT).url.split('?')[0]
+
         try:
             media = self.downloader.Download(url=post.url, quality=720, destination='/tmp/', output=str(uuid.uuid4()))
         except Exception as e:
@@ -202,3 +207,7 @@ class RedditClient(base.BaseClient):
     def _calculate_votes(upvotes: int, ratio: float) -> typing.Tuple[int, int]:
         downvotes = (upvotes / ratio) - upvotes
         return (upvotes, int(downvotes))
+
+    @staticmethod
+    def _is_mobile_url(url: str) -> bool:
+        return bool(re.match(NEW_REDDIT_URL_PATTERN, url))
