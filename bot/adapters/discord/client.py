@@ -383,7 +383,7 @@ class DiscordClient(mixins.BotMixin, discord.Client):
             if e.status != 413:  # Payload too large
                 raise e
             if post.buffer is not None:
-                logger.info('File too large, resizing...', size=len(post.buffer))
+                logger.info('File too large, resizing...', size=post.buffer.getbuffer().nbytes)
                 post.buffer.seek(0)
                 post.buffer = await utils.resize(buffer=post.buffer, extension=extension)
                 return await self._send_post(post=post, send_func=send_func, author=author)
