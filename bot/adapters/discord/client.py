@@ -20,7 +20,7 @@ from bot.adapters import mixins
 
 class CustomView(ui.View):
     @ui.button(label='❌')
-    async def on_click(
+    async def on_click_delete(
         self,
         interaction: discord.Interaction,
         _: ui.Button,
@@ -35,6 +35,32 @@ class CustomView(ui.View):
         else:
             logger.warning(
                 'User tried to perform an illegal delete action',
+                user=interaction.user.id,
+                message=interaction.message.id,
+            )
+
+
+class CustomViewWithReload(CustomView):
+    def __init__(self, *args, **kwargs):
+        self.client: DiscordClient = kwargs.pop('client')
+        super().__init__(*args, **kwargs)
+
+    @ui.button(label='🔄')
+    async def on_click_reload(
+        self,
+        interaction: discord.Interaction,
+        _: ui.Button,
+    ) -> None:
+        if interaction.message is None:
+            logger.warning('Invoked reload on a missing message')
+            return
+
+        if interaction.user.mentioned_in(interaction.message):
+            await self.client._handle_message(message=interaction.message, user=interaction.user)
+            logger.info('User performed a reload action', user=interaction.user.id, message=interaction.message.id)
+        else:
+            logger.warning(
+                'User tried to perform an illegal reload action',
                 user=interaction.user.id,
                 message=interaction.message.id,
             )
@@ -92,10 +118,7 @@ class DiscordClient(mixins.BotMixin, discord.Client):
         await self.tree.sync()
         logger.info('Logged on', bot_user=self.user)
 
-    async def on_message(self, message: discord.Message):  # noqa: C901
-        if message.author == self.user or message.guild is None:
-            return
-
+    async def _handle_message(self, message: discord.Message, user: discord.User):  # noqa: C901
         url = utils.find_first_url(message.content)
         if not url:
             return
@@ -124,42 +147,62 @@ class DiscordClient(mixins.BotMixin, discord.Client):
             logger.error('Failed downloading', url=url, error=str(e))
             await asyncio.gather(
                 new_message.edit(
-                    content=f'{message.author.mention}\nFailed downloading {url}.\nError: {str(e)}.',
+                    content=f'{user.mention}\nFailed downloading {url}.\nError: {str(e)}.',
                     suppress=True,
                 ),
                 new_message.add_reaction('❌'),
+                new_message.add_reaction('🔄'),
             )
             raise e
 
         try:
-            msg = await self._send_post(post=post, send_func=message.channel.send, author=message.author)
-            logger.info('User sent message with url', user=message.author.display_name, url=url)
+            msg = await self._send_post(post=post, send_func=message.channel.send, author=user)
+            logger.info('User sent message with url', user=user.display_name, url=url)
         except Exception as e:
             logger.error('Failed sending message', url=url, error=str(e))
             msg = await message.channel.send(
-                content=f'Failed sending discord message for {url} ({message.author.mention}).\nError: {str(e)}'
+                content=f'Failed sending discord message for {url} ({user.mention}).\nError: {str(e)}'
             )
 
         await asyncio.gather(msg.add_reaction('❌'), new_message.delete())
+
+    async def on_message(self, message: discord.Message):
+        if message.author == self.user or message.guild is None:
+            return
+
+        await self._handle_message(message=message, user=message.author)
 
     async def on_reaction_add(self, reaction: discord.Reaction, user: discord.User):
         if not self.user:
             logger.warning('Discord bot not logged in')
             return
 
+        if user.id == self.user.id:
+            return
+
+        if self.user.id not in [user.id async for user in reaction.users(limit=50)]:
+            return
+
         if (
             reaction.message.author.id == self.user.id
-            and reaction.emoji == '❌'
             and user.mentioned_in(message=reaction.message)
             and reaction.message.created_at.replace(tzinfo=None)
             >= (datetime.datetime.utcnow() - datetime.timedelta(minutes=5))
         ):
-            logger.info(
-                'User deleted message',
-                user=reaction.message.author.id,
-                url=utils.find_first_url(reaction.message.content),
-            )
-            await reaction.message.delete()
+            if reaction.emoji == '❌':
+                logger.info(
+                    'User deleted message',
+                    user=reaction.message.author.id,
+                    url=utils.find_first_url(reaction.message.content),
+                )
+                await reaction.message.delete()
+            elif reaction.emoji == '🔄':
+                logger.info(
+                    'User retried processing of message',
+                    user=reaction.message.author.id,
+                    url=utils.find_first_url(reaction.message.content),
+                )
+                await self._handle_message(message=reaction.message, user=user)
 
     async def embed_cmd(self, interaction: discord.Interaction, url: str, spoiler: bool = False) -> None:
         await interaction.response.defer()
@@ -182,7 +225,7 @@ class DiscordClient(mixins.BotMixin, discord.Client):
             logger.error('Failed downloading', url=url, error=str(e))
             await interaction.followup.send(
                 content=f'Failed fetching {url} ({interaction.user.mention}).\nError: {str(e)}',
-                view=CustomView(),
+                view=CustomViewWithReload(client=self),
             )
             raise e
 
