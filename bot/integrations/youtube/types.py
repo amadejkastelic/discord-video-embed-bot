@@ -17,6 +17,6 @@ class Likes(pydantic.BaseModel):
     raw_dislikes: int
     raw_likes: int
     dislikes: int
-    rating: int
+    rating: float
     view_count: int
     deleted: bool
