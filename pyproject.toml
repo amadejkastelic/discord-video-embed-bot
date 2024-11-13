@@ -7,9 +7,9 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"
-playwright = "^1.47.0"
+playwright = "^1.48.0"
 "discord.py" = "^2.4.0"
-instaloader = "^4.13.1"
+instaloader = "^4.14"
 facebook-scraper = "^0.2.59"
 python-magic = "0.4.27"
 redvid = "^2.0.5"
@@ -27,11 +27,11 @@ pymemcache = "^4.0.0"
 "discord-oauth2.py" = "^1.2.1"
 twitch-dl = "^2.9.2"
 pydantic = "^2.7.1"
-24ur-api = { extras = ["video"], version = "^0.1.5" }
+24ur-api = { extras = ["video"], version = "^0.1.6" }
 tiktokapipy = { extras = ["download"], version = "^0.2.4.post2" }
 psycopg = { extras = ["binary"], version = "^3.2.3" }
 aiograpi = "^0.0.3"
-pytubefix = "^8.1.1"
+pytubefix = "^8.3.2"
 
 [tool.poetry.dev-dependencies]
 black = "^24.10.0"

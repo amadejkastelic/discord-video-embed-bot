@@ -1,4 +1,5 @@
 import typing
+from urllib.parse import parse_qs, urlparse
 
 import aiograpi
 from aiograpi import exceptions as aiograpi_exceptions
@@ -38,7 +39,7 @@ class InstagramClient(base.BaseClient):
             pk = self.client.story_pk_from_url(url)
         else:
             pk = await self.client.media_pk_from_url(url)
-        return self.INTEGRATION, pk, None
+        return self.INTEGRATION, pk, max(0, int(parse_qs(urlparse(url).query).get('img_index', ['1'])[0]) - 1)
 
     async def get_post(self, url: str) -> domain.Post:
         try:
@@ -53,7 +54,7 @@ class InstagramClient(base.BaseClient):
         return await self._get_post(url)
 
     async def _get_post(self, url: str) -> domain.Post:  # noqa: C901
-        _, pk, _ = await self.get_integration_data(url)
+        _, pk, idx = await self.get_integration_data(url)
 
         if 'stories' in url:
             return await self._get_story(url, pk)
@@ -74,19 +75,17 @@ class InstagramClient(base.BaseClient):
             media_url = str(media_info.video_url)
         elif len(media_info.video_versions) > 0:
             media_url = media_info.video_versions[0].get('url')
-        elif len(media_info.resources) > 0:
-            for resource in media_info.resources:
-                if resource.video_url:
-                    media_url = resource.video_url
-                    break
-            for resource in media_info.resources:
-                if len(resource.video_versions) > 0:
-                    media_url = resource.video_versions[0].get('url')
+        elif len(media_info.resources) > idx:
+            media_url = media_info.resources[idx].video_url
+            if not media_url and len(media_info.resources) > idx:
+                media_url = media_info.resources[idx].video_versions[0].get('url')
+                if not media_url:
+                    media_url = media_info.resources[idx].image_versions2['candidates'][0]['url']
         elif len(media_info.image_versions2.get('candidates', [])) > 0:
             media_url = media_info.image_versions2['candidates'][0]['url']
 
         if media_url:
-            post.buffer = await self._download(url=media_url, cookies=self.client.cookie_dict)
+            post.buffer = await self._download(url=str(media_url), cookies=self.client.cookie_dict)
 
         return post
 
