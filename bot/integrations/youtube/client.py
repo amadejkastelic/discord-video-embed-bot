@@ -4,6 +4,7 @@ import typing
 import aiohttp
 import pytubefix as pytube
 from django.conf import settings
+from pytubefix import exceptions as pytube_exceptions
 
 from bot import constants
 from bot import domain
@@ -59,9 +60,19 @@ class YoutubeClient(base.BaseClient):
             post.likes = likes.likes
             post.dislikes = likes.dislikes
 
-        vid.streams.filter(progressive=True, file_extension='mp4').order_by(
-            'resolution'
-        ).desc().first().stream_to_buffer(post.buffer)
+        try:
+            streams = vid.streams
+        except pytube_exceptions.VideoUnavailable as e:
+            logger.warning(
+                'Failed to fetch video with ANDROID_VR client, falling back to MWEB',
+                error=str(e),
+                url=url,
+            )
+            streams = pytube.YouTube(url, 'MWEB').streams
+
+        streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first().stream_to_buffer(
+            post.buffer
+        )
 
         return post
 

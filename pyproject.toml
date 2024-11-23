@@ -7,7 +7,7 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"
-playwright = "^1.48.0"
+playwright = "^1.49.0"
 "discord.py" = "^2.4.0"
 instaloader = "^4.14"
 facebook-scraper = "^0.2.59"
@@ -31,7 +31,7 @@ pydantic = "^2.7.1"
 tiktokapipy = { extras = ["download"], version = "^0.2.4.post2" }
 psycopg = { extras = ["binary"], version = "^3.2.3" }
 aiograpi = "^0.0.3"
-pytubefix = "^8.3.2"
+pytubefix = "^8.5.1"
 
 [tool.poetry.dev-dependencies]
 black = "^24.10.0"
