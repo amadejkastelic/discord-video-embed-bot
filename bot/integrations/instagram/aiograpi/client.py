@@ -94,7 +94,7 @@ class InstagramClient(base.BaseClient):
 
         post = domain.Post(
             url=url,
-            author=story_info.user.username,
+            author=story_info.user.username or story_info.user.full_name,
             created=story_info.taken_at,
         )
 
@@ -106,5 +106,7 @@ class InstagramClient(base.BaseClient):
                 url=str(media_info.video_url or media_info.image_versions2['candidates'][0]['url']),
                 cookies=self.client.cookie_dict,
             )
+        elif story_info.thumbnail_url:
+            post.buffer = await self._download(url=str(story_info.thumbnail_url), cookies=self.client.cookie_dict)
 
         return post
