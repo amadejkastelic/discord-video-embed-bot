@@ -3,9 +3,9 @@ import datetime
 import io
 import mimetypes
 import os
-import ssl
 import random
 import re
+import ssl
 import tempfile
 import typing
 from contextlib import contextmanager
@@ -144,3 +144,27 @@ def date_to_human_format(date: datetime.datetime) -> str:
         return date.strftime('%b %-d, %Y')
 
     return date.strftime('%H:%M · %b %-d, %Y')
+
+
+def parse_relative_time(relative_time: str) -> datetime.timedelta:
+    units = {
+        'y': 'years',
+        'mo': 'months',
+        'w': 'weeks',
+        'd': 'days',
+        'h': 'hours',
+        'm': 'minutes',
+        's': 'seconds',
+    }
+
+    relative_time = relative_time.strip().lower()
+
+    # Extract the number and unit
+    number = int(''.join([ch for ch in relative_time if ch.isdigit()]))
+    unit = ''.join([ch for ch in relative_time if ch.isalpha()])
+
+    if unit not in units:
+        raise ValueError(f"Unsupported time unit: {unit}")
+
+    # Return the appropriate timedelta
+    return datetime.timedelta(**{units[unit]: number})

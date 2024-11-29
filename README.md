@@ -15,6 +15,7 @@ A Discord bot that automatically embeds media and metadata of messages containin
 - Threads ✅
 - 24ur.com ✅
 - 4chan ✅
+- Linkedin ✅
 
 ## How to run
 - Build the docker image: `docker build . -t video-embed-bot` or simply pull it from ghcr:

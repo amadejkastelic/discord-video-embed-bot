@@ -44,12 +44,14 @@ class InstagramClient(base.BaseClient):
     async def get_post(self, url: str) -> domain.Post:
         try:
             return await self._get_post(url)
-        except (aiograpi_exceptions.PreLoginRequired, aiograpi_exceptions.ClientLoginRequired):
+        except (
+            aiograpi_exceptions.PreLoginRequired,
+            aiograpi_exceptions.ClientLoginRequired,
+            aiograpi_exceptions.ReloginAttemptExceeded,
+        ):
             await self.login()
         except aiograpi_exceptions.LoginRequired:
             await self.login(relogin=True)
-        except aiograpi_exceptions.ReloginAttemptExceeded:
-            await self.login()
 
         return await self._get_post(url)
 
