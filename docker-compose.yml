@@ -1,6 +1,6 @@
 services:
   db:
-    image: 'postgres:16.4'
+    image: 'postgres:16.6-alpine'
     ports:
       - 5432:5432
     environment:
@@ -13,7 +13,7 @@ services:
       # Init script
       - ./docker/db/init.sql:/docker-entrypoint-initdb.d/init.sql
   cache:
-    image: 'memcached:1.6.29'
+    image: 'memcached:1.6.32-alpine'
     ports:
       - 11211:11211
     command:
