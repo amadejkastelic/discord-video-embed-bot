@@ -8,6 +8,7 @@ from django.conf import settings
 from bot import constants
 from bot import domain
 from bot import logger
+from bot.common import utils
 from bot.integrations import base
 from bot.integrations.four_chan import config
 from bot.integrations.four_chan import types
@@ -61,7 +62,7 @@ class FourChanClient(base.BaseClient):
         post = domain.Post(
             url=url,
             author=response.posts[0].name,
-            description=response.posts[0].com,
+            description=utils.html_to_markdown(response.posts[0].com),
             spoiler=True if response.posts[0].spoiler == 1 else False,
             created=datetime.datetime.fromtimestamp(response.posts[0].time) if response.posts[0].time else None,
         )
@@ -93,7 +94,7 @@ class FourChanClient(base.BaseClient):
             comments.append(
                 domain.Comment(
                     author=response.posts[i].name,
-                    comment=response.posts[i].com,
+                    comment=utils.html_to_markdown(response.posts[i].com),
                     spoiler=True if response.posts[i].spoiler == 1 else False,
                     created=datetime.datetime.fromtimestamp(response.posts[i].time) if response.posts[i].time else None,
                 )
