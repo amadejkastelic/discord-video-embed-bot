@@ -23,6 +23,13 @@ INSTAGRAM_POST_FORMAT = """🔗 URL: {url}
 👍🏻 Likes: {likes}\n
 """
 
+LINKEDIN_POST_FORMAT = """🔗 URL: {url}
+🧑🏻‍🎨 Author: {author}
+📅 Created: {created}
+👍🏻 Likes: {likes}
+📕 Description: {description}\n
+"""
+
 REDDIT_POST_FORMAT = """🔗 URL: {url}
 🧑🏻‍🎨 Author: {author}
 📅 Created: {created}
@@ -77,6 +84,7 @@ DEFAULT_INTEGRATION_POST_FMT_MAPPING = {
     constants.Integration.FACEBOOK: DEFAULT_POST_FORMAT,
     constants.Integration.FOUR_CHAN: FOUR_CHAN_POST_FORMAT,
     constants.Integration.INSTAGRAM: INSTAGRAM_POST_FORMAT,
+    constants.Integration.LINKEDIN: LINKEDIN_POST_FORMAT,
     constants.Integration.REDDIT: REDDIT_POST_FORMAT,
     constants.Integration.THREADS: THREADS_POST_FORMAT,
     constants.Integration.TIKTOK: TIKTOK_POST_FORMAT,

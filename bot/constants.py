@@ -31,6 +31,7 @@ class ServerStatus(enum.Enum):
 class Integration(enum.Enum):
     INSTAGRAM = 'instagram'
     FACEBOOK = 'facebook'
+    LINKEDIN = 'linkedin'
     TIKTOK = 'tiktok'
     REDDIT = 'reddit'
     THREADS = 'threads'
