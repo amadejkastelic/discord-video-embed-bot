@@ -47,6 +47,10 @@ class BaseClientSingleton:
     _CONFIG_CLASS = BaseClientConfig
 
     @classmethod
+    def should_handle(cls, url: str) -> bool:
+        return any(domain in url for domain in cls.DOMAINS)
+
+    @classmethod
     def _create_instance(cls) -> None:
         raise NotImplementedError()
 

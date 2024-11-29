@@ -31,7 +31,7 @@ pydantic = "^2.7.1"
 tiktokapipy = { extras = ["download"], version = "^0.2.4.post2" }
 psycopg = { extras = ["binary"], version = "^3.2.3" }
 aiograpi = "^0.0.3"
-pytubefix = "^8.5.1"
+pytubefix = "^8.6.0"
 
 [tool.poetry.dev-dependencies]
 black = "^24.10.0"
