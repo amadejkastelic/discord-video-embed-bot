@@ -12,6 +12,7 @@ from contextlib import contextmanager
 
 import aiohttp
 import magic
+import markdownify
 from PIL import Image as pil_image
 from django import db as django_db
 from requests import exceptions as requests_exceptions
@@ -168,3 +169,7 @@ def parse_relative_time(relative_time: str) -> datetime.timedelta:
 
     # Return the appropriate timedelta
     return datetime.timedelta(**{units[unit]: number})
+
+
+def html_to_markdown(html: typing.Optional[str]) -> typing.Optional[str]:
+    return markdownify.markdownify(html) if html else html

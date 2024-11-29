@@ -7,6 +7,7 @@ from django.conf import settings
 from bot import constants
 from bot import domain
 from bot import logger
+from bot.common import utils
 from bot.integrations import base
 from bot.integrations.twenty4ur import config
 
@@ -58,7 +59,7 @@ class Twenty4UrClient(base.BaseClient):
         return domain.Post(
             url=url,
             author=article.author,
-            description=article.summary,
+            description=utils.html_to_markdown(article.summary),
             created=article.posted_at,
             views=article.num_views,
             buffer=buffer,
@@ -70,7 +71,7 @@ class Twenty4UrClient(base.BaseClient):
                 author=comment.author,
                 created=comment.posted_at,
                 likes=comment.score,
-                comment=comment.content,
+                comment=utils.html_to_markdown(comment.content),
             )
             for comment in (await self.client.get_article_by_url(url=url, num_comments=n)).comments
         ]

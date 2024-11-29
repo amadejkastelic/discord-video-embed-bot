@@ -32,6 +32,7 @@ tiktokapipy = { extras = ["download"], version = "^0.2.4.post2" }
 psycopg = { extras = ["binary"], version = "^3.2.3" }
 aiograpi = "^0.0.3"
 pytubefix = "^8.6.0"
+markdownify = "^0.14.1"
 
 [tool.poetry.dev-dependencies]
 black = "^24.10.0"
