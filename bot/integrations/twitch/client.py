@@ -32,6 +32,10 @@ class TwitchClientSingleton(base.BaseClientSingleton):
 
         cls._INSTANCE = TwitchClient()
 
+    @classmethod
+    def should_handle(cls, url: str) -> bool:
+        return super().should_handle(url) and '/clip/' in url
+
 
 class TwitchClient(base.BaseClient):
     INTEGRATION = constants.Integration.TWITCH

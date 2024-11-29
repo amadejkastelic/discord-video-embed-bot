@@ -8,6 +8,7 @@ from bot import exceptions
 from bot import logger
 from bot import models
 from bot import repository
+from bot.domain import post_format
 from bot.integrations import registry
 
 
@@ -130,7 +131,12 @@ async def get_post(  # noqa: C901
         logger.debug('Post already in DB, not downloading again...', url=url)
 
     # Set formatting
-    post.set_format(server.integrations[integration].post_format)
+    post.set_format(
+        post_format.get_or_default(
+            integration=integration,
+            default=server.integrations[integration].post_format,
+        )
+    )
 
     repository.save_server_post(
         server_vendor=server_vendor,

@@ -29,7 +29,7 @@ CLASSES: typing.Set[typing.Type[base.BaseClientSingleton]] = {
 
 def should_handle(url: str) -> bool:
     for klass in CLASSES:
-        if any(domain in url for domain in klass.DOMAINS):
+        if klass.should_handle(url):
             return klass.get_instance() is not None
 
     return False

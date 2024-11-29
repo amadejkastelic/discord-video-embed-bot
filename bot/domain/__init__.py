@@ -1,3 +1,4 @@
+# TODO: Refactor
 import datetime
 import io
 import typing
@@ -5,15 +6,10 @@ from dataclasses import dataclass
 
 from bot import constants
 from bot.common import utils
+from bot.domain import post_format
 
 
-DEFAULT_POST_FORMAT = """🔗 URL: {url}
-🧑🏻‍🎨 Author: {author}
-📅 Created: {created}
-👀 Views: {views}
-👍🏻 Likes: {likes} 👎🏻 Dislikes: {dislikes}
-📕 Description: {description}\n
-"""
+DEFAULT_POST_FORMAT = post_format.DEFAULT_POST_FORMAT
 
 DEFAULT_COMMENT_FORMAT = """🧑🏻‍🎨 Author: {author}
 📅 Created: {created}
