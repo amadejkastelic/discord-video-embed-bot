@@ -45,11 +45,11 @@ class LinkedinClient(base.BaseClient):
             page = await context.new_page()
             await page.goto(url)
 
-            author = await page.locator('[data-tracking-control-name="public_post_feed-actor-name"]').inner_text()
-            description = await page.locator('[data-test-id="main-feed-activity-card__commentary"]').inner_text()
-            likes_text = await page.locator('[data-test-id="social-actions__reaction-count"]').inner_text()
+            author = await page.locator('[data-tracking-control-name="public_post_feed-actor-name"]').first.inner_text()
+            description = await page.locator('[data-test-id="main-feed-activity-card__commentary"]').first.inner_text()
+            likes_text = await page.locator('[data-test-id="social-actions__reaction-count"]').first.inner_text()
             likes = int(likes_text.replace(',', '').replace('.', '') or 0)
-            relative_time = await page.locator('time').inner_text()
+            relative_time = await page.locator('time').first.inner_text()
 
             post = domain.Post(
                 url=url,

@@ -149,9 +149,6 @@ def date_to_human_format(date: datetime.datetime) -> str:
 
 def parse_relative_time(relative_time: str) -> datetime.timedelta:
     units = {
-        'y': 'years',
-        'mo': 'months',
-        'w': 'weeks',
         'd': 'days',
         'h': 'hours',
         'm': 'minutes',
@@ -165,7 +162,17 @@ def parse_relative_time(relative_time: str) -> datetime.timedelta:
     unit = ''.join([ch for ch in relative_time if ch.isalpha()])
 
     if unit not in units:
-        raise ValueError(f"Unsupported time unit: {unit}")
+        if unit in ['w', 'week', 'weeks']:
+            number *= 7
+            unit = 'd'
+        elif unit in ['mo', 'month', 'months']:
+            number *= 30
+            unit = 'd'
+        elif unit in ['y', 'year', 'years']:
+            number *= 365
+            unit = 'd'
+        else:
+            raise ValueError(f"Unsupported time unit: {unit}")
 
     # Return the appropriate timedelta
     return datetime.timedelta(**{units[unit]: number})
