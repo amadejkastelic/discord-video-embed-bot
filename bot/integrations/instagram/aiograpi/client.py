@@ -2,6 +2,7 @@ import typing
 from urllib.parse import parse_qs, urlparse
 
 import aiograpi
+import aiohttp
 from aiograpi import exceptions as aiograpi_exceptions
 
 from bot import constants as bot_constants
@@ -37,6 +38,10 @@ class InstagramClient(base.BaseClient):
     ) -> typing.Tuple[bot_constants.Integration, str, typing.Optional[int]]:
         if 'stories' in url:
             pk = self.client.story_pk_from_url(url)
+        elif '/share/reel/' in url:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url=url) as resp:
+                    pk = await self.client.media_pk_from_url(str(resp.url))
         else:
             pk = await self.client.media_pk_from_url(url)
         return self.INTEGRATION, pk, max(0, int(parse_qs(urlparse(url).query).get('img_index', ['1'])[0]) - 1)
