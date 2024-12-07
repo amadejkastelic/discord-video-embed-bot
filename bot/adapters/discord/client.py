@@ -132,7 +132,12 @@ class DiscordClient(mixins.BotMixin, discord.Client):
             )
             return
 
-        new_message = (await asyncio.gather(message.delete(), message.channel.send('🔥 Working on it 🥵')))[1]
+        new_message = (
+            await asyncio.gather(
+                message.delete(),
+                message.channel.send(content='🔥 Working on it 🥵', reference=message.reference),
+            )
+        )[1]
 
         try:
             post = await service.get_post(
@@ -156,7 +161,12 @@ class DiscordClient(mixins.BotMixin, discord.Client):
             raise e
 
         try:
-            msg = await self._send_post(post=post, send_func=message.channel.send, author=user)
+            msg = await self._send_post(
+                post=post,
+                send_func=message.channel.send,
+                author=user,
+                reference=message.reference,
+            )
             logger.info('User sent message with url', user=user.display_name, url=url)
         except Exception as e:
             logger.error('Failed sending message', url=url, error=str(e))
@@ -398,9 +408,11 @@ class DiscordClient(mixins.BotMixin, discord.Client):
         post: domain.Post,
         send_func: typing.Callable,
         author: typing.Union[discord.User, discord.Member],
+        reference: typing.Optional[discord.MessageReference] = None,
     ) -> discord.Message:
         send_kwargs = {
             'suppress_embeds': True,
+            'reference': reference,
         }
         file = None
         if post.buffer:
