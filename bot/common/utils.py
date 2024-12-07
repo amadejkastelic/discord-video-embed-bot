@@ -11,7 +11,7 @@ import typing
 from contextlib import contextmanager
 
 try:
-    import pylibmagic  # noqa: F401
+    import pylibmagic  # noqa: F401 # pylint: disable=unused-import
 except ImportError:
     pass
 
