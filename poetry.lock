@@ -2360,6 +2360,27 @@ docs = ["sphinx", "sphinx-rtd-theme", "zope.interface"]
 tests = ["coverage[toml] (==5.0.4)", "pytest (>=6.0.0,<7.0.0)"]
 
 [[package]]
+name = "pylibmagic"
+version = "0.5.0"
+description = "scikit-build project with CMake for compiling libmagic"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "pylibmagic-0.5.0-py3-none-macosx_10_9_x86_64.whl", hash = "sha256:6e4aed7e50e7be87c33d7616393ec605be494388576efe3baa300da1d4c99703"},
+    {file = "pylibmagic-0.5.0-py3-none-macosx_11_0_arm64.whl", hash = "sha256:f403cf26e530fa45bcb260fed80f1cecc2df777f2d0239078a234b4f2f97dbf7"},
+    {file = "pylibmagic-0.5.0-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:e8614c1e9d7bb0c6b6989646e385a514acb111fed9ec64f50aaf0e21dcf7b7bb"},
+    {file = "pylibmagic-0.5.0-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:24b5bb791d42653d2668913c7b9a789b5458a2fff09d0ec3c8af33a1204eea6a"},
+    {file = "pylibmagic-0.5.0-py3-none-musllinux_1_1_aarch64.whl", hash = "sha256:10efe9403e45f3c9f379800991fb5f73c0f0fc80db4ec79b5e6db4d0a437a253"},
+    {file = "pylibmagic-0.5.0-py3-none-musllinux_1_1_x86_64.whl", hash = "sha256:948e94de523211c01a8dc1eee235e3433bdc96a39d7ecf8039b814386c27b832"},
+    {file = "pylibmagic-0.5.0.tar.gz", hash = "sha256:942f4f194994f09021f6a4e6e6477ceeb28e4e92dc268fda10d96fa45c8c9ec4"},
+]
+
+[package.extras]
+dev = ["pytest (>=6)", "pytest-cov (>=3)", "tbump (>=6.7.0)", "twine"]
+docs = ["Sphinx (>=4.0)", "myst-parser (>=0.13)", "sphinx-book-theme (>=0.1.0)", "sphinx-copybutton"]
+test = ["pytest (>=6)", "pytest-cov (>=3)", "python-magic"]
+
+[[package]]
 name = "pylint"
 version = "3.3.1"
 description = "python code static checker"
@@ -3271,4 +3292,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "fc5e59eb905051612688a48e8240627b82908c46ed18fdd3035f719f2831073d"
+content-hash = "a958427af978cd11eb32e47fcf3a32e42d2d27a9bac2efe67ba5a00ae6de5b9e"

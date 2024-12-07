@@ -33,6 +33,7 @@ psycopg = { extras = ["binary"], version = "^3.2.3" }
 aiograpi = "^0.0.3"
 pytubefix = "^8.6.0"
 markdownify = "^0.14.1"
+pylibmagic = "^0.5.0"
 
 [tool.poetry.dev-dependencies]
 black = "^24.10.0"

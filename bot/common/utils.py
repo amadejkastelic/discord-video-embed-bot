@@ -10,6 +10,11 @@ import tempfile
 import typing
 from contextlib import contextmanager
 
+try:
+    import pylibmagic  # noqa: F401
+except ImportError:
+    pass
+
 import aiohttp
 import magic
 import markdownify
