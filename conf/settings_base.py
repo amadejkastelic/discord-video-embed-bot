@@ -272,4 +272,10 @@ INTEGRATION_CONFIGURATION = {
     '4chan': {
         'enabled': False,
     },
+    'bluesky': {
+        'enabled': False,
+        'base_url': None,  # If you want some other instance
+        'username': None,
+        'password': None,
+    },
 }

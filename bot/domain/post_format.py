@@ -11,6 +11,13 @@ DEFAULT_POST_FORMAT = """🔗 URL: {url}
 📕 Description: {description}\n
 """
 
+BLUESKY_POST_FORMAT = """🔗 URL: {url}
+🧑🏻‍🎨 Author: {author}
+📅 Created: {created}
+👍🏻 Likes: {likes}
+📕 Description: {description}\n
+"""
+
 FOUR_CHAN_POST_FORMAT = """🔗 URL: {url}
 🧑🏻‍🎨 Author: {author}
 📅 Created: {created}
@@ -81,6 +88,7 @@ YOUTUBE_POST_FORMAT = """🔗 URL: {url}
 
 
 DEFAULT_INTEGRATION_POST_FMT_MAPPING = {
+    constants.Integration.BLUESKY: BLUESKY_POST_FORMAT,
     constants.Integration.FACEBOOK: DEFAULT_POST_FORMAT,
     constants.Integration.FOUR_CHAN: FOUR_CHAN_POST_FORMAT,
     constants.Integration.INSTAGRAM: INSTAGRAM_POST_FORMAT,

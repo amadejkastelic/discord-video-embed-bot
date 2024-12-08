@@ -125,7 +125,7 @@ class DiscordClient(mixins.BotMixin, discord.Client):
 
         if service.should_handle_url(url) is False:
             logger.debug(
-                'Handling for URL not implemented',
+                'Handling for URL not enabled',
                 url=url,
                 server_uid=str(message.guild.id),
                 server_vendor=self.VENDOR.value,
