@@ -29,6 +29,7 @@ class ServerStatus(enum.Enum):
 
 
 class Integration(enum.Enum):
+    BLUESKY = 'bluesky'
     INSTAGRAM = 'instagram'
     FACEBOOK = 'facebook'
     LINKEDIN = 'linkedin'

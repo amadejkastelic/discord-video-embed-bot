@@ -1,6 +1,7 @@
 import typing
 
 from bot.integrations import base
+from bot.integrations.bluesky import client as bluesky_client
 from bot.integrations.facebook import client as facebook_client
 from bot.integrations.four_chan import client as four_chan_client
 from bot.integrations.instagram import singleton as instagram_client
@@ -15,6 +16,7 @@ from bot.integrations.youtube import client as youtube_client
 
 
 CLASSES: typing.Set[typing.Type[base.BaseClientSingleton]] = {
+    bluesky_client.BlueskyClientSingleton,
     facebook_client.FacebookClientSingleton,
     four_chan_client.FourChanClientSingleton,
     instagram_client.InstagramClientSingleton,
