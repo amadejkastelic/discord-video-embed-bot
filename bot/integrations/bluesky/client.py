@@ -112,6 +112,10 @@ class BlueskyClient(base.BaseClient):
                     [await self._download(img.fullsize or img.thumb) for img in thread.post.embed.images[:3]]
                 )
             elif atproto_models.ids.AppBskyEmbedVideo in thread.post.embed.py_type:
-                post.buffer = await m3u8.download_stream(stream_url=thread.post.embed.playlist or thread.post.embed.alt)
+                stream_url = thread.post.embed.playlist or thread.post.embed.alt
+                post.buffer = await m3u8.download_stream(
+                    stream_url=stream_url,
+                    prefix=stream_url[: stream_url.find('playlist.m3u8')],
+                )
 
         return post
