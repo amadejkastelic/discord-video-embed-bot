@@ -12,7 +12,7 @@ wells_utils.logger.addHandler(logging.NullHandler())
 wells_utils.logger.propagate = False
 
 
-async def download_stream(
+async def download_stream(  # pylint: disable=too-many-positional-arguments
     stream_url: str,
     prefix: typing.Optional[str] = None,
     tmp_dir: str = '/tmp',
