@@ -30,11 +30,11 @@ Facebook requires you to provide cookies. Download them in your browser using [a
 
 ### Reddit
 
-For extended reddit support you need to create an app on reddit and add the following environment variables:
+For extended reddit support you need to [create an app on reddit](https://www.reddit.com/prefs/apps) and add the following environment variables:
 
 ```bash
-REDDIT_API_TOKEN=<your_reddit_api_token>
-REDDIT_API_SECRET=<your_reddit_api_secret>
+REDDIT_CLIENT_ID=<your_reddit_api_token>
+REDDIT_CLIENT_SECRET=<your_reddit_api_secret>
 REDDIT_USER_AGENT=<name_version_and_your_username>
 ```
 
