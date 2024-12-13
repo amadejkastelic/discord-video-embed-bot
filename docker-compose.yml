@@ -1,0 +1,18 @@
+services:
+  video-embed-bot:
+    image: video-embed-bot
+    container_name: video-embed-bot
+    restart: unless-stopped
+    environment:
+      DISCORD_API_TOKEN: "<bot_token>"
+      COMPACT_POST: "false"
+      REDDIT_CLIENT_ID: "<your_reddit_api_token>"
+      REDDIT_CLIENT_SECRET: "<your_reddit_api_secret>"
+      REDDIT_USER_AGENT: "<name_version_and_your_username>"
+      TWITTER_USERNAME: "<your_twitter_username>"
+      TWITTER_EMAIL: "<your_twitter_email>"
+      TWITTER_PASSWORD: "<your_twitter_password>"
+      INSTAGRAM_USERNAME: "<your_instagram_username>"
+    volumes:
+      - ./instagram.sess:/app/instagram.sess # Instagram session file
+      - ./cookies.txt:/app/cookies.txt # Facebook cookies
