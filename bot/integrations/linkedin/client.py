@@ -49,7 +49,10 @@ class LinkedinClient(base.BaseClient):
             description = await page.locator('[data-test-id="main-feed-activity-card__commentary"]').first.inner_text()
             likes_text = await page.locator('[data-test-id="social-actions__reaction-count"]').first.inner_text()
             likes = int(likes_text.replace(',', '').replace('.', '') or 0)
-            relative_time = await page.locator('time').first.inner_text()
+            relative_time = (await page.locator('time').first.inner_text()).split()[0]
+            author_pfp = await page.locator(
+                '[data-tracking-control-name="public_post_feed-actor-image"] img'
+            ).first.get_attribute('src')
 
             post = domain.Post(
                 url=url,
@@ -67,8 +70,10 @@ class LinkedinClient(base.BaseClient):
                 image_count = await image_locator.count()
                 media_url = await image_locator.get_attribute('content') if image_count > 0 else None
 
-            if media_url:
+            if media_url and 'static' not in media_url:
                 post.buffer = await self._download(media_url)
+            elif author_pfp:
+                post.buffer = await self._download(author_pfp)
 
             await browser.close()
             return post
