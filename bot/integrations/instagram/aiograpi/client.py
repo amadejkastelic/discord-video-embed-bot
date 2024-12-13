@@ -38,7 +38,7 @@ class InstagramClient(base.BaseClient):
     ) -> typing.Tuple[bot_constants.Integration, str, typing.Optional[int]]:
         if 'stories' in url:
             pk = self.client.story_pk_from_url(url)
-        elif '/share/reel/' in url:
+        elif '/share/' in url:
             async with aiohttp.ClientSession() as session:
                 async with session.get(url=url) as resp:
                     pk = await self.client.media_pk_from_url(str(resp.url))
