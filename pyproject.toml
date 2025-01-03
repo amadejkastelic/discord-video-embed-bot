@@ -1,52 +1,56 @@
-[tool.poetry]
+[project]
+authors = [{ name = "Amadej Kastelic", email = "amadejkastelic7@gmail.com" }]
+requires-python = "<3.14,>=3.12"
+dependencies = [
+    "playwright<2.0.0,>=1.49.0",
+    "discord-py<3.0.0,>=2.4.0",
+    "instaloader<5.0,>=4.14",
+    "facebook-scraper<1.0.0,>=0.2.59",
+    "python-magic==0.4.27",
+    "redvid<3.0.0,>=2.0.5",
+    "RedDownloader<5.0.0,>=4.3.0",
+    "ffmpeg-python<1.0.0,>=0.2.0",
+    "opencv-python<5.0.0.0,>=4.10.0.84",
+    "asyncpraw<8.0.0,>=7.8.0",
+    "twscrape<1.0,>=0.14",
+    "lxml-html-clean<1.0.0,>=0.3.1",
+    "Django<6.0.0,>=5.1.2",
+    "djangorestframework<4.0.0,>=3.15.2",
+    "djangorestframework-simplejwt<6.0.0,>=5.3.1",
+    "django-structlog<9.0.0,>=8.1.0",
+    "pymemcache<5.0.0,>=4.0.0",
+    "discord-oauth2-py<2.0.0,>=1.2.1",
+    "twitch-dl<3.0.0,>=2.9.2",
+    "pydantic<3.0.0,>=2.7.1",
+    "24ur-api[video]<1.0.0,>=0.1.6",
+    "tiktokapipy[download]<1.0.0.0,>=0.2.4.post2",
+    "psycopg[binary]<4.0.0,>=3.2.3",
+    "aiograpi<1.0.0,>=0.0.3",
+    "pytubefix<9.0.0,>=8.10.0",
+    "markdownify<1.0.0,>=0.14.1",
+    "pylibmagic<1.0.0,>=0.5.0",
+    "atproto<1.0.0,>=0.0.56",
+]
 name = "discord-video-embed-bot"
 description = "Discord bot that reads messages and embeds videos from various websited that don't support this"
 version = "0.1.0"
-authors = ["Amadej Kastelic <amadejkastelic7@gmail.com>"]
-package-mode = false
 
-[tool.poetry.dependencies]
-python = ">=3.12,<3.14"
-playwright = "^1.49.0"
-"discord.py" = "^2.4.0"
-instaloader = "^4.14"
-facebook-scraper = "^0.2.59"
-python-magic = "0.4.27"
-redvid = "^2.0.5"
-RedDownloader = "^4.3.0"
-ffmpeg-python = "^0.2.0"
-opencv-python = "^4.10.0.84"
-asyncpraw = "^7.8.0"
-twscrape = "^0.14"
-lxml-html-clean = "^0.3.1"
-Django = "^5.1.2"
-djangorestframework = "^3.15.2"
-djangorestframework-simplejwt = "^5.3.1"
-django-structlog = "^8.1.0"
-pymemcache = "^4.0.0"
-"discord-oauth2.py" = "^1.2.1"
-twitch-dl = "^2.9.2"
-pydantic = "^2.7.1"
-24ur-api = { extras = ["video"], version = "^0.1.6" }
-tiktokapipy = { extras = ["download"], version = "^0.2.4.post2" }
-psycopg = { extras = ["binary"], version = "^3.2.3" }
-aiograpi = "^0.0.3"
-pytubefix = "^8.6.0"
-markdownify = "^0.14.1"
-pylibmagic = "^0.5.0"
-atproto = "^0.0.56"
+[dependency-groups]
+dev = [
+    "black<25.0.0,>=24.10.0",
+    "flake8<8.0.0,>=7.1.1",
+    "flake8-import-order<1.0.0,>=0.18.2",
+    "pylint<4.0.0,>=3.3.1",
+    "pylint-django<3.0.0,>=2.6.1",
+    "isort<6.0.0,>=5.13.2",
+]
 
-[tool.poetry.dev-dependencies]
-black = "^24.10.0"
-flake8 = "^7.1.1"
-flake8-import-order = "^0.18.2"
-pylint = "^3.3.1"
-pylint-django = "^2.6.1"
-isort = "^5.13.2"
+[tool.uv]
+default-groups = []
 
 [tool.black]
 line-length = 120
-target-version = ['py312']
+target-version = ['py313']
 include = '\.pyi?$'
 skip-string-normalization = true
 
@@ -66,5 +70,4 @@ max-complexity = 10
 
 [tool.ruff.isort]
 force-single-line = true
-known-third-party = ["btspython"]
 case-sensitive = true

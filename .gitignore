@@ -7,3 +7,4 @@ accounts.db
 settings.py
 docker/db/data
 *.log
+.venv

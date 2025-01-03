@@ -16,16 +16,16 @@ jobs:
       - name: Set up Python environment
         uses: actions/setup-python@v4
         with:
-          python-version: "3.12.4"
+          python-version: "3.12"
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install poetry
-          poetry install
+          python -m pip install uv
+          uv sync --dev
       - name: flake8
         uses: py-actions/flake8@v2
       - name: pylint
         run: |
-          poetry run pylint ./bot/**/*.py
+          uv run pylint ./bot/**/*.py
       - name: black formatting
         uses: psf/black@stable

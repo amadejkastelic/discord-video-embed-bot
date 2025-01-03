@@ -5,11 +5,10 @@ pkgs.mkShell {
   packages = with pkgs; [
     python312
     python312Packages.pip
-    python312Packages.python-magic
-    playwright
-    playwright-driver.browsers
+    python312Packages.playwright
+    playwright-driver
     docker-compose
-    poetry
+    uv
     curl
     jq
     file
@@ -19,7 +18,6 @@ pkgs.mkShell {
   shellHook = ''
     export PLAYWRIGHT_BROWSERS_PATH=${pkgs.playwright-driver.browsers}
     export PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=true
-    docker-compose up -d
-    poetry install && poetry shell
+    uv sync
   '';
 }
