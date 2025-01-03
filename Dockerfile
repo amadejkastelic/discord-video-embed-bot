@@ -26,6 +26,6 @@ COPY bot/ ./bot/
 COPY conf/ ./conf/
 COPY examples/settings_prod.py ./settings.py
 
-RUN uv install && uv run playwright install chromium && uv run playwright install-deps
+RUN uv sync && uv run playwright install chromium && uv run playwright install-deps
 
 ENTRYPOINT ["uv", "run", "python", "manage.py"]
