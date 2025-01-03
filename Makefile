@@ -1,6 +1,6 @@
 init:
 	cp examples/settings_dev.py settings.py
-	poetry install
+	uv sync && uv install
 run-server:
 	docker-compose up -d
 	DJANGO_SETTINGS_MODULE=settings ./manage.py runserver 8080

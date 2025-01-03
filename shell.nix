@@ -3,10 +3,9 @@ pkgs.mkShell {
   LD_LIBRARY_PATH = "${pkgs.stdenv.cc.cc.lib}/lib";
 
   packages = with pkgs; [
-    python313
-    python313Packages.pip
-    python313Packages.python-magic
-    python313Packages.playwright
+    python312
+    python312Packages.pip
+    python312Packages.playwright
     playwright-driver
     docker-compose
     uv
@@ -14,9 +13,6 @@ pkgs.mkShell {
     jq
     file
     ffmpeg
-    cargo
-    rustc
-    libffi_3_3
   ];
 
   shellHook = ''

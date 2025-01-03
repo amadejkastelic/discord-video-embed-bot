@@ -16,16 +16,16 @@ RUN apt -y update -oAcquire::AllowInsecureRepositories=true && \
     apt -y remove wget && \
     apt -y autoremove && apt -y clean
 
-RUN pip install "poetry"
+RUN pip install uv
 
 WORKDIR /app
 COPY pyproject.toml ./
-COPY poetry.lock ./
+COPY uv.lock ./
 COPY *.py ./
 COPY bot/ ./bot/
 COPY conf/ ./conf/
 COPY examples/settings_prod.py ./settings.py
 
-RUN poetry install --without dev && poetry run playwright install chromium && poetry run playwright install-deps
+RUN uv install && uv run playwright install chromium && uv run playwright install-deps
 
-ENTRYPOINT ["poetry", "run", "python", "manage.py"]
+ENTRYPOINT ["uv", "run", "python", "manage.py"]

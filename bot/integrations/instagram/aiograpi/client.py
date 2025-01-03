@@ -85,9 +85,10 @@ class InstagramClient(base.BaseClient):
         elif len(media_info.resources) > idx:
             media_url = media_info.resources[idx].video_url
             if not media_url and len(media_info.resources) > idx:
-                media_url = media_info.resources[idx].video_versions[0].get('url')
+                if media_info.resources[idx].video_versions:
+                    media_url = media_info.resources[idx].video_versions[0].get('url')
                 if not media_url:
-                    media_url = media_info.resources[idx].image_versions2['candidates'][0]['url']
+                    media_url = media_info.resources[idx].image_versions[0].get('url')
         elif len(media_info.image_versions2.get('candidates', [])) > 0:
             media_url = media_info.image_versions2['candidates'][0]['url']
 
