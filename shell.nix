@@ -3,23 +3,25 @@ pkgs.mkShell {
   LD_LIBRARY_PATH = "${pkgs.stdenv.cc.cc.lib}/lib";
 
   packages = with pkgs; [
-    python312
-    python312Packages.pip
-    python312Packages.python-magic
-    playwright
-    playwright-driver.browsers
+    python313
+    python313Packages.pip
+    python313Packages.python-magic
+    python313Packages.playwright
+    playwright-driver
     docker-compose
-    poetry
+    uv
     curl
     jq
     file
     ffmpeg
+    cargo
+    rustc
+    libffi_3_3
   ];
 
   shellHook = ''
     export PLAYWRIGHT_BROWSERS_PATH=${pkgs.playwright-driver.browsers}
     export PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=true
-    docker-compose up -d
-    poetry install && poetry shell
+    uv sync
   '';
 }
