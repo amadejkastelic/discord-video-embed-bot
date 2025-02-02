@@ -412,8 +412,9 @@ class DiscordClient(mixins.BotMixin, discord.Client):
     ) -> discord.Message:
         send_kwargs = {
             'suppress_embeds': True,
-            'reference': reference,
         }
+        if reference is not None:
+            send_kwargs['reference'] = reference
         file = None
         if post.buffer:
             extension = utils.guess_extension_from_buffer(buffer=post.buffer)
