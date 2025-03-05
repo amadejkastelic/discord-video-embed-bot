@@ -17,6 +17,7 @@ A Discord bot that automatically embeds media and metadata of messages containin
 - 4chan ✅
 - Linkedin ✅
 - Bluesky ✅
+- Truth Social ✅
 
 ## How to run
 - Build the docker image: `docker build . -t video-embed-bot` or simply pull it from ghcr:

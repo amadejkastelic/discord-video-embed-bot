@@ -23,7 +23,7 @@ class Twenty4UrClientSingleton(base.BaseClientSingleton):
         'dominvrt.si',
         'okusno.je',
     ]
-    _CONFIG_SCHEMA = config.Twenty4UrConfig
+    _CONFIG_CLASS = config.Twenty4UrConfig
 
     @classmethod
     def _create_instance(cls) -> None:

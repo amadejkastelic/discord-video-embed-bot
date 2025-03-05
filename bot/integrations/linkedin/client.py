@@ -14,7 +14,7 @@ from bot.integrations.linkedin import config
 
 class LinkedinClientSingleton(base.BaseClientSingleton):
     DOMAINS = ['linkedin.com/posts', 'linkedin.com/feed']
-    _CONFIG_SCHEMA = config.LinkedinConfig
+    _CONFIG_CLASS = config.LinkedinConfig
 
     @classmethod
     def _create_instance(cls) -> None:
