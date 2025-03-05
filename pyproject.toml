@@ -30,6 +30,7 @@ dependencies = [
     "markdownify<1.0.0,>=0.14.1",
     "pylibmagic<1.0.0,>=0.5.0",
     "atproto<1.0.0,>=0.0.56",
+    "truthbrush>=0.1.9",
 ]
 name = "discord-video-embed-bot"
 description = "Discord bot that reads messages and embeds videos from various websited that don't support this"

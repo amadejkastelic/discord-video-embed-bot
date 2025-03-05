@@ -9,6 +9,7 @@ from bot.integrations.linkedin import client as linkedin_client
 from bot.integrations.reddit import client as reddit_client
 from bot.integrations.threads import client as threads_client
 from bot.integrations.tiktok import client as tiktok_client
+from bot.integrations.truth_social import client as truth_social_client
 from bot.integrations.twenty4ur import client as twenty4ur_client
 from bot.integrations.twitch import client as twitch_client
 from bot.integrations.twitter import client as twitter_client
@@ -24,6 +25,7 @@ CLASSES: typing.Set[typing.Type[base.BaseClientSingleton]] = {
     reddit_client.RedditClientSingleton,
     threads_client.ThreadsClientSingleton,
     tiktok_client.TiktokClientSingleton,
+    truth_social_client.TruthSocialClientSingleton,
     twenty4ur_client.Twenty4UrClientSingleton,
     twitch_client.TwitchClientSingleton,
     twitter_client.TwitterClientSingleton,

@@ -19,7 +19,7 @@ from bot.integrations.twitch import config
 
 class TwitchClientSingleton(base.BaseClientSingleton):
     DOMAINS = ['twitch.tv']
-    _CONFIG_SCHEMA = config.TwitchConfig
+    _CONFIG_CLASS = config.TwitchConfig
 
     @classmethod
     def _create_instance(cls) -> None:

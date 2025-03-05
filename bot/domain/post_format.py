@@ -58,6 +58,13 @@ TIKTOK_POST_FORMAT = """🔗 URL: {url}
 👍🏻 Likes: {likes}\n
 """
 
+TRUTH_SOCIAL_POST_FORMAT = """🔗 URL: {url}
+🧑🏻‍🎨 Author: {author}
+📅 Created: {created}
+👍🏻 Likes: {likes}
+📕 Description: {description}\n
+"""
+
 TWENTY4_UR_POST_FORMAT = """🔗 URL: {url}
 🧑🏻‍🎨 Author: {author}
 📅 Created: {created}
@@ -96,6 +103,7 @@ DEFAULT_INTEGRATION_POST_FMT_MAPPING = {
     constants.Integration.REDDIT: REDDIT_POST_FORMAT,
     constants.Integration.THREADS: THREADS_POST_FORMAT,
     constants.Integration.TIKTOK: TIKTOK_POST_FORMAT,
+    constants.Integration.TRUTH_SOCIAL: TRUTH_SOCIAL_POST_FORMAT,
     constants.Integration.TWENTY4_UR: TWENTY4_UR_POST_FORMAT,
     constants.Integration.TWITCH: TWITCH_POST_FORMAT,
     constants.Integration.TWITTER: TWITTER_POST_FORMAT,

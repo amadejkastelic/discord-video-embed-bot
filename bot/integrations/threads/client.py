@@ -34,7 +34,7 @@ HEADERS = {
 
 class ThreadsClientSingleton(base.BaseClientSingleton):
     DOMAINS = ['threads.net']
-    _CONFIG_SCHEMA = config.ThreadsConfig
+    _CONFIG_CLASS = config.ThreadsConfig
 
     @classmethod
     def _create_instance(cls) -> None:
