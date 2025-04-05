@@ -37,19 +37,19 @@ class Command(base.BaseCommand):
         )
 
     def handle(self, *args: typing.Any, **options: typing.Any) -> typing.NoReturn:
-        older_than = self._parse_older_than(options.get('older_than', '1d'))
+        older_than = self._older_than_to_timedelta(options.get('older_than', '1d'))
         batch_size = options.get('batch_size', 10)
         sleep = options.get('sleep', 60 * 60 * 1)
 
-        logger.info(
-            'Running purge posts command', older_than=older_than.isoformat(), batch_size=batch_size, sleep=sleep
-        )
+        logger.info('Running purge posts command', older_than=older_than, batch_size=batch_size, sleep=sleep)
 
         while True:
             try:
                 num_deleted, _ = models.Post.objects.filter(
                     pk__in=list(
-                        models.Post.objects.filter(created__lt=older_than).values_list('pk', flat=True)[:batch_size]
+                        models.Post.objects.filter(created__lt=datetime.datetime.now() - older_than).values_list(
+                            'pk', flat=True
+                        )[:batch_size]
                     )
                 ).delete()
             except db.OperationalError as e:
@@ -63,24 +63,22 @@ class Command(base.BaseCommand):
             time.sleep(sleep)
 
     @staticmethod
-    def _parse_older_than(older_than: str) -> typing.Optional[datetime.datetime]:
-        now = datetime.datetime.now()
-
+    def _older_than_to_timedelta(older_than: str) -> typing.Optional[datetime.timedelta]:
         num, unit = int(older_than[:-1]), older_than[-1]
         match (unit):
             case 'y':
-                return now - datetime.timedelta(days=365 * num)
+                return datetime.timedelta(days=365 * num)
             case 'm':
-                return now - datetime.timedelta(days=30 * num)
+                return datetime.timedelta(days=30 * num)
             case 'w':
-                return now - datetime.timedelta(days=7 * num)
+                return datetime.timedelta(days=7 * num)
             case 'd':
-                return now - datetime.timedelta(days=num)
+                return datetime.timedelta(days=num)
             case 'h':
-                return now - datetime.timedelta(hours=num)
+                return datetime.timedelta(hours=num)
             case 'M':
-                return now - datetime.timedelta(minutes=num)
+                return datetime.timedelta(minutes=num)
             case 's':
-                return now - datetime.timedelta(seconds=num)
+                return datetime.timedelta(seconds=num)
 
-        return now - datetime.timedelta(days=1)
+        return datetime.timedelta(days=1)
