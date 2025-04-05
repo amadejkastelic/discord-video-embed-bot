@@ -7,9 +7,9 @@ RUN apt -y update && apt -y install libmagic-dev wget
 
 # Get latest ffmpeg
 RUN apt -y update -oAcquire::AllowInsecureRepositories=true && \
-    wget https://www.deb-multimedia.org/pool/main/d/deb-multimedia-keyring/deb-multimedia-keyring_2016.8.1_all.deb && \
-    dpkg -i deb-multimedia-keyring_2016.8.1_all.deb && \
-    rm deb-multimedia-keyring_2016.8.1_all.deb && \
+    wget https://www.deb-multimedia.org/pool/main/d/deb-multimedia-keyring/deb-multimedia-keyring_2024.9.1_all.deb && \
+    dpkg -i deb-multimedia-keyring_2024.9.1_all.deb && \
+    rm deb-multimedia-keyring_2024.9.1_all.deb && \
     echo "deb https://www.deb-multimedia.org bookworm main non-free" >> /etc/apt/sources.list && \
     apt -y update && apt -y upgrade && \
     apt -y install ffmpeg && \
