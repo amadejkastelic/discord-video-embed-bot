@@ -149,7 +149,7 @@ class DiscordClient(mixins.BotMixin, discord.Client):
             if not post:
                 raise exceptions.IntegrationClientError('Failed to fetch post')
         except Exception as e:
-            logger.error('Failed downloading', url=url, error=str(e))
+            logger.exception('Failed downloading', url=url, error=str(e))
             await asyncio.gather(
                 new_message.edit(
                     content=f'{user.mention}\nFailed downloading {url}.\nError: {str(e)}.',
@@ -169,7 +169,7 @@ class DiscordClient(mixins.BotMixin, discord.Client):
             )
             logger.info('User sent message with url', user=user.display_name, url=url)
         except Exception as e:
-            logger.error('Failed sending message', url=url, error=str(e))
+            logger.exception('Failed sending message', url=url, error=str(e))
             msg = await message.channel.send(
                 content=f'Failed sending discord message for {url} ({user.mention}).\nError: {str(e)}'
             )
@@ -232,7 +232,7 @@ class DiscordClient(mixins.BotMixin, discord.Client):
             if not post.spoiler:
                 post.spoiler = spoiler
         except Exception as e:
-            logger.error('Failed downloading', url=url, error=str(e))
+            logger.exception('Failed downloading', url=url, error=str(e))
             await interaction.followup.send(
                 content=f'Failed fetching {url} ({interaction.user.mention}).\nError: {str(e)}',
                 view=CustomViewWithReload(client=self),
@@ -266,7 +266,7 @@ class DiscordClient(mixins.BotMixin, discord.Client):
                 author_uid=str(interaction.user.id),
             )
         except Exception as e:
-            logger.error('Failed downloading', url=url, error=str(e))
+            logger.exception('Failed downloading', url=url, error=str(e))
             await interaction.followup.send(
                 content=f'Failed fetching {url} ({interaction.user.mention}).\nError: {str(e)}',
                 view=CustomView(),
