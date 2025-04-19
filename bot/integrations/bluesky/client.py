@@ -17,7 +17,7 @@ from bot.integrations.bluesky import config
 
 
 class BlueskyClientSingleton(base.BaseClientSingleton):
-    DOMAINS = ['bsky.app']
+    DOMAINS = {'bsky.app'}
     _CONFIG_CLASS = config.BlueskyConfig
 
     @classmethod
@@ -39,7 +39,7 @@ class BlueskyClientSingleton(base.BaseClientSingleton):
             return
 
         if conf.base_url:
-            cls.DOMAINS = [conf.base_url]
+            cls.DOMAINS = {conf.base_url}
 
         cls._INSTANCE = BlueskyClient(
             username=conf.username,

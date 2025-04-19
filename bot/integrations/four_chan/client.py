@@ -18,7 +18,7 @@ IMAGE_URL_TEMPLATE = 'https://i.4cdn.org/{board}/{image_id}{extension}'
 
 
 class FourChanClientSingleton(base.BaseClientSingleton):
-    DOMAINS = ['4chan.org']
+    DOMAINS = {'4chan.org'}
     _CONFIG_CLASS = config.FourChanConfig
 
     @classmethod

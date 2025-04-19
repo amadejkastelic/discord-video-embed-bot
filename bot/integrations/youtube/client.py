@@ -18,7 +18,7 @@ LIKES_API_URL_TEMPLATE = 'https://returnyoutubedislikeapi.com/votes?videoId={vid
 
 
 class YoutubeClientSingleton(base.BaseClientSingleton):
-    DOMAINS = ['youtube.com/shorts']
+    DOMAINS = {'youtube.com/shorts'}
     _CONFIG_CLASS = config.YoutubeConfig
 
     @classmethod

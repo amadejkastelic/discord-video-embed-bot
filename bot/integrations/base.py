@@ -42,13 +42,16 @@ class BaseClientConfig(pydantic.BaseModel):
 
 
 class BaseClientSingleton:
-    DOMAINS: typing.List[str] = []
+    DOMAINS: typing.Set[str] = []
+    BLACKLIST_DOMAINS: typing.Set[str] = []
     _INSTANCE: typing.Optional[typing.Union[BaseClient, int]] = None
     _CONFIG_CLASS = BaseClientConfig
 
     @classmethod
     def should_handle(cls, url: str) -> bool:
-        return any(domain in url for domain in cls.DOMAINS)
+        return any(domain in url for domain in cls.DOMAINS) and not any(
+            domain in url for domain in cls.BLACKLIST_DOMAINS
+        )
 
     @classmethod
     def _create_instance(cls) -> None:

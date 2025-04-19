@@ -13,7 +13,7 @@ from bot.integrations.linkedin import config
 
 
 class LinkedinClientSingleton(base.BaseClientSingleton):
-    DOMAINS = ['linkedin.com/posts', 'linkedin.com/feed']
+    DOMAINS = {'linkedin.com/posts', 'linkedin.com/feed'}
     _CONFIG_CLASS = config.LinkedinConfig
 
     @classmethod

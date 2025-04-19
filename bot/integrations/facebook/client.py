@@ -1,8 +1,9 @@
-import os
 import typing
 from urllib import parse as urllib_parse
 
-import facebook_scraper
+import aiohttp
+import fake_useragent
+from bs4 import BeautifulSoup as bs
 from django.conf import settings
 
 from bot import constants
@@ -12,9 +13,17 @@ from bot import logger
 from bot.integrations import base
 from bot.integrations.facebook import config
 
+_API_URL = 'https://fdown.net/'
+_HEADERS = {
+    'User-Agent': fake_useragent.UserAgent().random,
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Referer': 'https://fdown.net/',
+}
+
 
 class FacebookClientSingleton(base.BaseClientSingleton):
-    DOMAINS = ['facebook.com', 'fb.watch']
+    DOMAINS = {'facebook.com', 'fb.watch'}
     _CONFIG_CLASS = config.FacebookConfig
 
     @classmethod
@@ -26,20 +35,14 @@ class FacebookClientSingleton(base.BaseClientSingleton):
             cls._INSTANCE = base.MISSING
             return
 
-        if conf.cookies_file_path is None:
-            logger.warning('Not enabling facebook integration due to missing cookies')
-            cls._INSTANCE = base.MISSING
-            return
-
-        cls._INSTANCE = FacebookClient(cookies_path=conf.cookies_file_path)
+        cls._INSTANCE = FacebookClient()
 
 
 class FacebookClient(base.BaseClient):
     INTEGRATION = constants.Integration.FACEBOOK
 
-    def __init__(self, cookies_path: str):
+    def __init__(self):
         super().__init__()
-        self.cookies_path = cookies_path
 
     async def get_integration_data(self, url: str) -> typing.Tuple[constants.Integration, str, typing.Optional[int]]:
         if '/watch' in url.split('?')[0] and 'v=' in url:
@@ -48,25 +51,26 @@ class FacebookClient(base.BaseClient):
         return self.INTEGRATION, url.strip('/').split('?')[0].split('/')[-1], None
 
     async def get_post(self, url: str) -> domain.Post:
-        kwargs = {}
-        if self.cookies_path and os.path.exists(self.cookies_path):
-            kwargs['cookies'] = 'cookies.txt'
+        async with aiohttp.ClientSession(headers=_HEADERS) as session:
+            # Set cookies
+            async with session.get(_API_URL) as response:
+                pass
 
-        fb_post = next(facebook_scraper.get_posts(post_urls=[url], **kwargs))
+            async with session.post(_API_URL + 'download.php', data=aiohttp.FormData(fields={"URLz": url})) as response:
+                if response.status != 200:
+                    logger.debug('Failed to fetch URL', url=url, status=response.status, response=response)
+                    raise exceptions.IntegrationError(f'Failed to fetch URL: {url}')
 
-        ts = fb_post.get('time')
-        post = domain.Post(
-            url=url,
-            author=fb_post.get('username'),
-            description=fb_post.get('text'),
-            likes=fb_post.get('likes'),
-            created=ts.astimezone() if ts else None,
-        )
+                response_data = await response.text()
 
-        if fb_post.get('video'):
-            post.buffer = await self._download(url=fb_post['video'])
-        elif fb_post.get('images'):
-            post.buffer = await self._download(url=fb_post['images'][0])
+        logger.debug('Response data', url=url, response=response_data)
+
+        post = domain.Post(url=url)
+
+        soup = bs(response_data, 'html.parser')
+        stream = soup.find('a', id='hdlink') or soup.find('a', id='sdlink')
+        if stream:
+            post.buffer = await self._download(url=stream['href'])
 
         return post
 
