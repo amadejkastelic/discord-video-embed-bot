@@ -7,7 +7,6 @@ pkgs.mkShell {
     python312Packages.pip
     python312Packages.playwright
     playwright-driver
-    docker-compose
     uv
     curl
     jq
