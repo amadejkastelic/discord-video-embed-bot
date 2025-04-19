@@ -23,7 +23,7 @@ HEADERS = {'referer': 'https://www.tiktok.com/'}
 
 
 class TiktokClientSingleton(base.BaseClientSingleton):
-    DOMAINS = ['tiktok.com']
+    DOMAINS = {'tiktok.com'}
     _CONFIG_CLASS = config.TiktokConfig
 
     @classmethod

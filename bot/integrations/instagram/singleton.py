@@ -8,7 +8,7 @@ from bot.integrations.instagram.instaloader import client as instaloader_client
 
 
 class InstagramClientSingleton(base.BaseClientSingleton):
-    DOMAINS = ['instagram.com', 'ddinstagram.com']
+    DOMAINS = {'instagram.com', 'ddinstagram.com'}
     _CONFIG_CLASS = config.InstagramConfig
 
     @classmethod

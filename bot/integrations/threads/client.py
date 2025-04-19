@@ -33,7 +33,7 @@ HEADERS = {
 
 
 class ThreadsClientSingleton(base.BaseClientSingleton):
-    DOMAINS = ['threads.net']
+    DOMAINS = {'threads.net'}
     _CONFIG_CLASS = config.ThreadsConfig
 
     @classmethod

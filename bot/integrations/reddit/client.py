@@ -28,7 +28,16 @@ NEW_REDDIT_URL_PATTERN = '^https://www.reddit.com/r/[^/]+/s/[^/]+$'
 
 
 class RedditClientSingleton(base.BaseClientSingleton):
-    DOMAINS = ['reddit.com', 'redd.it']
+    DOMAINS = {'reddit.com', 'redd.it'}
+    BLACKLIST_DOMAINS = {
+        'i.redd.it',
+        'v.redd.it',
+        'preview.redd.it',
+        'gallery.redd.it',
+        'i.redd.it',
+        'preview.redd.it',
+        'v.redd.it',
+    }
     _CONFIG_CLASS = config.RedditConfig
 
     @classmethod

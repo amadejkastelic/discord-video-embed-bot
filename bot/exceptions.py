@@ -22,6 +22,12 @@ class NotSupportedError(BaseError):
         super().__init__(f'Action not supported: {action}')
 
 
+class IntegrationError(BaseError):
+    def __init__(self, error: str) -> None:
+        super().__init__(f'Integration error: {error}')
+        self.error = error
+
+
 class ConfigurationError(BaseError):
     pass
 

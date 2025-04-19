@@ -13,7 +13,7 @@ from bot.integrations.twenty4ur import config
 
 
 class Twenty4UrClientSingleton(base.BaseClientSingleton):
-    DOMAINS = [
+    DOMAINS = {
         '24ur.com',
         'zadovoljna.si',
         'bibaleze.si',
@@ -22,7 +22,7 @@ class Twenty4UrClientSingleton(base.BaseClientSingleton):
         'moskisvet.com',
         'dominvrt.si',
         'okusno.je',
-    ]
+    }
     _CONFIG_CLASS = config.Twenty4UrConfig
 
     @classmethod

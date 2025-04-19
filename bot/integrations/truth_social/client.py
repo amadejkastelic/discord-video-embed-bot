@@ -14,7 +14,7 @@ from bot.integrations.truth_social import config
 
 
 class TruthSocialClientSingleton(base.BaseClientSingleton):
-    DOMAINS = ['truthsocial.com']
+    DOMAINS = {'truthsocial.com'}
     _CONFIG_CLASS = config.TruthSocialConfig
 
     @classmethod
