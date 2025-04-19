@@ -1,3 +1,4 @@
+import ssl
 import typing
 from urllib import parse as urllib_parse
 
@@ -15,7 +16,6 @@ from bot.integrations.facebook import config
 
 _API_URL = 'https://fdown.net/'
 _HEADERS = {
-    'User-Agent': fake_useragent.UserAgent().chrome,
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
     'Accept-Encoding': 'gzip, deflate, br, zstd',
     'Accept-Language': 'en-US,en;q=0.9',
@@ -42,15 +42,29 @@ class FacebookClientSingleton(base.BaseClientSingleton):
             cls._INSTANCE = base.MISSING
             return
 
-        cls._INSTANCE = FacebookClient(headers=conf.headers)
+        ssl_context = None
+        if conf.tls1_2:
+            ssl_context = ssl.create_default_context()
+            ssl_context.options |= ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1
+            ssl_context.set_ciphers('ECDHE+AESGCM:ECDHE+CHACHA20:DHE+AESGCM:DHE+CHACHA20')
+
+        cls._INSTANCE = FacebookClient(headers=conf.headers or {}, ssl_context=ssl_context)
 
 
 class FacebookClient(base.BaseClient):
     INTEGRATION = constants.Integration.FACEBOOK
 
-    def __init__(self, headers: typing.Optional[typing.Dict[str, str]] = None) -> None:
+    def _get_headers(self) -> typing.Dict[str, str]:
+        return self.headers | {'User-Agent': fake_useragent.UserAgent().random}
+
+    def __init__(
+        self,
+        headers: typing.Dict[str, str],
+        ssl_context: typing.Optional[ssl.SSLContext] = None,
+    ) -> None:
         super().__init__()
         self.headers = _HEADERS | (headers or {})
+        self.connector = aiohttp.TCPConnector(ssl=ssl_context or True)
 
     async def get_integration_data(self, url: str) -> typing.Tuple[constants.Integration, str, typing.Optional[int]]:
         if '/watch' in url.split('?')[0] and 'v=' in url:
@@ -59,7 +73,11 @@ class FacebookClient(base.BaseClient):
         return self.INTEGRATION, url.strip('/').split('?')[0].split('/')[-1], None
 
     async def get_post(self, url: str) -> domain.Post:
-        async with aiohttp.ClientSession(headers=self.headers) as session:
+        async with aiohttp.ClientSession(
+            connector=self.connector,
+            headers=self._get_headers(),
+            cookie_jar=aiohttp.CookieJar(unsafe=True),
+        ) as session:
             # Set cookies
             async with session.get(_API_URL) as response:
                 pass
