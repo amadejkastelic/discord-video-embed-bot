@@ -14,16 +14,28 @@ jobs:
     steps:
       - name: Check out source repository
         uses: actions/checkout@v4
+
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@main
+
       - name: Set up Nix environment
         uses: nicknovitski/nix-develop@v1
+
+      - name: Setup Nix cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+
       - name: flake8
         run: |
           uv run flake8 ./bot/**/*.py
+
       - name: pylint
         run: |
           uv run pylint ./bot/**/*.py
+
       - name: black formatting
         run: |
           uv run black --check --diff ./bot/**/*.py
+
+      - name: build
+        run: |
+          nix build .
