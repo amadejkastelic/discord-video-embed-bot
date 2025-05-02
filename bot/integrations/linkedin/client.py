@@ -1,6 +1,7 @@
 import datetime
 import typing
 
+import fake_useragent
 from django.conf import settings
 from playwright.async_api import async_playwright
 
@@ -43,6 +44,11 @@ class LinkedinClient(base.BaseClient):
             context = await browser.new_context()
 
             page = await context.new_page()
+            await page.set_extra_http_headers(
+                {
+                    'User-Agent': fake_useragent.UserAgent().random,
+                }
+            )
             await page.goto(url)
 
             author = await page.locator('[data-tracking-control-name="public_post_feed-actor-name"]').first.inner_text()

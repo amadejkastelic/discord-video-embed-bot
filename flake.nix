@@ -118,45 +118,41 @@
           "discord-video-embed-bot" = ["dev"];
         };
 
-        browsers = pkgs.playwright.browsers.overrideAttrs {
+        browsers = pkgs.playwright.browsers.override {
           withChromium = false;
           withFirefox = false;
           withWebkit = false;
-          withFfmpeg = true;
+          withFfmpeg = false;
           withChromiumHeadlessShell = true;
         };
 
-        dockerImage = pkgs.dockerTools.buildImage {
+        dockerImage = pkgs.dockerTools.buildLayeredImage {
           name = "discord-video-embed-bot";
           tag = "latest";
           created = "now";
 
+          maxLayers = 10;
+
           # Tmp dir is needed for playwright
-          runAsRoot = ''
-            mkdir -p /tmp
+          extraCommands = ''
+            mkdir -p ./tmp
+            chmod 1777 ./tmp
           '';
 
-          # Copy the Python virtual environment and other required tools
-          copyToRoot = pkgs.buildEnv {
-            name = "image-root";
-            paths = [
-              venv
-              pkgs.ffmpeg
-              pkgs.file
-              pkgs.bash
-              pkgs.coreutils
-              pkgs.cacert
-              browsers
-              (pkgs.runCommand "project-files" {} ''
-                mkdir -p $out/app/conf
-                cp -r ${./manage.py} $out/app/manage.py
-                cp -r ${./wsgi.py} $out/app/wsgi.py
-                cp -r ${./asgi.py} $out/app/asgi.py
-                cp -r ${./conf/settings_base.py} $out/app/conf/settings_base.py
-              '')
-            ];
-            pathsToLink = ["/bin" "/lib" "/app"];
-          };
+          contents = [
+            venv
+            pkgs.ffmpeg-headless
+            pkgs.cacert
+            browsers
+            # Include necessary project files
+            (pkgs.runCommand "project-files" {} ''
+              mkdir -p $out/app/conf
+              cp -r ${./manage.py} $out/app/manage.py
+              cp -r ${./wsgi.py} $out/app/wsgi.py
+              cp -r ${./asgi.py} $out/app/asgi.py
+              cp -r ${./conf/settings_base.py} $out/app/conf/settings_base.py
+            '')
+          ];
 
           # Configure environment variables
           config = {
@@ -196,6 +192,9 @@
             browsers
           ];
 
+          UV_NO_SYNC = true;
+          UV_PYTHON_DOWNLOADS = "never";
+          UV_PYTHON = "${venv}/bin/python";
           LD_LIBRARY_PATH = "${pkgs.stdenv.cc.cc.lib}/lib";
           PLAYWRIGHT_BROWSERS_PATH = browsers;
           PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS = true;
