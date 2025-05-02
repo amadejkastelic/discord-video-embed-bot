@@ -14,6 +14,9 @@
 
     flake-parts.url = "github:hercules-ci/flake-parts";
 
+    # Needed for nix-shell until https://github.com/arrterian/nix-env-selector/pull/97 is merged
+    flake-compat.url = "github:edolstra/flake-compat";
+
     pyproject-build-systems = {
       url = "github:pyproject-nix/build-system-pkgs";
       inputs.nixpkgs.follows = "nixpkgs";
