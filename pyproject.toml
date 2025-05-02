@@ -2,7 +2,7 @@
 authors = [{ name = "Amadej Kastelic", email = "amadejkastelic7@gmail.com" }]
 requires-python = "<3.13,>=3.11"
 dependencies = [
-    "playwright<2.0.0,>=1.49.0",
+    "playwright<=1.50.1,>=1.49.0",
     "discord-py<3.0.0,>=2.4.0",
     "instaloader<5.0,>=4.14",
     "facebook-scraper<1.0.0,>=0.2.59",
@@ -25,7 +25,7 @@ dependencies = [
     "24ur-api[video]<1.0.0,>=0.1.6",
     "tiktokapipy[download]<1.0.0.0,>=0.2.4.post2",
     "psycopg[binary]<4.0.0,>=3.2.3",
-    "aiograpi<1.0.0,>=0.0.3",
+    "aiograpi>=0.0.3,<1.0.0",
     "pytubefix>=8.12.1,<9.0.0",
     "markdownify<1.0.0,>=0.14.1",
     "pylibmagic<1.0.0,>=0.5.0",
@@ -36,7 +36,10 @@ dependencies = [
 ]
 name = "discord-video-embed-bot"
 description = "Discord bot that reads messages and embeds videos from various websited that don't support this"
-version = "0.1.0"
+version = "0.45.3"
+
+[project.scripts]
+manage = "django.core.management:execute_from_command_line"
 
 [dependency-groups]
 dev = [
@@ -48,8 +51,19 @@ dev = [
     "isort<6.0.0,>=5.13.2",
 ]
 
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["*"]
+exclude = ["tests", "tests.*"]
+namespaces = false
+
 [tool.uv]
 default-groups = []
+package = true
 
 [tool.black]
 line-length = 120
