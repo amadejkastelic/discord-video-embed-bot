@@ -18,11 +18,11 @@ jobs:
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@main
 
-      - name: Set up Nix environment
-        uses: nicknovitski/nix-develop@v1
-
       - name: Setup Nix cache
         uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Set up Nix environment
+        uses: nicknovitski/nix-develop@v1
 
       - name: flake8
         run: |
