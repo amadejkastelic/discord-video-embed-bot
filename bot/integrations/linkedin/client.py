@@ -40,7 +40,14 @@ class LinkedinClient(base.BaseClient):
 
     async def get_post(self, url: str) -> domain.Post:
         async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True)
+            browser = await p.chromium.launch(
+                headless=True,
+                args=[
+                    '--no-sandbox',
+                    '--disable-dev-shm-usage',
+                    '--disable-setuid-sandbox',
+                ],
+            )
             context = await browser.new_context()
 
             page = await context.new_page()
