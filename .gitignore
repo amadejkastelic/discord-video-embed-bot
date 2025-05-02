@@ -8,3 +8,4 @@ settings.py
 docker/db/data
 *.log
 .venv
+*.egg-info

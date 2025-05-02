@@ -1,22 +1,13 @@
-{pkgs ? import (fetchTarball "https://github.com/NixOS/nixpkgs/tarball/nixos-unstable") {}}:
-pkgs.mkShell {
-  LD_LIBRARY_PATH = "${pkgs.stdenv.cc.cc.lib}/lib";
-
-  packages = with pkgs; [
-    python312
-    python312Packages.pip
-    python312Packages.playwright
-    playwright-driver
-    uv
-    curl
-    jq
-    file
-    ffmpeg
-  ];
-
-  shellHook = ''
-    export PLAYWRIGHT_BROWSERS_PATH=${pkgs.playwright-driver.browsers}
-    export PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=true
-    uv sync
-  '';
-}
+(
+  import
+  (
+    let
+      lock = builtins.fromJSON (builtins.readFile ./flake.lock);
+    in
+      fetchTarball {
+        url = lock.nodes.flake-compat.locked.url or "https://github.com/edolstra/flake-compat/archive/${lock.nodes.flake-compat.locked.rev}.tar.gz";
+        sha256 = lock.nodes.flake-compat.locked.narHash;
+      }
+  )
+  {src = ./.;}
+).shellNix
