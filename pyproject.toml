@@ -1,6 +1,6 @@
 [project]
 authors = [{ name = "Amadej Kastelic", email = "amadejkastelic7@gmail.com" }]
-requires-python = "<3.14,>=3.12"
+requires-python = "<3.13,>=3.11"
 dependencies = [
     "playwright<2.0.0,>=1.49.0",
     "discord-py<3.0.0,>=2.4.0",
@@ -53,7 +53,7 @@ default-groups = []
 
 [tool.black]
 line-length = 120
-target-version = ['py313']
+target-version = ['py312']
 include = '\.pyi?$'
 skip-string-normalization = true
 
