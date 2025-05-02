@@ -2,8 +2,12 @@ import datetime
 import json
 import typing
 
+import fake_useragent
+import requests
 import twscrape
+import x_client_transaction
 from django.conf import settings
+from x_client_transaction import utils as x_utils
 
 from bot import constants
 from bot import domain
@@ -90,6 +94,23 @@ class TwitterClient(base.BaseClient):
         if self.client:
             await self.client.pool.relogin(usernames=[self.username])
 
+    def _gen_transaction_id(self) -> str:
+        headers = {
+            "Authority": "x.com",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Cache-Control": "no-cache",
+            "Referer": "https://x.com",
+            "User-Agent": fake_useragent.UserAgent().random,
+            "X-Twitter-Active-User": "yes",
+            "X-Twitter-Client-Language": "en",
+        }
+        session = requests.Session()
+        session.headers = headers
+        response = x_utils.handle_x_migration(session)
+        return x_client_transaction.ClientTransaction(response).generate_transaction_id(
+            method='POST', path='/1.1/onboarding/task.json'
+        )
+
     async def login(self) -> None:
         if self.logged_in:
             return
@@ -100,6 +121,13 @@ class TwitterClient(base.BaseClient):
             password=self.password,
             email_password=self.password,
         )
+        account = await self.client.pool.get_account(self.username)
+        account.headers.update(
+            {
+                'x-client-transaction-id': self._gen_transaction_id(),
+            }
+        )
+        await self.client.pool.save(account)
 
         await self.client.pool.login_all()
 

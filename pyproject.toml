@@ -33,6 +33,7 @@ dependencies = [
     "truthbrush>=0.1.9",
     "brotli>=1.1.0",
     "yt-dlp>=2025.6.9",
+    "xclienttransaction==0.0.7",
 ]
 name = "discord-video-embed-bot"
 description = "Discord bot that reads messages and embeds videos from various websited that don't support this"

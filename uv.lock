@@ -532,6 +532,7 @@ dependencies = [
     { name = "truthbrush" },
     { name = "twitch-dl" },
     { name = "twscrape" },
+    { name = "xclienttransaction" },
     { name = "yt-dlp" },
 ]
 
@@ -577,6 +578,7 @@ requires-dist = [
     { name = "truthbrush", specifier = ">=0.1.9" },
     { name = "twitch-dl", specifier = ">=2.9.2,<3.0.0" },
     { name = "twscrape", specifier = ">=0.17,<1.0" },
+    { name = "xclienttransaction", specifier = "==0.0.7" },
     { name = "yt-dlp", specifier = ">=2025.6.9" },
 ]
 
@@ -1810,6 +1812,20 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/b3/8f/705086c9d734d3b663af0e9bb3d4de6578d08f46b1b101c2442fd9aecaa2/win32_setctime-1.2.0.tar.gz", hash = "sha256:ae1fdf948f5640aae05c511ade119313fb6a30d7eabe25fef9764dca5873c4c0", size = 4867, upload-time = "2024-12-07T15:28:28.314Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e1/07/c6fe3ad3e685340704d314d765b7912993bcb8dc198f0e7a89382d37974b/win32_setctime-1.2.0-py3-none-any.whl", hash = "sha256:95d644c4e708aba81dc3704a116d8cbc974d70b3bdb8be1d150e36be6e9d1390", size = 4083, upload-time = "2024-12-07T15:28:26.465Z" },
+]
+
+[[package]]
+name = "xclienttransaction"
+version = "0.0.7"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "beautifulsoup4" },
+    { name = "lxml" },
+    { name = "requests" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f1/28/232c36f02f315c0d5255c1d60f1c64e05cb96beb0105c974792a17c72de6/xclienttransaction-0.0.7.tar.gz", hash = "sha256:3bc4686b6026938b7b2fb617f33284ba7e219a4a2eda3f53caa8642d71b2f639", size = 7860, upload-time = "2025-05-01T12:34:03.554Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c8/60/ced1b16bd85f8c4ecc0fcd97fd43f58956e2ca227811905ee7fa43e6bf41/xclienttransaction-0.0.7-py3-none-any.whl", hash = "sha256:64330a1aac8963b82d941db8401e909a4537ed2d91cd8cd8d257a5eb6420c4bb", size = 9235, upload-time = "2025-05-01T12:34:02.069Z" },
 ]
 
 [[package]]
