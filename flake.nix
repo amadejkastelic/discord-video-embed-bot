@@ -51,9 +51,6 @@
       inputs.nixpkgs-lib.follows = "nixpkgs";
     };
 
-    flake-compat = {
-      url = "github:edolstra/flake-compat";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    flake-compat.url = "github:edolstra/flake-compat";
   };
 }
