@@ -16,21 +16,30 @@ jobs:
         uses: actions/checkout@v4
 
       - uses: nixbuild/nix-quick-install-action@v30
-        nix_conf: |
-          keep-env-derivations = true
-          keep-outputs = true
+        with:
+          nix_on_tmpfs: true
 
-      - name: Restore and save Nix store
+      - name: Hash flake
+        shell: bash
+        run: |
+          # Manually compute hash because hashFiles doesn't work outside the workspace
+          # (https://github.com/actions/toolkit/issues/1035.)
+          shopt -s extglob
+          flake_hash=$(sha256sum flake.@(nix|lock) | sha256sum | sed 's/[[:blank:]].*//')
+          echo "flake_hash=${flake_hash}" >> $GITHUB_ENV
+
+      - name: Cache Nix Store
         uses: nix-community/cache-nix-action@v6
         with:
-          primary-key: nix-${{ runner.os }}-${{ hashFiles('**/*.nix', '**/flake.lock') }}
+          primary-key: nix-${{ runner.os }}-${{ env.flake_hash }}
           restore-prefixes-first-match: nix-${{ runner.os }}-
-          gc-max-store-size-linux: 1G
+
+          # Purge old caches and garbage collect new one if there wasn't an exact match
           purge: true
           purge-prefixes: nix-${{ runner.os }}-
           purge-created: 0
-          purge-last-accessed: 0
           purge-primary-key: never
+          gc-max-store-size-linux: 0
 
       - name: Set up Nix environment
         uses: nicknovitski/nix-develop@v1
