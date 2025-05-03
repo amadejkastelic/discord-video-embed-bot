@@ -44,6 +44,10 @@ jobs:
       - name: Set up Nix environment
         uses: nicknovitski/nix-develop@v1
 
+      - name: Create settings
+        run: |
+          cp ./examples/settings_dev.py settings.py
+
       - name: flake8
         run: |
           flake8 ./bot/**/*.py
