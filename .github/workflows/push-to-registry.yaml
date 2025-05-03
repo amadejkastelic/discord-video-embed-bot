@@ -21,7 +21,7 @@ jobs:
         run: |
           TAG=$(git describe --tags HEAD)
           echo "tag=$TAG" >> $GITHUB_OUTPUT
-          echo "tag=$TAG" > tag.txt
+          echo "$TAG" > tag.txt
 
       - name: Upload tag artifact
         uses: actions/upload-artifact@v4
