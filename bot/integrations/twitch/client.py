@@ -30,7 +30,7 @@ class TwitchClientSingleton(base.BaseClientSingleton):
             cls._INSTANCE = base.MISSING
             return
 
-        cls._INSTANCE = TwitchClient()
+        cls._INSTANCE = TwitchClient(conf.post_format)
 
     @classmethod
     def should_handle(cls, url: str) -> bool:

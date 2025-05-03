@@ -1,8 +1,8 @@
 services:
   api:
-    image: 'ghcr.io/amadejkastelic/discord-video-embed-bot:0.21.0'
+    image: 'ghcr.io/amadejkastelic/discord-video-embed-bot:latest'
     command: runserver 8080
-    ports: 
+    ports:
       - 8080:8080
     environment:
       - DJANGO_SETTINGS_MODULE=settings
@@ -14,21 +14,19 @@ services:
       - cache
     restart: always
   discord-bot:
-    image: 'ghcr.io/amadejkastelic/discord-video-embed-bot:0.21.0'
+    image: 'ghcr.io/amadejkastelic/discord-video-embed-bot:latest'
     command: discord_bot
     environment:
       - DJANGO_SETTINGS_MODULE=settings
       - DJANGO_ALLOW_ASYNC_UNSAFE=true
     volumes:
       - ./settings.py:/app/settings.py
-      - ./cookies.txt:/app/cookies.txt
-      # - ./instagram.sess:/app/instagram.sess
     depends_on:
       - db
       - cache
     restart: always
   posts-purger:
-    image: 'ghcr.io/amadejkastelic/discord-video-embed-bot:0.21.0'
+    image: 'ghcr.io/amadejkastelic/discord-video-embed-bot:latest'
     command: purge_posts --older-than 7d --batch-size 100 --sleep 3600
     environment:
       - DJANGO_SETTINGS_MODULE=settings
@@ -57,6 +55,5 @@ services:
     image: 'memcached:1.6.29'
     ports:
       - 11211:11211
-    command:
-      -- 'memory-limit=1024'
+    command: -- 'memory-limit=1024'
     restart: always

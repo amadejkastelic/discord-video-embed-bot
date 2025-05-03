@@ -17,9 +17,10 @@ class InstagramClient(base.BaseClient):
         self,
         username: typing.Optional[str],
         password: typing.Optional[str],
+        post_format: typing.Optional[str] = None,
         **kwargs,
     ):
-        super().__init__()
+        super().__init__(post_format)
 
         self.username = username
         self.password = password

@@ -156,7 +156,7 @@
               cp -r ${./manage.py} $out/app/manage.py
               cp -r ${./wsgi.py} $out/app/wsgi.py
               cp -r ${./asgi.py} $out/app/asgi.py
-              cp -r ${./conf/settings_base.py} $out/app/conf/settings_base.py
+              cp -r ${./conf}/* $out/app/conf/
             '')
           ];
 
@@ -204,6 +204,7 @@
           LD_LIBRARY_PATH = "${pkgs.stdenv.cc.cc.lib}/lib";
           PLAYWRIGHT_BROWSERS_PATH = browsers;
           PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS = true;
+          DJANGO_SETTINGS_MODULE = "settings";
         };
       };
     };

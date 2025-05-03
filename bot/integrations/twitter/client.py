@@ -52,6 +52,7 @@ class TwitterClientSingleton(base.BaseClientSingleton):
             username=conf.username,
             email=conf.email,
             password=conf.password,
+            post_format=conf.post_format,
         )
 
 
@@ -63,8 +64,9 @@ class TwitterClient(base.BaseClient):
         username: typing.Optional[str],
         email: typing.Optional[str],
         password: typing.Optional[str],
+        post_format: typing.Optional[str] = None,
     ):
-        super().__init__()
+        super().__init__(post_format)
 
         self.client: typing.Optional[twscrape.API] = None
         if all([username, email, password]):

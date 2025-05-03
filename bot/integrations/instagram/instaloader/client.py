@@ -21,8 +21,9 @@ class InstagramClient(base.BaseClient):
         password: typing.Optional[str],
         session_file_path: typing.Optional[str],
         user_agent: typing.Optional[str],
+        post_format: typing.Optional[str] = None,
     ):
-        super().__init__()
+        super().__init__(post_format)
 
         self.client = instaloader.Instaloader(user_agent=user_agent)
         if username and session_file_path and os.path.exists(session_file_path):

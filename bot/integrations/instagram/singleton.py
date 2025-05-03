@@ -1,5 +1,7 @@
 from django.conf import settings
 
+import fake_useragent
+
 from bot import logger
 from bot.integrations import base
 from bot.integrations.instagram import config
@@ -21,16 +23,14 @@ class InstagramClientSingleton(base.BaseClientSingleton):
             return
 
         if conf.version == 1:
-            cls._INSTANCE = instaloader_client.InstagramClient(
-                username=conf.username,
-                password=conf.password,
-                session_file_path=conf.session_file_path,
-                user_agent=conf.user_agent,
-            )
+            klass = instaloader_client.InstagramClient
         else:
-            cls._INSTANCE = aiograpi_client.InstagramClient(
-                username=conf.username,
-                password=conf.password,
-                session_file_path=conf.session_file_path,
-                user_agent=conf.user_agent,
-            )
+            klass = aiograpi_client.InstagramClient
+
+        cls._INSTANCE = klass(
+            username=conf.username,
+            password=conf.password,
+            session_file_path=conf.session_file_path,
+            user_agent=conf.user_agent or fake_useragent.UserAgent().random,
+            post_format=conf.post_format,
+        )

@@ -32,6 +32,7 @@ disable=
     consider-using-f-string,
     too-many-locals,
     broad-exception-caught,
+    too-many-positional-arguments,
 
 [SIMILARITIES]
 

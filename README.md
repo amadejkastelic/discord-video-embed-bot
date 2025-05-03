@@ -6,7 +6,7 @@ A Discord bot that automatically embeds media and metadata of messages containin
 
 ## Supported platforms
 - Instagram ✅
-- Facebook ✅
+- Facebook ⚠️ - flaky
 - Tiktok ✅
 - Reddit ✅
 - Twitter ✅
@@ -15,43 +15,60 @@ A Discord bot that automatically embeds media and metadata of messages containin
 - Threads ✅
 - 24ur.com ✅
 - 4chan ✅
-- Linkedin ✅
+- Linkedin ⚠️ - flaky
 - Bluesky ✅
 - Truth Social ✅
 
-## How to run
-- Build the docker image: `docker build . -t video-embed-bot` or simply pull it from ghcr:
-```bash
-docker pull ghcr.io/amadejkastelic/discord-video-embed-bot:<latest|tag>
-```
-- Run it with your discord api key: `docker run -e DISCORD_API_TOKEN=<api_token> video-embed-bot`
+## Configuration
 
-### Facebook
-Facebook requires you to provide cookies. Download them in your browser using [an extension](https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc) while you're logged in and mount them to the container).
+You first need to configure settings. There are two possible ways of running this app:
+- [Standalone mode](conf/settings_base_standalone.py) - no database and cache
+- [Database mode](conf/settings_base.py)
 
-### Reddit
-- For extended reddit support you need to create an app on reddit and add the following environment variables:
+You need to create your own settings by in the project root by running:
 ```bash
-REDDIT_API_TOKEN=<your_reddit_api_token>
-REDDIT_API_SECRET=<your_reddit_api_secret>
-REDDIT_USER_AGENT=<name_version_and_your_username>
+# Standalone mode
+make init-standalone
+# with DB
+make init
 ```
 
-### Twitter
-- For better twitter support you need to add credentials:
+Now you can edit the settings.py in project root. Each of the currently supported integration can be configured independently. All possible options are listed in [_settings_app.py](conf/_settings_app.py).
+
+## Building
+
+You can build and load the docker image by running:
 ```bash
-TWITTER_USERNAME=<your_twitter_username>
-TWITTER_EMAIL=<your_twitter_email>
-TWITTER_PASSWORD=<your_twitter_password>
+nix build .#docker
+docker load < result
 ```
 
-### Instagram
-- For better instagram integration that allows to view items that require login, you need to provide the instagram.sess file and instagram username environemnt variable:
+## Running
+
+### Nix
+
 ```bash
-INSTAGRAM_USERNAME=<your_instagram_username>
+nix develop
+python manage.py discord_bot
 ```
-- `instagram.sess` file should be in the working directory of your instance
-- You can obtain the session file by logging into Instagram in Firefox and running:
+
+### Without Nix
+
 ```bash
-python bin/fetch_instagram_session.py
+uv sync
+python manage.py discord_bot
 ```
+
+### Docker
+
+If you don't want to build the image yourself, you can pull a pre-built image (available versions are listed [here](https://github.com/amadejkastelic/discord-video-embed-bot/pkgs/container/discord-video-embed-bot)):
+```bash
+docker pull ghcr.io/amadejkastelic/discord-video-embed-bot:latest
+```
+
+You can run the container with the following command (make sure to mount settings):
+```bash
+docker run --network=host --rm -v $(pwd)/settings.py:/app/settings.py discord-video-embed-bot discord_bot
+```
+
+Example docker compose files are available under [examples](examples).
