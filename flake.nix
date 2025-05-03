@@ -143,6 +143,12 @@
             venv
             pkgs.ffmpeg-headless
             pkgs.cacert
+            pkgs.coreutils
+
+            # Required for redvid
+            pkgs.rename
+            pkgs.bash
+
             browsers
             # Include necessary project files
             (pkgs.runCommand "project-files" {} ''
