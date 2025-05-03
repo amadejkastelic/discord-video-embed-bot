@@ -1,3 +1,4 @@
+# pylint: disable=unused-argument
 import typing
 
 from bot import constants
