@@ -566,7 +566,7 @@ wheels = [
 
 [[package]]
 name = "discord-video-embed-bot"
-version = "0.45.3"
+version = "1.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "24ur-api", extra = ["video"] },
