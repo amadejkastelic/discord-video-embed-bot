@@ -1,0 +1,10 @@
+services:
+  discord-bot:
+    image: 'ghcr.io/amadejkastelic/discord-video-embed-bot:latest'
+    command: discord_bot
+    environment:
+      - DJANGO_SETTINGS_MODULE=settings
+      - DJANGO_ALLOW_ASYNC_UNSAFE=true
+    volumes:
+      - ./settings.py:/app/settings.py
+    restart: always

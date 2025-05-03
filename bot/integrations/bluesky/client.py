@@ -42,6 +42,7 @@ class BlueskyClientSingleton(base.BaseClientSingleton):
             cls.DOMAINS = {conf.base_url}
 
         cls._INSTANCE = BlueskyClient(
+            post_format=conf.post_format,
             username=conf.username,
             password=conf.password,
             base_url=conf.base_url,
@@ -51,8 +52,14 @@ class BlueskyClientSingleton(base.BaseClientSingleton):
 class BlueskyClient(base.BaseClient):
     INTEGRATION = constants.Integration.BLUESKY
 
-    def __init__(self, username: str, password: str, base_url: typing.Optional[str] = None):
-        super().__init__()
+    def __init__(
+        self,
+        username: str,
+        password: str,
+        base_url: typing.Optional[str] = None,
+        post_format: typing.Optional[str] = None,
+    ):
+        super().__init__(post_format)
         self.client = atproto.AsyncClient(base_url=base_url)
         self.logged_in = False
         self.username = username

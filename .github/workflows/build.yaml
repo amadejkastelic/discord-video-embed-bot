@@ -46,15 +46,15 @@ jobs:
 
       - name: flake8
         run: |
-          uv run flake8 ./bot/**/*.py
+          flake8 ./bot/**/*.py
 
       - name: pylint
         run: |
-          uv run pylint ./bot/**/*.py
+          pylint ./bot/**/*.py
 
       - name: black formatting
         run: |
-          uv run black --check --diff ./bot/**/*.py
+          black --check --diff ./bot/**/*.py
 
       - name: build
         run: |

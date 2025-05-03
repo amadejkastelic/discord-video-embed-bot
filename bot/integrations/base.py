@@ -15,6 +15,9 @@ DEFAULT_TIMEOUT = (3.0, 3.0)
 class BaseClient:
     INTEGRATION: constants.Integration
 
+    def __init__(self, post_format: typing.Optional[str] = None) -> None:
+        self.post_format = post_format
+
     async def get_integration_data(self, url: str) -> typing.Tuple[constants.Integration, str, typing.Optional[int]]:
         raise NotImplementedError()
 
@@ -39,6 +42,7 @@ class BaseClient:
 
 class BaseClientConfig(pydantic.BaseModel):
     enabled: bool = False
+    post_format: typing.Optional[str] = None
 
 
 class BaseClientSingleton:

@@ -45,7 +45,7 @@ class ThreadsClientSingleton(base.BaseClientSingleton):
             cls._INSTANCE = base.MISSING
             return
 
-        cls._INSTANCE = ThreadsClient()
+        cls._INSTANCE = ThreadsClient(conf.post_format)
 
 
 class ThreadsClient(base.BaseClient):

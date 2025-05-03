@@ -53,14 +53,21 @@ class RedditClientSingleton(base.BaseClientSingleton):
             client_id=conf.client_id,
             client_secret=conf.client_secret,
             user_agent=conf.user_agent,
+            post_format=conf.post_format,
         )
 
 
 class RedditClient(base.BaseClient):
     INTEGRATION = constants.Integration.REDDIT
 
-    def __init__(self, client_id: str, client_secret: str, user_agent: str):
-        super().__init__()
+    def __init__(
+        self,
+        client_id: str,
+        client_secret: str,
+        user_agent: str,
+        post_format: typing.Optional[str] = None,
+    ) -> None:
+        super().__init__(post_format)
         self.client = None
         if all([client_id, client_secret, user_agent]):
             self.client = asyncpraw.Reddit(

@@ -35,7 +35,7 @@ class TiktokClientSingleton(base.BaseClientSingleton):
             cls._INSTANCE = base.MISSING
             return
 
-        cls._INSTANCE = TiktokClient()
+        cls._INSTANCE = TiktokClient(conf.post_format)
 
 
 class TiktokClient(base.BaseClient):

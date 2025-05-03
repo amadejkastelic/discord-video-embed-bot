@@ -26,7 +26,7 @@ class LinkedinClientSingleton(base.BaseClientSingleton):
             cls._INSTANCE = base.MISSING
             return
 
-        cls._INSTANCE = LinkedinClient()
+        cls._INSTANCE = LinkedinClient(conf.post_format)
 
 
 class LinkedinClient(base.BaseClient):

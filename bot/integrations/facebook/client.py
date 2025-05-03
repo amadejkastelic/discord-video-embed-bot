@@ -48,7 +48,11 @@ class FacebookClientSingleton(base.BaseClientSingleton):
             ssl_context.options |= ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1
             ssl_context.set_ciphers('ECDHE+AESGCM:ECDHE+CHACHA20:DHE+AESGCM:DHE+CHACHA20')
 
-        cls._INSTANCE = FacebookClient(headers=conf.headers or {}, ssl_context=ssl_context)
+        cls._INSTANCE = FacebookClient(
+            post_format=conf.post_format,
+            headers=conf.headers or {},
+            ssl_context=ssl_context,
+        )
 
 
 class FacebookClient(base.BaseClient):
@@ -61,8 +65,9 @@ class FacebookClient(base.BaseClient):
         self,
         headers: typing.Dict[str, str],
         ssl_context: typing.Optional[ssl.SSLContext] = None,
+        post_format: typing.Optional[str] = None,
     ) -> None:
-        super().__init__()
+        super().__init__(post_format)
         self.headers = _HEADERS | (headers or {})
         self.connector = aiohttp.TCPConnector(ssl=ssl_context or True)
 

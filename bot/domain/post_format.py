@@ -113,5 +113,20 @@ DEFAULT_INTEGRATION_POST_FMT_MAPPING = {
 }
 
 
-def get_or_default(integration: constants.Integration, default: typing.Optional[str]) -> str:
-    return DEFAULT_INTEGRATION_POST_FMT_MAPPING.get(integration, default or DEFAULT_POST_FORMAT)
+def get_or_default(
+    integration: constants.Integration,
+    default: typing.Optional[str] = None,
+    override: typing.Optional[str] = None,
+) -> str:
+    """
+    Get the post format for the given integration. If no post format is found, return the default post format.
+    If an override is provided, return that instead.
+    """
+    return (
+        override
+        if override is not None
+        else DEFAULT_INTEGRATION_POST_FMT_MAPPING.get(
+            integration,
+            default if default is not None else DEFAULT_POST_FORMAT,
+        )
+    )

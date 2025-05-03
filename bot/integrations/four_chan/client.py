@@ -30,7 +30,7 @@ class FourChanClientSingleton(base.BaseClientSingleton):
             cls._INSTANCE = base.MISSING
             return
 
-        cls._INSTANCE = FourChanClient()
+        cls._INSTANCE = FourChanClient(conf.post_format)
 
 
 # https://github.com/4chan/4chan-API

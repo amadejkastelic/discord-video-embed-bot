@@ -34,14 +34,14 @@ class Twenty4UrClientSingleton(base.BaseClientSingleton):
             cls._INSTANCE = base.MISSING
             return
 
-        cls._INSTANCE = Twenty4UrClient()
+        cls._INSTANCE = Twenty4UrClient(conf.post_format)
 
 
 class Twenty4UrClient(base.BaseClient):
     INTEGRATION = constants.Integration.TWENTY4_UR
 
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, post_format: typing.Optional[str] = None) -> None:
+        super().__init__(post_format)
         self.client = client.Client()
 
     async def get_integration_data(self, url: str) -> typing.Tuple[constants.Integration, str, typing.Optional[int]]:

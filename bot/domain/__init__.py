@@ -112,7 +112,7 @@ class Post:
         )
 
     def set_format(self, fmt: typing.Optional[str]) -> None:
-        self._format = fmt or DEFAULT_POST_FORMAT
+        self._format = fmt if fmt is not None else DEFAULT_POST_FORMAT
 
     def read_buffer(self) -> typing.Optional[bytes]:
         if not self.buffer:

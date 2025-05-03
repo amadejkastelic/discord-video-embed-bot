@@ -36,14 +36,20 @@ class TruthSocialClientSingleton(base.BaseClientSingleton):
         cls._INSTANCE = TruthSocialClient(
             username=conf.username,
             password=conf.password,
+            post_format=conf.post_format,
         )
 
 
 class TruthSocialClient(base.BaseClient):
     INTEGRATION = constants.Integration.TRUTH_SOCIAL
 
-    def __init__(self, username: str, password: str):
-        super().__init__()
+    def __init__(
+        self,
+        username: str,
+        password: str,
+        post_format: typing.Optional[str] = None,
+    ):
+        super().__init__(post_format)
 
         self.client = truthbrush_api.Api(
             username=username,

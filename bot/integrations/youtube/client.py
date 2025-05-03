@@ -30,13 +30,14 @@ class YoutubeClientSingleton(base.BaseClientSingleton):
             cls._INSTANCE = base.MISSING
             return
 
-        cls._INSTANCE = YoutubeClient(fetch_likes=conf.external_likes_api)
+        cls._INSTANCE = YoutubeClient(post_format=conf.post_format, fetch_likes=conf.external_likes_api)
 
 
 class YoutubeClient(base.BaseClient):
     INTEGRATION = constants.Integration.YOUTUBE
 
-    def __init__(self, fetch_likes: bool) -> None:
+    def __init__(self, fetch_likes: bool, post_format: typing.Optional[str] = None) -> None:
+        super().__init__(post_format)
         self.fetch_likes = fetch_likes
 
     async def get_integration_data(self, url: str) -> typing.Tuple[constants.Integration, str, typing.Optional[int]]:

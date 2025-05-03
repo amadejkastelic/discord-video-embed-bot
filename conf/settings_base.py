@@ -3,6 +3,9 @@ from pathlib import Path
 
 import structlog
 
+# flake8: noqa
+from conf._settings_app import *
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -179,7 +182,7 @@ structlog.configure(
     processors=[
         structlog.contextvars.merge_contextvars,
         structlog.stdlib.filter_by_level,
-        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.processors.TimeStamper(fmt='iso'),
         structlog.stdlib.add_logger_name,
         structlog.stdlib.add_log_level,
         structlog.stdlib.PositionalArgumentsFormatter(),
@@ -213,69 +216,11 @@ AUTH_USER_MODEL = 'bot.User'
 #       APP CONFIG       #
 ##########################
 
-BOT_CONFIGURATION = {
-    'discord': {
-        'enabled': False,
-        'api_token': None,
-    },
-}
-
 OAUTH2_CONFIGURATION = {
     'discord': {
         'client_id': None,
         'client_secret': None,
         'redirect_uri': None,
         'api_token': BOT_CONFIGURATION['discord']['api_token'],
-    },
-}
-
-INTEGRATION_CONFIGURATION = {
-    'tiktok': {
-        'enabled': False,
-    },
-    'instagram': {
-        'enabled': False,
-        'session_file_path': None,
-        'username': None,
-        'user_agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0',
-        'password': None,
-    },
-    'facebook': {
-        'enabled': False,
-        'cookies_file_path': None,
-    },
-    'reddit': {
-        'enabled': False,
-        'client_id': None,
-        'client_secret': None,
-        'user_agent': None,
-    },
-    'youtube': {
-        'enabled': False,
-        'external_likes_api': False,
-    },
-    'threads': {
-        'enable': False,
-    },
-    '24ur': {
-        'enable': False,
-    },
-    'twitter': {
-        'enabled': False,
-        'username': None,
-        'email': None,
-        'password': None,
-    },
-    'twitch': {
-        'enabled': False,
-    },
-    '4chan': {
-        'enabled': False,
-    },
-    'bluesky': {
-        'enabled': False,
-        'base_url': None,  # If you want some other instance
-        'username': None,
-        'password': None,
     },
 }
