@@ -76,6 +76,13 @@
           };
         in
         {
+          formatter = pkgs.nixfmt-tree;
+
+          checks = import ./nix/checks.nix {
+            inherit pkgs devVenv;
+            nixfmt-tree = pkgs.nixfmt-tree;
+          };
+
           packages = {
             default = venv;
             docker = dockerImage;
