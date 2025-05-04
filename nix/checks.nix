@@ -1,6 +1,6 @@
 {
   pkgs,
-  devVenv,
+  venv,
   nixfmt-tree,
 }:
 let
@@ -11,14 +11,14 @@ let
     pkgs.runCommand name
       {
         nativeBuildInputs = [
-          devVenv
+          venv
           nixfmt-tree
         ];
         src = src;
       }
       ''
         cd ${src}
-        export PATH=${devVenv}/bin:$PATH
+        export PATH=${venv}/bin:$PATH
         export DJANGO_SETTINGS_MODULE=conf.settings_test
         export TREEFMT_TREE_ROOT=${src}
         ${command}

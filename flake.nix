@@ -79,7 +79,8 @@
           formatter = pkgs.nixfmt-tree;
 
           checks = import ./nix/checks.nix {
-            inherit pkgs devVenv;
+            inherit pkgs;
+            venv = devVenv;
             nixfmt-tree = pkgs.nixfmt-tree;
           };
 
@@ -94,7 +95,8 @@
           };
 
           devShells.default = import ./nix/dev-shell.nix {
-            inherit pkgs devVenv browsers;
+            inherit pkgs browsers;
+            venv = devVenv;
           };
         };
     };
