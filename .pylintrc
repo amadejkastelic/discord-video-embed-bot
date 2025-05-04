@@ -5,6 +5,10 @@ ignore-paths=bot/migrations
 load-plugins=pylint_django
 django-settings-module=examples.settings_dev
 
+[GENERAL]
+
+persistent=no
+
 [FORMAT]
 
 max-line-length=120
