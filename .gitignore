@@ -9,3 +9,4 @@ docker/db/data
 *.log
 .venv
 *.egg-info
+result
