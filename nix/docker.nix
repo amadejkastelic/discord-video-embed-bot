@@ -16,14 +16,20 @@ pkgs.dockerTools.buildLayeredImage {
   '';
 
   contents = [
-    venv
+    # Layer 1: playwright browsers
+    browsers
+
+    # Layer 2: system dependencies
     pkgs.ffmpeg-headless
     pkgs.cacert
     pkgs.coreutils
     pkgs.rename
     pkgs.bash
-    browsers
 
+    # Layer 3: python dependencies
+    venv
+
+    # Layer 4: application files
     (pkgs.runCommand "project-files" { } ''
       mkdir -p $out/app/conf
       cp -r ${../manage.py} $out/app/manage.py
