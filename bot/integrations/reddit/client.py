@@ -56,6 +56,10 @@ class RedditClientSingleton(base.BaseClientSingleton):
             post_format=conf.post_format,
         )
 
+    @classmethod
+    def should_handle(cls, url: str) -> bool:
+        return super().should_handle(url) and ('/comments/' in url or re.match(NEW_REDDIT_URL_PATTERN, url))
+
 
 class RedditClient(base.BaseClient):
     INTEGRATION = constants.Integration.REDDIT
