@@ -23,4 +23,10 @@ pkgs.mkShell {
     PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS = true;
     DJANGO_SETTINGS_MODULE = "settings";
   };
+
+  # Workaround: make vscode's python extension read the .venv
+  shellHook = ''
+    venv="$(cd $(dirname $(which python)); cd ..; pwd)"
+    ln -Tsf "$venv" .venv
+  '';
 }

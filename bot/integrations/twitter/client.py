@@ -40,6 +40,10 @@ class TwitterClientSingleton(base.BaseClientSingleton):
     _CONFIG_CLASS = config.TwitterConfig
 
     @classmethod
+    def should_handle(cls, url: str) -> bool:
+        return super().should_handle(url) and '/status/' in url
+
+    @classmethod
     def _create_instance(cls) -> None:
         conf: config.TwitterConfig = cls._load_config(conf=settings.INTEGRATION_CONFIGURATION.get('twitter', {}))
 
