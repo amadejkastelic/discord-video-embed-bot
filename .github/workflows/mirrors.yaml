@@ -18,5 +18,5 @@ jobs:
         env:
           CODEBERG_TOKEN: ${{ secrets.CODEBERG_TOKEN }}
         run: |
-          git remote add codeberg https://amadejkastelic:${CODEBERG_TOKEN}@codeberg.org/amadejkastelic/nixos-config.git
+          git remote add codeberg https://amadejkastelic:${CODEBERG_TOKEN}@codeberg.org/amadejkastelic/discord-video-embed-bot.git
           git push codeberg main:main
