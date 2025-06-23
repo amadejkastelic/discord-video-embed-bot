@@ -1,7 +1,7 @@
 import io
 import os
-import uuid
 import sys
+import uuid
 
 import fake_useragent
 import yt_dlp
