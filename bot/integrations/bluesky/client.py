@@ -10,8 +10,8 @@ from bot import constants
 from bot import domain
 from bot import exceptions
 from bot import logger
-from bot.common import m3u8
 from bot.common import utils
+from bot.common import stream
 from bot.integrations import base
 from bot.integrations.bluesky import config
 
@@ -120,9 +120,6 @@ class BlueskyClient(base.BaseClient):
                 )
             elif atproto_models.ids.AppBskyEmbedVideo in thread.post.embed.py_type:
                 stream_url = thread.post.embed.playlist or thread.post.embed.alt
-                post.buffer = await m3u8.download_stream(
-                    stream_url=stream_url,
-                    prefix=stream_url[: stream_url.find('playlist.m3u8')],
-                )
+                post.buffer = await stream.download(stream_url=stream_url)
 
         return post

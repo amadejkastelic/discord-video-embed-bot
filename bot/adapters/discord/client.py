@@ -152,7 +152,7 @@ class DiscordClient(mixins.BotMixin, discord.Client):
             logger.exception('Failed downloading', url=url, error=str(e))
             await asyncio.gather(
                 new_message.edit(
-                    content=f'{user.mention}\nFailed downloading {url}.\nError: {str(e)}.',
+                    content=f'{user.mention}\nFailed downloading {url}\nError: {str(e)}.',
                     suppress=True,
                 ),
                 new_message.add_reaction('❌'),
