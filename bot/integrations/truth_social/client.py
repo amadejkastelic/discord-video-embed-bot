@@ -61,7 +61,7 @@ class TruthSocialClient(base.BaseClient):
 
     async def get_post(self, url: str) -> domain.Post:
         path = urlparse(url).path.split('/')
-        username, post_id = path[1].lstrip('@'), path[3]
+        username, post_id = path[1].lstrip('@'), path[-1]
 
         *_, status = self.client.pull_statuses(username=username, since_id=str(int(post_id) - 1))
 
