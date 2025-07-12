@@ -44,6 +44,9 @@ jobs:
       - name: Set up Nix environment
         uses: nicknovitski/nix-develop@v1
 
+      - name: Set TMPDIR
+        run: export TMPDIR=/tmp
+
       - name: nix flake check
         run: |
           nix flake check -L

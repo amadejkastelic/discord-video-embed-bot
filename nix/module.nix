@@ -50,7 +50,7 @@
       enable = lib.mkEnableOption "Enable Memcached for the bot";
       listen = lib.mkOption {
         type = lib.types.str;
-        default = "127.0.0.1";
+        default = "localhost";
         description = "Address to listen on";
       };
       port = lib.mkOption {
