@@ -23,6 +23,11 @@
       default = { };
       description = "Environment variables for the Discord Video Embed Bot service";
     };
+    integrationSettings = lib.mkOption {
+      type = lib.types.attrs;
+      default = { };
+      description = "Integration settings for the Discord Video Embed Bot";
+    };
     db = {
       enable = lib.mkEnableOption "Enable PostgreSQL for the bot";
       package = lib.mkOption {
@@ -68,7 +73,7 @@
         ++ lib.optional config.discordVideoEmbedBot.db.enable "postgresql.service"
         ++ lib.optional config.discordVideoEmbedBot.cache.enable "memcached.service";
       wantedBy = [ "multi-user.target" ];
-      preStart = ''
+      preStart = lib.mkIf config.discordVideoEmbedBot.db.enable ''
         ${config.discordVideoEmbedBot.package}/bin/manage migrate
       '';
       serviceConfig = {
@@ -79,12 +84,24 @@
         Restart = "always";
       };
       environment = config.discordVideoEmbedBot.environment // {
+        DJANGO_DB_ENGINE =
+          if config.discordVideoEmbedBot.db.enable then
+            "django.db.backends.postgresql"
+          else
+            "django.db.backends.dummy";
         DJANGO_DB_NAME = config.discordVideoEmbedBot.db.initialDatabase;
         DJANGO_DB_USER = config.discordVideoEmbedBot.db.initialDatabase;
         DJANGO_DB_PASSWORD = config.discordVideoEmbedBot.db.initialDatabase;
         DJANGO_DB_PORT = toString config.discordVideoEmbedBot.db.port;
 
+        DJANGO_CACHE_BACKEND =
+          if config.discordVideoEmbedBot.cache.enable then
+            "django.core.cache.backends.memcached.PyMemcacheCache"
+          else
+            "django.core.cache.backends.dummy.DummyCache";
         DJANGO_CACHE_LOCATION = "localhost:${toString config.discordVideoEmbedBot.cache.port}";
+
+        INTEGRATION_CONFIGURATION_JSON = builtins.toJSON config.discordVideoEmbedBot.integrationSettings;
       };
     };
 

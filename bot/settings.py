@@ -1,4 +1,5 @@
 import datetime
+import json
 import os
 from pathlib import Path
 
@@ -71,13 +72,13 @@ WSGI_APPLICATION = 'wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": os.environ.get("DJANGO_DB_ENGINE", "django.db.backends.postgresql"),
-        "NAME": os.environ["DJANGO_DB_NAME"],
-        "USER": os.environ["DJANGO_DB_USER"],
-        "PASSWORD": os.environ.get("DJANGO_DB_PASSWORD", ""),
-        "HOST": os.environ.get("DJANGO_DB_HOST", "localhost"),
-        "PORT": os.environ.get("DJANGO_DB_PORT", "5432"),
+    'default': {
+        'ENGINE': os.environ.get('DJANGO_DB_ENGINE', 'django.db.backends.dummy'),
+        'NAME': os.environ.get('DJANGO_DB_NAME', ''),
+        'USER': os.environ.get('DJANGO_DB_USER', ''),
+        'PASSWORD': os.environ.get('DJANGO_DB_PASSWORD', ''),
+        'HOST': os.environ.get('DJANGO_DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DJANGO_DB_PORT', '5432'),
     }
 }
 
@@ -86,9 +87,9 @@ DATABASES = {
 # https://docs.djangoproject.com/en/5.0/ref/settings/#caches
 
 CACHES = {
-    "default": {
-        "BACKEND": os.environ.get("DJANGO_CACHE_BACKEND", "django.core.cache.backends.locmem.LocMemCache"),
-        "LOCATION": os.environ.get("DJANGO_CACHE_LOCATION", "127.0.0.1:11211"),
+    'default': {
+        'BACKEND': os.environ.get('DJANGO_CACHE_BACKEND', 'django.core.cache.backends.dummy.DummyCache'),
+        'LOCATION': os.environ.get('DJANGO_CACHE_LOCATION', '127.0.0.1:11211'),
     }
 }
 
@@ -210,62 +211,7 @@ BOT_CONFIGURATION = {
     },
 }
 
-"""
-Each integration has its own configuration.
-All of them are disabled by default and need to be enabled.
-You can enable them by setting the 'enabled' key to True.
-You can also set a custom post_format for each integration.
-"""
-INTEGRATION_CONFIGURATION = {
-    'tiktok': {
-        'enabled': True,
-    },
-    'instagram': {
-        'enabled': False,
-        'session_file_path': None,
-        'username': None,
-        'user_agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0',
-        'password': None,
-    },
-    'facebook': {
-        'enabled': False,
-        'cookies_file_path': None,
-    },
-    'reddit': {
-        'enabled': False,
-        'client_id': None,
-        'client_secret': None,
-        'user_agent': None,
-    },
-    'youtube': {
-        'enabled': False,
-        'external_likes_api': False,  # Use return youtube dislikes API
-    },
-    'threads': {
-        'enable': False,
-    },
-    '24ur': {
-        'enable': False,
-    },
-    'twitter': {
-        'enabled': False,
-        'username': None,
-        'email': None,
-        'password': None,
-    },
-    'twitch': {
-        'enabled': False,
-    },
-    '4chan': {
-        'enabled': False,
-    },
-    'bluesky': {
-        'enabled': False,
-        'base_url': None,  # If you want some other instance
-        'username': None,
-        'password': None,
-    },
-}
+INTEGRATION_CONFIGURATION = json.loads(os.environ.get('INTEGRATION_CONFIGURATION_JSON', '{}'))
 
 OAUTH2_CONFIGURATION = {
     'discord': {

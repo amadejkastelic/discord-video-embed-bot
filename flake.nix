@@ -56,20 +56,12 @@
 
           default = self.nixosModules.discord-video-embed-bot;
         };
-
-        nixosTests = {
-          discord-video-embed-bot = import ./nix/test.nix {
-            pkgs = nixpkgs.legacyPackages.x86_64-linux;
-            module = self.nixosModules.discord-video-embed-bot;
-          };
-          default = self.nixosTests.discord-video-embed-bot;
-        };
       };
 
       perSystem =
         { pkgs, system, ... }:
         let
-          inherit (nixpkgs) lib;
+          lib = pkgs.lib;
 
           python = pkgs.python312;
 
@@ -101,14 +93,23 @@
           dockerImage = import ./nix/docker.nix {
             inherit pkgs venv browsers;
           };
+
+          testModule = self.nixosModules.discord-video-embed-bot;
         in
         {
           formatter = pkgs.nixfmt-tree;
 
-          checks = import ./nix/checks.nix {
-            inherit pkgs;
-            venv = devVenv;
-            nixfmt-tree = pkgs.nixfmt-tree;
+          checks = {
+            default = import ./nix/checks.nix {
+              inherit pkgs;
+              venv = devVenv;
+              nixfmt-tree = pkgs.nixfmt-tree;
+            };
+
+            nixosTests = import ./nix/test.nix {
+              inherit pkgs lib;
+              module = testModule;
+            };
           };
 
           packages = {

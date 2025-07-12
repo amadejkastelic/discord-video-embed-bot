@@ -258,7 +258,8 @@ class Service(basic.Service):
                     enabled=True,
                 )
                 for integration in integrations or list(constants.Integration)
-            ]
+            ],
+            ignore_conflicts=True,
         )
 
         cache.delete(store=cache.Store.SERVER, key=f'{server_vendor.value}_{server_vendor_uid}')
