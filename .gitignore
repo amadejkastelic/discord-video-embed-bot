@@ -11,3 +11,4 @@ docker/db/data
 *.egg-info
 result
 *.qcow2
+.nixos-test-history

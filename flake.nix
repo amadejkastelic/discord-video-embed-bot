@@ -56,6 +56,14 @@
 
           default = self.nixosModules.discord-video-embed-bot;
         };
+
+        nixosTests = {
+          discord-video-embed-bot = import ./nix/test.nix {
+            pkgs = nixpkgs.legacyPackages.x86_64-linux;
+            module = self.nixosModules.discord-video-embed-bot;
+          };
+          default = self.nixosTests.discord-video-embed-bot;
+        };
       };
 
       perSystem =
@@ -65,7 +73,7 @@
 
           python = pkgs.python312;
 
-          pythonConfig = import ./nix/python.nix {
+          env = import ./nix/python-env.nix {
             inherit
               pkgs
               lib
@@ -75,7 +83,11 @@
               uv2nix
               ;
           };
+          inherit (env) pythonSet workspace;
 
+          pythonConfig = import ./nix/venv.nix {
+            inherit env;
+          };
           inherit (pythonConfig) venv devVenv;
 
           browsers = pkgs.playwright.browsers.override {
@@ -100,7 +112,15 @@
           };
 
           packages = {
-            default = venv;
+            default = pkgs.callPackage ./nix/default.nix {
+              inherit
+                pkgs
+                browsers
+                pyproject-nix
+                pythonSet
+                workspace
+                ;
+            };
             docker = dockerImage;
           };
 

@@ -13,11 +13,6 @@
       default = package;
       description = "Package for the Discord Video Embed Bot";
     };
-    settingsPath = lib.mkOption {
-      type = lib.types.path;
-      default = "/etc/discord-video-embed-bot/settings.py";
-      description = "Path to the settings file for the Discord Video Embed Bot";
-    };
     user = lib.mkOption {
       type = lib.types.str;
       default = "discordbot";
@@ -28,17 +23,17 @@
       default = { };
       description = "Environment variables for the Discord Video Embed Bot service";
     };
-    workingDirectory = lib.mkOption {
-      type = lib.types.path;
-      default = "/var/lib/discord-video-embed-bot";
-      description = "Working directory for the Discord Video Embed Bot service";
-    };
-    postgresql = {
+    db = {
       enable = lib.mkEnableOption "Enable PostgreSQL for the bot";
       package = lib.mkOption {
         type = lib.types.package;
         default = pkgs.postgresql_16;
         description = "PostgreSQL package to use for the Discord Video Embed Bot";
+      };
+      port = lib.mkOption {
+        type = lib.types.int;
+        default = 5432;
+        description = "Port for PostgreSQL";
       };
       initialDatabase = lib.mkOption {
         type = lib.types.str;
@@ -46,7 +41,7 @@
         description = "Initial database name";
       };
     };
-    memcached = {
+    cache = {
       enable = lib.mkEnableOption "Enable Memcached for the bot";
       listen = lib.mkOption {
         type = lib.types.str;
@@ -64,59 +59,66 @@
   config = lib.mkIf config.discordVideoEmbedBot.enable ({
     users.users.${config.discordVideoEmbedBot.user} = {
       isSystemUser = true;
-      home = config.discordVideoEmbedBot.workingDirectory;
-      createHome = true;
     };
 
     systemd.services.discord-video-embed-bot = {
       description = "Discord Video Embed Bot";
       after =
         [ "network.target" ]
-        ++ lib.optional config.discordVideoEmbedBot.postgresql.enable "postgresql.service"
-        ++ lib.optional config.discordVideoEmbedBot.memcached.enable "memcached.service";
+        ++ lib.optional config.discordVideoEmbedBot.db.enable "postgresql.service"
+        ++ lib.optional config.discordVideoEmbedBot.cache.enable "memcached.service";
       wantedBy = [ "multi-user.target" ];
       preStart = ''
-        ${config.discordVideoEmbedBot.package}/bin/python manage.py migrate
+        ${config.discordVideoEmbedBot.package}/bin/manage migrate
       '';
       serviceConfig = {
         User = config.discordVideoEmbedBot.user;
-        WorkingDirectory = config.discordVideoEmbedBot.workingDirectory;
         ExecStart = ''
-          ${config.discordVideoEmbedBot.package}/bin/python manage.py discord_bot"
+          ${config.discordVideoEmbedBot.package}/bin/manage discord_bot
         '';
-        /*
-          Environment =
-          lib.concatStringsSep " " (
-            lib.mapAttrsToList (k: v: "${k}=${v}") config.discordVideoEmbedBot.environment
-          )
-          + "DJANGO_SETTINGS_MODULE=${config.discordVideoEmbedBot.settingsPath}";
-        */
         Restart = "always";
       };
-      /*
-        environment = config.discord-video-embed-bot.environment // {
-          DJANGO_SETTINGS_MODULE = config.discordVideoEmbedBot.settingsPath;
-        };
-      */
+      environment = config.discordVideoEmbedBot.environment // {
+        DJANGO_DB_NAME = config.discordVideoEmbedBot.db.initialDatabase;
+        DJANGO_DB_USER = config.discordVideoEmbedBot.db.initialDatabase;
+        DJANGO_DB_PASSWORD = config.discordVideoEmbedBot.db.initialDatabase;
+        DJANGO_DB_PORT = toString config.discordVideoEmbedBot.db.port;
+
+        DJANGO_CACHE_LOCATION = "localhost:${toString config.discordVideoEmbedBot.cache.port}";
+      };
     };
 
-    services.postgresql = lib.mkIf config.discordVideoEmbedBot.postgresql.enable {
+    services.postgresql = lib.mkIf config.discordVideoEmbedBot.db.enable {
       enable = true;
-      package = config.discordVideoEmbedBot.postgresql.package;
-      ensureDatabases = config.discordVideoEmbedBot.postgresql.initialDatabase;
+      package = config.discordVideoEmbedBot.db.package;
+      ensureDatabases = [ config.discordVideoEmbedBot.db.initialDatabase ];
       ensureUsers = [
         {
-          name = config.discordVideoEmbedBot.postgresql.initialUser;
+          name = config.discordVideoEmbedBot.db.initialDatabase;
           ensureDBOwnership = true;
+          ensureClauses.login = true;
         }
       ];
+      initialScript = pkgs.writeText "init.sql" ''
+        DO
+        $do$
+        BEGIN
+          IF NOT EXISTS (
+            SELECT FROM pg_catalog.pg_roles WHERE rolname = '${config.discordVideoEmbedBot.db.initialDatabase}'
+          ) THEN
+            CREATE ROLE "${config.discordVideoEmbedBot.db.initialDatabase}" LOGIN PASSWORD '${config.discordVideoEmbedBot.db.initialDatabase}';
+          ELSE
+            ALTER ROLE "${config.discordVideoEmbedBot.db.initialDatabase}" WITH PASSWORD '${config.discordVideoEmbedBot.db.initialDatabase}';
+          END IF;
+        END
+        $do$;
+      '';
     };
 
-    # Enable Memcached if requested
-    services.memcached = lib.mkIf config.discordVideoEmbedBot.memcached.enable {
+    services.memcached = lib.mkIf config.discordVideoEmbedBot.cache.enable {
       enable = true;
-      listen = config.discordVideoEmbedBot.memcached.listen;
-      port = config.discordVideoEmbedBot.memcached.port;
+      listen = config.discordVideoEmbedBot.cache.listen;
+      port = config.discordVideoEmbedBot.cache.port;
     };
   });
 }
