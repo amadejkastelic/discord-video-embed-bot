@@ -15,12 +15,6 @@ jobs:
       - name: Check out source repository
         uses: actions/checkout@v4
 
-      - name: Move repo to short path
-        run: |
-          mkdir -p /tmp/bot
-          cp -R . /tmp/bot/
-          cd /tmp/bot
-
       - uses: nixbuild/nix-quick-install-action@v30
         with:
           nix_on_tmpfs: true

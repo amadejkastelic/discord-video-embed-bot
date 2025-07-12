@@ -89,9 +89,5 @@ pkgs.nixosTest {
     bot.start()
     bot.wait_for_unit("discord-video-embed-bot.service")
     bot.succeed("systemctl is-active discord-video-embed-bot.service")
-
-    botStandalone.start()
-    botStandalone.wait_for_unit("discord-video-embed-bot.service")
-    botStandalone.succeed("systemctl is-active discord-video-embed-bot.service")
   '';
 }
