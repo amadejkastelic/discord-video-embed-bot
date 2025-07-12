@@ -76,13 +76,7 @@ let
       pyprojectOverrides
     ]
   );
-
-  venv = pythonSet.mkVirtualEnv "discord-video-embed-bot-env" workspace.deps.default;
-
-  devVenv = pythonSet.mkVirtualEnv "discord-video-embed-bot-dev-env" {
-    "discord-video-embed-bot" = [ "dev" ];
-  };
 in
 {
-  inherit venv devVenv;
+  inherit workspace pythonSet;
 }

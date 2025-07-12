@@ -10,3 +10,5 @@ docker/db/data
 .venv
 *.egg-info
 result
+*.qcow2
+.nixos-test-history

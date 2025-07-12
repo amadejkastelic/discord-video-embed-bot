@@ -24,6 +24,7 @@
 
   outputs =
     {
+      self,
       nixpkgs,
       flake-parts,
       uv2nix,
@@ -39,18 +40,32 @@
         "x86_64-darwin"
       ];
 
+      flake = {
+        nixosModules = {
+          discord-video-embed-bot =
+            {
+              config,
+              pkgs,
+              lib,
+              ...
+            }:
+            import ./nix/module.nix {
+              inherit config pkgs lib;
+              package = self.packages.${pkgs.system}.default;
+            };
+
+          default = self.nixosModules.discord-video-embed-bot;
+        };
+      };
+
       perSystem =
-        {
-          pkgs,
-          system,
-          ...
-        }:
+        { pkgs, system, ... }:
         let
-          inherit (nixpkgs) lib;
+          lib = pkgs.lib;
 
           python = pkgs.python312;
 
-          pythonConfig = import ./nix/python.nix {
+          env = import ./nix/python-env.nix {
             inherit
               pkgs
               lib
@@ -60,7 +75,11 @@
               uv2nix
               ;
           };
+          inherit (env) pythonSet workspace;
 
+          pythonConfig = import ./nix/venv.nix {
+            inherit env;
+          };
           inherit (pythonConfig) venv devVenv;
 
           browsers = pkgs.playwright.browsers.override {
@@ -74,18 +93,35 @@
           dockerImage = import ./nix/docker.nix {
             inherit pkgs venv browsers;
           };
+
+          testModule = self.nixosModules.discord-video-embed-bot;
         in
         {
           formatter = pkgs.nixfmt-tree;
 
-          checks = import ./nix/checks.nix {
-            inherit pkgs;
-            venv = devVenv;
-            nixfmt-tree = pkgs.nixfmt-tree;
-          };
+          checks =
+            import ./nix/checks.nix {
+              inherit pkgs;
+              venv = devVenv;
+              nixfmt-tree = pkgs.nixfmt-tree;
+            }
+            // {
+              nixosTests = import ./nix/test.nix {
+                inherit pkgs lib;
+                module = testModule;
+              };
+            };
 
           packages = {
-            default = venv;
+            default = pkgs.callPackage ./nix/default.nix {
+              inherit
+                pkgs
+                browsers
+                pyproject-nix
+                pythonSet
+                workspace
+                ;
+            };
             docker = dockerImage;
           };
 
