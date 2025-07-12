@@ -99,18 +99,18 @@
         {
           formatter = pkgs.nixfmt-tree;
 
-          checks = {
-            default = import ./nix/checks.nix {
+          checks =
+            import ./nix/checks.nix {
               inherit pkgs;
               venv = devVenv;
               nixfmt-tree = pkgs.nixfmt-tree;
+            }
+            // {
+              nixosTests = import ./nix/test.nix {
+                inherit pkgs lib;
+                module = testModule;
+              };
             };
-
-            nixosTests = import ./nix/test.nix {
-              inherit pkgs lib;
-              module = testModule;
-            };
-          };
 
           packages = {
             default = pkgs.callPackage ./nix/default.nix {
