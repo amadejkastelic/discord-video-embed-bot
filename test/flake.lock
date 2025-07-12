@@ -1,5 +1,26 @@
 {
   "nodes": {
+    "discord-video-embed-bot": {
+      "inputs": {
+        "flake-parts": "flake-parts",
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "pyproject-build-systems": "pyproject-build-systems",
+        "pyproject-nix": "pyproject-nix",
+        "uv2nix": "uv2nix"
+      },
+      "locked": {
+        "lastModified": 0,
+        "narHash": "sha256-KfMmf3ZskeU7c0Ajs/sXpRqfBZ+WEPDsu2k5zBH2L6U=",
+        "path": "/nix/store/l507v5vdali73m5ylmjxpk9kr0xvg0cg-source",
+        "type": "path"
+      },
+      "original": {
+        "path": "/nix/store/l507v5vdali73m5ylmjxpk9kr0xvg0cg-source",
+        "type": "path"
+      }
+    },
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": "nixpkgs-lib"
@@ -20,15 +41,15 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1746232882,
-        "narHash": "sha256-MHmBH2rS8KkRRdoU/feC/dKbdlMkcNkB5mwkuipVHeQ=",
-        "owner": "NixOS",
+        "lastModified": 1742669843,
+        "narHash": "sha256-G5n+FOXLXcRx+3hCJ6Rt6ZQyF1zqQ0DL0sWAMn2Nk0w=",
+        "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "7a2622e2c0dbad5c4493cb268aba12896e28b008",
+        "rev": "1e5b653dff12029333a6546c11e108ede13052eb",
         "type": "github"
       },
       "original": {
-        "owner": "NixOS",
+        "owner": "nixos",
         "ref": "nixos-unstable",
         "repo": "nixpkgs",
         "type": "github"
@@ -51,15 +72,15 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1742669843,
-        "narHash": "sha256-G5n+FOXLXcRx+3hCJ6Rt6ZQyF1zqQ0DL0sWAMn2Nk0w=",
-        "owner": "nixos",
+        "lastModified": 1751984180,
+        "narHash": "sha256-LwWRsENAZJKUdD3SpLluwDmdXY9F45ZEgCb0X+xgOL0=",
+        "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "1e5b653dff12029333a6546c11e108ede13052eb",
+        "rev": "9807714d6944a957c2e036f84b0ff8caf9930bc0",
         "type": "github"
       },
       "original": {
-        "owner": "nixos",
+        "owner": "NixOS",
         "ref": "nixos-unstable",
         "repo": "nixpkgs",
         "type": "github"
@@ -68,12 +89,15 @@
     "pyproject-build-systems": {
       "inputs": {
         "nixpkgs": [
+          "discord-video-embed-bot",
           "nixpkgs"
         ],
         "pyproject-nix": [
+          "discord-video-embed-bot",
           "pyproject-nix"
         ],
         "uv2nix": [
+          "discord-video-embed-bot",
           "uv2nix"
         ]
       },
@@ -93,7 +117,7 @@
     },
     "pyproject-nix": {
       "inputs": {
-        "nixpkgs": "nixpkgs_2"
+        "nixpkgs": "nixpkgs"
       },
       "locked": {
         "lastModified": 1746146146,
@@ -111,19 +135,18 @@
     },
     "root": {
       "inputs": {
-        "flake-parts": "flake-parts",
-        "nixpkgs": "nixpkgs",
-        "pyproject-build-systems": "pyproject-build-systems",
-        "pyproject-nix": "pyproject-nix",
-        "uv2nix": "uv2nix"
+        "discord-video-embed-bot": "discord-video-embed-bot",
+        "nixpkgs": "nixpkgs_2"
       }
     },
     "uv2nix": {
       "inputs": {
         "nixpkgs": [
+          "discord-video-embed-bot",
           "nixpkgs"
         ],
         "pyproject-nix": [
+          "discord-video-embed-bot",
           "pyproject-nix"
         ]
       },

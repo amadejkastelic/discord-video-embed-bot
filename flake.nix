@@ -24,6 +24,7 @@
 
   outputs =
     {
+      self,
       nixpkgs,
       flake-parts,
       uv2nix,
@@ -39,12 +40,26 @@
         "x86_64-darwin"
       ];
 
+      flake = {
+        nixosModules = {
+          discord-video-embed-bot =
+            {
+              config,
+              pkgs,
+              lib,
+              ...
+            }:
+            import ./nix/module.nix {
+              inherit config pkgs lib;
+              package = self.packages.${pkgs.system}.default;
+            };
+
+          default = self.nixosModules.discord-video-embed-bot;
+        };
+      };
+
       perSystem =
-        {
-          pkgs,
-          system,
-          ...
-        }:
+        { pkgs, system, ... }:
         let
           inherit (nixpkgs) lib;
 

@@ -10,3 +10,4 @@ docker/db/data
 .venv
 *.egg-info
 result
+*.qcow2
