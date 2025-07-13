@@ -32,7 +32,7 @@ in
       description = "Environment variables for the Discord Video Embed Bot service";
     };
     environmentFile = lib.mkOption {
-      type = lib.types.str;
+      type = lib.types.nullOr lib.types.str;
       default = null;
       description = "Path to the environment file for the Discord Video Embed Bot service";
     };
