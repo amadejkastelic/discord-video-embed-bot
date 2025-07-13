@@ -99,6 +99,7 @@ in
       serviceConfig = {
         User = cfg.user;
         Group = cfg.group;
+        WorkingDirectory = "/var/lib/discord-video-embed-bot";
         ExecStart = ''
           ${cfg.package}/bin/manage discord_bot
         '';
@@ -123,6 +124,10 @@ in
         INTEGRATION_CONFIGURATION_JSON = builtins.toJSON cfg.integrationSettings;
       };
     };
+
+    systemd.tmpfiles.rules = [
+      "d /var/lib/discord-video-embed-bot 0750 ${cfg.user} ${cfg.group} -"
+    ];
 
     services.postgresql = lib.mkIf cfg.db.enable {
       enable = true;
