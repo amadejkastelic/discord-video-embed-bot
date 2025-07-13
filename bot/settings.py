@@ -212,7 +212,7 @@ BOT_CONFIGURATION = {
     },
 }
 
-INTEGRATION_CONFIGURATION = defaultdict({}, json.loads(os.environ.get('INTEGRATION_CONFIGURATION_JSON', '{}')))
+INTEGRATION_CONFIGURATION = defaultdict(dict, json.loads(os.environ.get('INTEGRATION_CONFIGURATION_JSON', '{}')))
 
 # Support secrets from environment variables for sensitive data
 if 'REDDIT_CLIENT_ID' in os.environ:
