@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+from collections import defaultdict
 from pathlib import Path
 
 import structlog
@@ -211,7 +212,31 @@ BOT_CONFIGURATION = {
     },
 }
 
-INTEGRATION_CONFIGURATION = json.loads(os.environ.get('INTEGRATION_CONFIGURATION_JSON', '{}'))
+INTEGRATION_CONFIGURATION = defaultdict({}, json.loads(os.environ.get('INTEGRATION_CONFIGURATION_JSON', '{}')))
+
+# Support secrets from environment variables for sensitive data
+if 'REDDIT_CLIENT_ID' in os.environ:
+    INTEGRATION_CONFIGURATION['reddit']['client_id'] = os.environ['REDDIT_CLIENT_ID']
+if 'REDDIT_CLIENT_SECRET' in os.environ:
+    INTEGRATION_CONFIGURATION['reddit']['client_secret'] = os.environ['REDDIT_CLIENT_SECRET']
+if 'INSTAGRAM_USERNAME' in os.environ:
+    INTEGRATION_CONFIGURATION['instagram']['username'] = os.environ['INSTAGRAM_USERNAME']
+if 'INSTAGRAM_PASSWORD' in os.environ:
+    INTEGRATION_CONFIGURATION['instagram']['password'] = os.environ['INSTAGRAM_PASSWORD']
+if 'TWITTER_USERNAME' in os.environ:
+    INTEGRATION_CONFIGURATION['twitter']['username'] = os.environ['TWITTER_USERNAME']
+if 'TWITTER_EMAIL' in os.environ:
+    INTEGRATION_CONFIGURATION['twitter']['email'] = os.environ['TWITTER_EMAIL']
+if 'TWITTER_PASSWORD' in os.environ:
+    INTEGRATION_CONFIGURATION['twitter']['password'] = os.environ['TWITTER_PASSWORD']
+if 'BLUESKY_USERNAME' in os.environ:
+    INTEGRATION_CONFIGURATION['bluesky']['username'] = os.environ['BLUESKY_USERNAME']
+if 'BLUESKY_PASSWORD' in os.environ:
+    INTEGRATION_CONFIGURATION['bluesky']['password'] = os.environ['BLUESKY_PASSWORD']
+if 'TRUTH_SOCIAL_USERNAME' in os.environ:
+    INTEGRATION_CONFIGURATION['truth_social']['username'] = os.environ['TRUTH_SOCIAL_USERNAME']
+if 'TRUTH_SOCIAL_PASSWORD' in os.environ:
+    INTEGRATION_CONFIGURATION['truth_social']['password'] = os.environ['TRUTH_SOCIAL_PASSWORD']
 
 OAUTH2_CONFIGURATION = {
     'discord': {
