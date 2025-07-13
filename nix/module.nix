@@ -31,6 +31,11 @@ in
       default = { };
       description = "Environment variables for the Discord Video Embed Bot service";
     };
+    environmentFile = lib.mkOption {
+      type = lib.types.str;
+      default = null;
+      description = "Path to the environment file for the Discord Video Embed Bot service";
+    };
     integrationSettings = lib.mkOption {
       type = lib.types.attrs;
       default = { };
@@ -98,6 +103,7 @@ in
           ${cfg.package}/bin/manage discord_bot
         '';
         Restart = "always";
+        EnvironmentFile = lib.mkIf (cfg.environmentFile != null) cfg.environmentFile;
       };
       environment = cfg.environment // {
         DJANGO_DB_ENGINE =
