@@ -7,7 +7,6 @@ pkgs.mkShell {
   packages = [
     venv
     pkgs.uv
-    pkgs.python312Packages.playwright
     pkgs.ffmpeg
     pkgs.file
     pkgs.nixfmt-tree

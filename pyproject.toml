@@ -2,7 +2,7 @@
 authors = [{ name = "Amadej Kastelic", email = "amadejkastelic7@gmail.com" }]
 requires-python = "<3.13,>=3.12"
 dependencies = [
-    "playwright<=1.50.1,>=1.49.0",
+    "playwright==1.53.0",
     "discord-py<3.0.0,>=2.5.2",
     "instaloader<5.0,>=4.14.1",
     "facebook-scraper<1.0.0,>=0.2.59",
