@@ -45,7 +45,7 @@ in
       enable = lib.mkEnableOption "Enable PostgreSQL for the bot";
       package = lib.mkOption {
         type = lib.types.package;
-        default = pkgs.postgresql_16;
+        default = pkgs.postgresql;
         description = "PostgreSQL package to use for the Discord Video Embed Bot";
       };
       port = lib.mkOption {

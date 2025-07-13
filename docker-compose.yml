@@ -1,6 +1,6 @@
 services:
   db:
-    image: 'postgres:16.6-alpine'
+    image: 'postgres:17.5-alpine'
     ports:
       - 5432:5432
     environment:
@@ -10,8 +10,6 @@ services:
     volumes:
       # Persistence
       - ./docker/db/data/:/var/lib/postgresql/data/
-      # Init script
-      - ./docker/db/init.sql:/docker-entrypoint-initdb.d/init.sql
   cache:
     image: 'memcached:1.6.32-alpine'
     ports:
