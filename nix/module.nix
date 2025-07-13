@@ -5,6 +5,9 @@
   package ? null,
   ...
 }:
+let
+  cfg = config.services.discordVideoEmbedBot;
+in
 {
   options.services.discordVideoEmbedBot = {
     enable = lib.mkEnableOption "Enable the Discord Video Embed Bot service";
@@ -17,6 +20,11 @@
       type = lib.types.str;
       default = "discordbot";
       description = "User under which the Discord Video Embed Bot service runs";
+    };
+    group = lib.mkOption {
+      type = lib.types.str;
+      default = cfg.user;
+      description = "Group under which the Discord Video Embed Bot service runs";
     };
     environment = lib.mkOption {
       type = lib.types.attrsOf lib.types.str;
@@ -61,57 +69,62 @@
     };
   };
 
-  config = lib.mkIf config.services.discordVideoEmbedBot.enable ({
-    users.users.${config.services.discordVideoEmbedBot.user} = {
+  config = lib.mkIf cfg.enable ({
+    users.users.${cfg.user} = {
+      name = cfg.user;
+      group = cfg.group;
+      description = "Discord Video Embed Bot User";
       isSystemUser = true;
+    };
+
+    users.groups.${cfg.group} = {
+      name = cfg.group;
     };
 
     systemd.services.discord-video-embed-bot = {
       description = "Discord Video Embed Bot";
       after =
         [ "network.target" ]
-        ++ lib.optional config.services.discordVideoEmbedBot.db.enable "postgresql.service"
-        ++ lib.optional config.services.discordVideoEmbedBot.cache.enable "memcached.service";
+        ++ lib.optional cfg.db.enable "postgresql.service"
+        ++ lib.optional cfg.cache.enable "memcached.service";
       wantedBy = [ "multi-user.target" ];
-      preStart = lib.mkIf config.services.discordVideoEmbedBot.db.enable ''
-        ${config.services.discordVideoEmbedBot.package}/bin/manage migrate
+      preStart = lib.mkIf cfg.db.enable ''
+        ${cfg.package}/bin/manage migrate
       '';
       serviceConfig = {
-        User = config.services.discordVideoEmbedBot.user;
+        User = cfg.user;
+        Group = cfg.group;
         ExecStart = ''
-          ${config.services.discordVideoEmbedBot.package}/bin/manage discord_bot
+          ${cfg.package}/bin/manage discord_bot
         '';
         Restart = "always";
       };
-      environment = config.services.discordVideoEmbedBot.environment // {
+      environment = cfg.environment // {
         DJANGO_DB_ENGINE =
-          if config.services.discordVideoEmbedBot.db.enable then
-            "django.db.backends.postgresql"
-          else
-            "django.db.backends.dummy";
-        DJANGO_DB_NAME = config.services.discordVideoEmbedBot.db.initialDatabase;
-        DJANGO_DB_USER = config.services.discordVideoEmbedBot.db.initialDatabase;
-        DJANGO_DB_PASSWORD = config.services.discordVideoEmbedBot.db.initialDatabase;
-        DJANGO_DB_PORT = toString config.services.discordVideoEmbedBot.db.port;
+          if cfg.db.enable then "django.db.backends.postgresql" else "django.db.backends.dummy";
+        DJANGO_DB_NAME = cfg.db.initialDatabase;
+        DJANGO_DB_USER = cfg.db.initialDatabase;
+        DJANGO_DB_PASSWORD = cfg.db.initialDatabase;
+        DJANGO_DB_PORT = toString cfg.db.port;
 
         DJANGO_CACHE_BACKEND =
-          if config.services.discordVideoEmbedBot.cache.enable then
+          if cfg.cache.enable then
             "django.core.cache.backends.memcached.PyMemcacheCache"
           else
             "django.core.cache.backends.dummy.DummyCache";
-        DJANGO_CACHE_LOCATION = "localhost:${toString config.services.discordVideoEmbedBot.cache.port}";
+        DJANGO_CACHE_LOCATION = "localhost:${toString cfg.cache.port}";
 
-        INTEGRATION_CONFIGURATION_JSON = builtins.toJSON config.services.discordVideoEmbedBot.integrationSettings;
+        INTEGRATION_CONFIGURATION_JSON = builtins.toJSON cfg.integrationSettings;
       };
     };
 
-    services.postgresql = lib.mkIf config.services.discordVideoEmbedBot.db.enable {
+    services.postgresql = lib.mkIf cfg.db.enable {
       enable = true;
-      package = config.services.discordVideoEmbedBot.db.package;
-      ensureDatabases = [ config.services.discordVideoEmbedBot.db.initialDatabase ];
+      package = cfg.db.package;
+      ensureDatabases = [ cfg.db.initialDatabase ];
       ensureUsers = [
         {
-          name = config.services.discordVideoEmbedBot.db.initialDatabase;
+          name = cfg.db.initialDatabase;
           ensureDBOwnership = true;
           ensureClauses.login = true;
         }
@@ -121,21 +134,21 @@
         $do$
         BEGIN
           IF NOT EXISTS (
-            SELECT FROM pg_catalog.pg_roles WHERE rolname = '${config.services.discordVideoEmbedBot.db.initialDatabase}'
+            SELECT FROM pg_catalog.pg_roles WHERE rolname = '${cfg.db.initialDatabase}'
           ) THEN
-            CREATE ROLE "${config.services.discordVideoEmbedBot.db.initialDatabase}" LOGIN PASSWORD '${config.services.discordVideoEmbedBot.db.initialDatabase}';
+            CREATE ROLE "${cfg.db.initialDatabase}" LOGIN PASSWORD '${cfg.db.initialDatabase}';
           ELSE
-            ALTER ROLE "${config.services.discordVideoEmbedBot.db.initialDatabase}" WITH PASSWORD '${config.services.discordVideoEmbedBot.db.initialDatabase}';
+            ALTER ROLE "${cfg.db.initialDatabase}" WITH PASSWORD '${cfg.db.initialDatabase}';
           END IF;
         END
         $do$;
       '';
     };
 
-    services.memcached = lib.mkIf config.services.discordVideoEmbedBot.cache.enable {
+    services.memcached = lib.mkIf cfg.cache.enable {
       enable = true;
-      listen = config.services.discordVideoEmbedBot.cache.listen;
-      port = config.services.discordVideoEmbedBot.cache.port;
+      listen = cfg.cache.listen;
+      port = cfg.cache.port;
     };
   });
 }

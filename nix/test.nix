@@ -21,9 +21,6 @@ let
 
       boot.loader.grub.devices = [ "nodev" ];
 
-      users.users.discordbot.group = "discordbot";
-      users.groups.discordbot = { };
-
       users.users.root = {
         openssh.authorizedKeys.keys = [ testUserKey ];
       };
