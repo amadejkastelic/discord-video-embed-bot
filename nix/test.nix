@@ -54,7 +54,7 @@ pkgs.nixosTest {
             guest.port = 22;
           }
         ];
-        discordVideoEmbedBot = {
+        services.discordVideoEmbedBot = {
           enable = true;
           integrationSettings = {
             tiktok.enabled = true;
@@ -74,7 +74,7 @@ pkgs.nixosTest {
             guest.port = 22;
           }
         ];
-        discordVideoEmbedBot = {
+        services.discordVideoEmbedBot = {
           enable = true;
           integrationSettings = {
             tiktok.enabled = true;
