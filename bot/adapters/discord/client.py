@@ -424,13 +424,15 @@ class DiscordClient(mixins.BotMixin, discord.Client):
             )
             send_kwargs['file'] = file
 
+        def trim_content(post: domain.Post, content: str) -> str:
+            if len(content) < 2000: return content
+            if post.spoiler: return content[:1995] + '||...'
+            return content[:1997] + '...'
+
+        resize_tries, MAX_RESIZE_TRIES = 0, 3
         try:
             content = f'Here you go {author.mention} {utils.random_emoji()}.\n{str(post)}'
-            if len(content) > 2000:
-                if post.spoiler:
-                    content = content[:1995] + '||...'
-                else:
-                    content = content[:1997] + '...'
+            content = trim_content(post, content)
 
             send_kwargs['content'] = content
 
@@ -438,11 +440,25 @@ class DiscordClient(mixins.BotMixin, discord.Client):
         except discord.HTTPException as e:
             if e.status != 413:  # Payload too large
                 raise e
-            if post.buffer is not None:
+            if post.buffer is not None and resize_tries < MAX_RESIZE_TRIES:
                 logger.info('File too large, resizing...', size=post.buffer.getbuffer().nbytes)
+                resize_tries += 1
                 post.buffer.seek(0)
                 post.buffer = await utils.resize(buffer=post.buffer, extension=extension)
                 return await self._send_post(post=post, send_func=send_func, author=author)
+            if (resize_tries >= MAX_RESIZE_TRIES):
+                try:
+                    content = (f'I\'m sorry {author.mention}, your post was too big '
+                        f'and I couldn\'t make it small enough. \U0001F622\n{str(post)}'
+                    )
+                    content = trim_content(content, post)
+                    post.buffer = None
+
+                    send_kwargs['content'] = content
+
+                    return await send_func(**send_kwargs)
+                except discord.HTTPException:
+                    raise exceptions.BotError('Couldn\'t even send error message???')
 
             raise exceptions.BotError('Failed to send message') from e
         except utils.SSL_ERRORS as e:
