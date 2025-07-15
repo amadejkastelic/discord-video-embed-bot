@@ -14,8 +14,11 @@ from bot import domain
 from bot import exceptions
 from bot import logger
 from bot import service
-from bot.common import utils
 from bot.adapters import mixins
+from bot.common import utils
+
+
+MAX_RESIZE_TRIES = 3
 
 
 class CustomView(ui.View):
@@ -403,12 +406,21 @@ class DiscordClient(mixins.BotMixin, discord.Client):
             ephemeral=True,
         )
 
-    async def _send_post(
+    @staticmethod
+    def _trim_content(content: str, spoiler: bool = False) -> str:
+        if len(content) < 2000:
+            return content
+        if spoiler:
+            return content[:1995] + '||...'
+        return content[:1997] + '...'
+
+    async def _send_post(  # noqa: C901
         self,
         post: domain.Post,
         send_func: typing.Callable,
         author: typing.Union[discord.User, discord.Member],
         reference: typing.Optional[discord.MessageReference] = None,
+        retries: int = 0,
     ) -> discord.Message:
         send_kwargs = {
             'suppress_embeds': True,
@@ -426,11 +438,7 @@ class DiscordClient(mixins.BotMixin, discord.Client):
 
         try:
             content = f'Here you go {author.mention} {utils.random_emoji()}.\n{str(post)}'
-            if len(content) > 2000:
-                if post.spoiler:
-                    content = content[:1995] + '||...'
-                else:
-                    content = content[:1997] + '...'
+            content = self._trim_content(content=content, spoiler=post.spoiler)
 
             send_kwargs['content'] = content
 
@@ -438,11 +446,30 @@ class DiscordClient(mixins.BotMixin, discord.Client):
         except discord.HTTPException as e:
             if e.status != 413:  # Payload too large
                 raise e
-            if post.buffer is not None:
+            if post.buffer is not None and retries < MAX_RESIZE_TRIES:
                 logger.info('File too large, resizing...', size=post.buffer.getbuffer().nbytes)
                 post.buffer.seek(0)
                 post.buffer = await utils.resize(buffer=post.buffer, extension=extension)
-                return await self._send_post(post=post, send_func=send_func, author=author)
+                return await self._send_post(post=post, send_func=send_func, author=author, retries=retries + 1)
+            if retries >= MAX_RESIZE_TRIES:
+                try:
+                    content = (
+                        f'I\'m sorry {author.mention}, your post was too big '
+                        f'and I couldn\'t make it small enough. 🥲\n{str(post)}'
+                    )
+                    content = self._trim_content(content=content, spoiler=post.spoiler)
+                    post.buffer = None
+
+                    send_kwargs.update(
+                        {
+                            'content': content,
+                            'file': None,
+                        }
+                    )
+
+                    return await send_func(**send_kwargs)
+                except discord.HTTPException:
+                    raise exceptions.BotError('Couldn\'t even send error message???')
 
             raise exceptions.BotError('Failed to send message') from e
         except utils.SSL_ERRORS as e:

@@ -22,7 +22,7 @@ from PIL import Image as pil_image
 from django import db as django_db
 from requests import exceptions as requests_exceptions
 
-emoji = ['😼', '😺', '😸', '😹', '😻', '🙀', '😿', '😾', '😩', '🙈', '🙉', '🙊', '😳']
+emoji = ['😼', '😺', '😸', '😹', '😻', '🙀', '😿', '😾', '😩', '🙈', '🙉', '🙊', '😳', '😢']
 
 SSL_ERRORS = (
     requests_exceptions.SSLError,
