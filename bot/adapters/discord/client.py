@@ -432,7 +432,7 @@ class DiscordClient(mixins.BotMixin, discord.Client):
         resize_tries, MAX_RESIZE_TRIES = 0, 3
         try:
             content = f'Here you go {author.mention} {utils.random_emoji()}.\n{str(post)}'
-            content = trim_content(content, post)
+            content = trim_content(post, content)
 
             send_kwargs['content'] = content
 
