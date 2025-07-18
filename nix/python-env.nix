@@ -22,7 +22,7 @@ let
 
       buildSystemOverrides = {
         aiofiles.hatchling = [ ];
-        aiograpi.setuptools = [ ];
+        instagrapi.setuptools = [ ];
         aiosqlite.flit-core = [ ];
         annotated-types.hatchling = [ ];
         appdirs.setuptools = [ ];

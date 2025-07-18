@@ -1,9 +1,9 @@
 import typing
 from urllib.parse import parse_qs, urlparse
 
-import aiograpi
 import aiohttp
-from aiograpi import exceptions as aiograpi_exceptions
+import instagrapi
+from instagrapi import exceptions as instagrapi_exceptions
 
 from bot import constants as bot_constants
 from bot import domain
@@ -24,10 +24,10 @@ class InstagramClient(base.BaseClient):
 
         self.username = username
         self.password = password
-        self.client = aiograpi.Client()
+        self.client = instagrapi.Client()
 
-    async def login(self, relogin: bool = False):
-        await self.client.login(
+    def login(self, relogin: bool = False):
+        self.client.login(
             username=self.username,
             password=self.password,
             relogin=relogin,
@@ -42,22 +42,21 @@ class InstagramClient(base.BaseClient):
         elif '/share/' in url:
             async with aiohttp.ClientSession() as session:
                 async with session.get(url=url) as resp:
-                    pk = await self.client.media_pk_from_url(str(resp.url))
+                    pk = self.client.media_pk_from_url(str(resp.url))
         else:
-            pk = await self.client.media_pk_from_url(url)
+            pk = self.client.media_pk_from_url(url)
         return self.INTEGRATION, pk, max(0, int(parse_qs(urlparse(url).query).get('img_index', ['1'])[0]) - 1)
 
     async def get_post(self, url: str) -> domain.Post:
         try:
             return await self._get_post(url)
         except (
-            aiograpi_exceptions.PreLoginRequired,
-            aiograpi_exceptions.ClientLoginRequired,
-            aiograpi_exceptions.ReloginAttemptExceeded,
+            instagrapi_exceptions.ClientLoginRequired,
+            instagrapi_exceptions.ReloginAttemptExceeded,
         ):
-            await self.login()
-        except aiograpi_exceptions.LoginRequired:
-            await self.login(relogin=True)
+            self.login()
+        except instagrapi_exceptions.LoginRequired:
+            self.login(relogin=True)
 
         return await self._get_post(url)
 
@@ -67,7 +66,7 @@ class InstagramClient(base.BaseClient):
         if 'stories' in url:
             return await self._get_story(url, pk)
 
-        media_info = await self.client.media_info(pk)
+        media_info = self.client.media_info(pk)
 
         post = domain.Post(
             url=url,
@@ -99,7 +98,7 @@ class InstagramClient(base.BaseClient):
         return post
 
     async def _get_story(self, url: str, pk: str) -> domain.Post:
-        story_info = await self.client.story_info(pk)
+        story_info = self.client.story_info(pk)
 
         post = domain.Post(
             url=url,
@@ -110,7 +109,7 @@ class InstagramClient(base.BaseClient):
         if story_info.video_url:
             post.buffer = await self._download(url=str(story_info.video_url), cookies=self.client.cookie_dict)
         elif story_info.medias:
-            media_info = await self.client.media_info(story_info.medias[0].media_pk)
+            media_info = self.client.media_info(story_info.medias[0].media_pk)
             post.buffer = await self._download(
                 url=str(media_info.video_url or media_info.image_versions2['candidates'][0]['url']),
                 cookies=self.client.cookie_dict,
