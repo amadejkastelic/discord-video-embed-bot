@@ -11,10 +11,11 @@ class BaseBotConfig(pydantic.BaseModel):
 
 class BaseBot:
     VENDOR: constants.ServerVendor
-    _CONFIG_CLASS: BaseBotConfig = BaseBotConfig
+    _CONFIG_CLASS = BaseBotConfig
 
-    def _load_config(self, conf: typing.Dict) -> BaseBotConfig:
-        return self._CONFIG_CLASS.model_validate(conf)
+    @classmethod
+    def _load_config(cls, conf: typing.Dict) -> _CONFIG_CLASS:
+        return cls._CONFIG_CLASS.model_validate(conf)
 
     async def run(self) -> typing.NoReturn:
         raise NotImplementedError()

@@ -6,7 +6,7 @@ A Discord bot that automatically embeds media and metadata of messages containin
 
 ## Supported platforms
 - Instagram ✅
-- Facebook ⚠️ - flaky
+- Facebook ✅
 - Tiktok ✅
 - Reddit ✅
 - Twitter ✅
@@ -15,7 +15,7 @@ A Discord bot that automatically embeds media and metadata of messages containin
 - Threads ✅
 - 24ur.com ✅
 - 4chan ✅
-- Linkedin ⚠️ - flaky
+- Linkedin ✅
 - Bluesky ✅
 - Truth Social ✅
 
@@ -49,14 +49,14 @@ docker load < result
 
 ```bash
 nix develop
-python manage.py discord_bot
+python manage.py bot discord
 ```
 
 ### Without Nix
 
 ```bash
 uv sync
-python manage.py discord_bot
+python manage.py bot discord
 ```
 
 ### Docker

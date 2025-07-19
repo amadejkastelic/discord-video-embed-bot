@@ -6,9 +6,12 @@ from django.conf import settings
 from bot import exceptions
 from bot.adapters import base
 from bot.adapters.discord import client
+from bot.adapters.discord import config
 
 
 class DiscordBot(base.BaseBot):
+    _CONFIG_CLASS = config.DiscordConfig
+
     def __init__(self) -> None:
         super().__init__()
 
