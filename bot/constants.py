@@ -3,6 +3,7 @@ import enum
 
 class ServerVendor(enum.Enum):
     DISCORD = 'discord'
+    TERMINAL = 'terminal'
 
 
 class ServerTier(enum.Enum):

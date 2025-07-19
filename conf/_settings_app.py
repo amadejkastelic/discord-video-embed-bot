@@ -2,6 +2,7 @@ BOT_CONFIGURATION = {
     'discord': {
         'api_token': None,
     },
+    'terminal': {},
 }
 
 """

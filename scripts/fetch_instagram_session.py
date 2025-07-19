@@ -27,9 +27,9 @@ def import_session(cookiefile, sessionfile):
     print('Using cookies from {}.'.format(cookiefile))
     conn = connect(f'file:{cookiefile}?immutable=1', uri=True)
     try:
-        cookie_data = conn.execute('SELECT name, value FROM moz_cookies WHERE baseDomain=\'instagram.com\'')
+        cookie_data = conn.execute("SELECT name, value FROM moz_cookies WHERE baseDomain='instagram.com'")
     except OperationalError:
-        cookie_data = conn.execute('SELECT name, value FROM moz_cookies WHERE host LIKE \'%instagram.com\'')
+        cookie_data = conn.execute("SELECT name, value FROM moz_cookies WHERE host LIKE '%instagram.com'")
     instaloader = Instaloader(max_connection_attempts=1)
     instaloader.context._session.cookies.update(cookie_data)
     username = instaloader.test_login()

@@ -20,10 +20,10 @@ class Oauth2ViewSet(viewsets.ViewSet):
         return shortcuts.redirect(
             client.generate_uri(
                 scope=[
-                    "identify",
-                    "guilds",
-                    "connections",
-                    "role_connections.write",
+                    'identify',
+                    'guilds',
+                    'connections',
+                    'role_connections.write',
                 ]
             )
         )
@@ -37,7 +37,7 @@ class Oauth2ViewSet(viewsets.ViewSet):
 
         return django_http.JsonResponse(
             {
-                "username": identity.user.username,
-                "servers": [server.name for server in identity.servers],
+                'username': identity.user.username,
+                'servers': [server.name for server in identity.servers],
             }
         )

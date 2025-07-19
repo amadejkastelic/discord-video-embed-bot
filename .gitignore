@@ -14,3 +14,4 @@ result
 .nixos-test-history
 .ruff_cache
 .pre-commit-config.yaml
+.claude/settings.local.json

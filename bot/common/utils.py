@@ -177,7 +177,7 @@ def parse_relative_time(relative_time: str) -> datetime.timedelta:
             number *= 365
             unit = 'd'
         else:
-            raise ValueError(f"Unsupported time unit: {unit}")
+            raise ValueError(f'Unsupported time unit: {unit}')
 
     # Return the appropriate timedelta
     return datetime.timedelta(**{units[unit]: number})

@@ -65,7 +65,7 @@ class Command(base.BaseCommand):
     @staticmethod
     def _older_than_to_timedelta(older_than: str) -> typing.Optional[datetime.timedelta]:
         num, unit = int(older_than[:-1]), older_than[-1]
-        match (unit):
+        match unit:
             case 'y':
                 return datetime.timedelta(days=365 * num)
             case 'm':

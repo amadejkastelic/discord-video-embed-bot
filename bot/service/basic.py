@@ -78,7 +78,7 @@ class Service:
         author_uid: str,
     ) -> typing.List[domain.Comment]:
         if n > 15:
-            raise exceptions.NotAllowedError('Can\'t fetch more than 15 comments')
+            raise exceptions.NotAllowedError("Can't fetch more than 15 comments")
 
         try:
             client = registry.get_instance(url)

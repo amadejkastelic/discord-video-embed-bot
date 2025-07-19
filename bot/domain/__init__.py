@@ -70,7 +70,7 @@ class Server:
         if self.tier_valid_until is not None and self.tier_valid_until < datetime.datetime.now():
             return num_posts_in_one_day < 3
 
-        match (self.tier):
+        match self.tier:
             case constants.ServerTier.FREE:
                 return num_posts_in_one_day < 3
             case constants.ServerTier.STANDARD:

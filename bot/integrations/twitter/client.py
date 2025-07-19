@@ -96,13 +96,13 @@ class TwitterClient(base.BaseClient):
 
     def _gen_transaction_id(self) -> str:
         headers = {
-            "Authority": "x.com",
-            "Accept-Language": "en-US,en;q=0.9",
-            "Cache-Control": "no-cache",
-            "Referer": "https://x.com",
-            "User-Agent": fake_useragent.UserAgent().random,
-            "X-Twitter-Active-User": "yes",
-            "X-Twitter-Client-Language": "en",
+            'Authority': 'x.com',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Cache-Control': 'no-cache',
+            'Referer': 'https://x.com',
+            'User-Agent': fake_useragent.UserAgent().random,
+            'X-Twitter-Active-User': 'yes',
+            'X-Twitter-Client-Language': 'en',
         }
         session = requests.Session()
         session.headers = headers

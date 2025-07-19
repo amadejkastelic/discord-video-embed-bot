@@ -57,7 +57,7 @@ class TwitchClient(base.BaseClient):
             return domain.Post(
                 url=url,
                 author=clip['broadcaster']['displayName'],
-                description=f'{clip['title']} - {clip['game']['name']}',
+                description=f'{clip["title"]} - {clip["game"]["name"]}',
                 views=clip['viewCount'],
                 created=datetime.datetime.fromisoformat(clip['createdAt']),
                 buffer=io.BytesIO(resp.content),

@@ -318,7 +318,7 @@ class DiscordClient(mixins.BotMixin, discord.Client):
             return
 
         if interaction.user.guild.id == member.id:
-            response = 'Can\'t ban yourself..'
+            response = "Can't ban yourself.."
         else:
             try:
                 service.change_server_member_banned_status(
@@ -431,7 +431,7 @@ class DiscordClient(mixins.BotMixin, discord.Client):
             extension = utils.guess_extension_from_buffer(buffer=post.buffer)
             file = discord.File(
                 fp=post.buffer,
-                filename=f'{'SPOILER_' if post.spoiler else ''}file{extension}',
+                filename=f'{"SPOILER_" if post.spoiler else ""}file{extension}',
             )
             send_kwargs['file'] = file
 
@@ -453,8 +453,8 @@ class DiscordClient(mixins.BotMixin, discord.Client):
             if retries >= MAX_RESIZE_TRIES:
                 try:
                     content = (
-                        f'I\'m sorry {author.mention}, your post was too big '
-                        f'and I couldn\'t make it small enough. 🥲\n{str(post)}'
+                        f"I'm sorry {author.mention}, your post was too big "
+                        f"and I couldn't make it small enough. 🥲\n{str(post)}"
                     )
                     content = self._trim_content(content=content, spoiler=post.spoiler)
                     post.buffer = None
@@ -468,12 +468,12 @@ class DiscordClient(mixins.BotMixin, discord.Client):
 
                     return await send_func(**send_kwargs)
                 except discord.HTTPException:
-                    raise exceptions.BotError('Couldn\'t even send error message???')
+                    raise exceptions.BotError("Couldn't even send error message???")
 
             raise exceptions.BotError('Failed to send message') from e
         except utils.SSL_ERRORS as e:
             # Retry on SSL errors
-            logger.error("SSL Error, retrying", error=str(e))
+            logger.error('SSL Error, retrying', error=str(e))
             return await self._send_post(post=post, send_func=send_func, author=author)
 
     async def _send_comments(

@@ -14,7 +14,7 @@ async def download(
 ) -> io.BytesIO:
     with yt_dlp.YoutubeDL(
         {
-            'format': f'best[height<=1080][tbr<={max_bitrate//1000}]/best[height<=1080]',
+            'format': f'best[height<=1080][tbr<={max_bitrate // 1000}]/best[height<=1080]',
             'outtmpl': os.path.join(tmp_dir, f'{uuid.uuid4()}.%(ext)s'),
             'quiet': True,
             'no_warnings': True,

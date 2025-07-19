@@ -87,7 +87,7 @@ class FacebookClient(base.BaseClient):
             async with session.get(_API_URL) as response:
                 pass
 
-            async with session.post(_API_URL + 'download.php', data=aiohttp.FormData(fields={"URLz": url})) as response:
+            async with session.post(_API_URL + 'download.php', data=aiohttp.FormData(fields={'URLz': url})) as response:
                 if response.status != 200:
                     logger.debug('Failed to fetch URL', url=url, status=response.status, response=response)
                     raise exceptions.IntegrationError(f'Failed to fetch URL: {url}')
