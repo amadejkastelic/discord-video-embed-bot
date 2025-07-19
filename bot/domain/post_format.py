@@ -94,6 +94,14 @@ YOUTUBE_POST_FORMAT = """🔗 URL: {url}
 👍🏻 Likes: {likes} 👎🏻 Dislikes: {dislikes}\n
 """
 
+NINEGAG_POST_FORMAT = """🔗 URL: {url}
+🧑🏻‍🎨 Author: {author}
+📅 Created: {created}
+👀 Views: {views}
+👍🏻 Likes: {likes}
+📕 Description: {description}\n
+"""
+
 
 DEFAULT_INTEGRATION_POST_FMT_MAPPING = {
     constants.Integration.BLUESKY: BLUESKY_POST_FORMAT,
@@ -101,6 +109,7 @@ DEFAULT_INTEGRATION_POST_FMT_MAPPING = {
     constants.Integration.FOUR_CHAN: FOUR_CHAN_POST_FORMAT,
     constants.Integration.INSTAGRAM: INSTAGRAM_POST_FORMAT,
     constants.Integration.LINKEDIN: LINKEDIN_POST_FORMAT,
+    constants.Integration.NINEGAG: NINEGAG_POST_FORMAT,
     constants.Integration.REDDIT: REDDIT_POST_FORMAT,
     constants.Integration.THREADS: THREADS_POST_FORMAT,
     constants.Integration.TIKTOK: TIKTOK_POST_FORMAT,

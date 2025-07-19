@@ -60,4 +60,7 @@ INTEGRATION_CONFIGURATION = {
         'username': None,
         'password': None,
     },
+    '9gag': {
+        'enabled': False,
+    },
 }

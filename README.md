@@ -18,6 +18,7 @@ A Discord bot that automatically embeds media and metadata of messages containin
 - Linkedin ✅
 - Bluesky ✅
 - Truth Social ✅
+- 9gag ✅
 
 ## Configuration
 
