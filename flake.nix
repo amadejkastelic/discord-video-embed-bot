@@ -20,6 +20,11 @@
       inputs.uv2nix.follows = "uv2nix";
       inputs.pyproject-nix.follows = "pyproject-nix";
     };
+
+    pre-commit-hooks = {
+      url = "github:cachix/pre-commit-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -38,6 +43,10 @@
         "aarch64-darwin"
         "x86_64-linux"
         "x86_64-darwin"
+      ];
+
+      imports = [
+        ./nix/pre-commit-hooks.nix
       ];
 
       flake = {
@@ -59,7 +68,12 @@
       };
 
       perSystem =
-        { pkgs, system, ... }:
+        {
+          pkgs,
+          system,
+          config,
+          ...
+        }:
         let
           lib = pkgs.lib;
 
@@ -99,18 +113,12 @@
         {
           formatter = pkgs.nixfmt-tree;
 
-          checks =
-            import ./nix/checks.nix {
-              inherit pkgs;
-              venv = devVenv;
-              nixfmt-tree = pkgs.nixfmt-tree;
-            }
-            // {
-              nixosTests = import ./nix/test.nix {
-                inherit pkgs lib;
-                module = testModule;
-              };
+          checks = {
+            nixosTests = import ./nix/test.nix {
+              inherit pkgs lib;
+              module = testModule;
             };
+          };
 
           packages = {
             default = pkgs.callPackage ./nix/default.nix {
@@ -131,7 +139,7 @@
           };
 
           devShells.default = import ./nix/dev-shell.nix {
-            inherit pkgs browsers;
+            inherit config pkgs browsers;
             venv = devVenv;
           };
         };

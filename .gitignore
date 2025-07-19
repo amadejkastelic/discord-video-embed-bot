@@ -12,3 +12,5 @@ docker/db/data
 result
 *.qcow2
 .nixos-test-history
+.ruff_cache
+.pre-commit-config.yaml

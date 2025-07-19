@@ -5,8 +5,8 @@ from django import db
 from django.core.management import base
 
 from bot import logger
-from bot.common import utils
 from bot.adapters.discord import bot
+from bot.common import utils
 
 
 class Command(base.BaseCommand):

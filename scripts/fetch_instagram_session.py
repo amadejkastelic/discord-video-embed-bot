@@ -2,10 +2,12 @@ from argparse import ArgumentParser
 from glob import glob
 from os.path import expanduser
 from platform import system
-from sqlite3 import OperationalError, connect
+from sqlite3 import OperationalError
+from sqlite3 import connect
 
 try:
-    from instaloader import ConnectionException, Instaloader
+    from instaloader import ConnectionException
+    from instaloader import Instaloader
 except ModuleNotFoundError:
     raise SystemExit('Instaloader not found.\n  pip install [--user] instaloader')
 

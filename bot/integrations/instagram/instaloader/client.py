@@ -1,7 +1,8 @@
 import io
 import os
 import typing
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs
+from urllib.parse import urlparse
 
 import instaloader
 import requests

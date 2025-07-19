@@ -2,7 +2,6 @@ import typing
 
 from bot import constants
 
-
 DEFAULT_POST_FORMAT = """🔗 URL: {url}
 🧑🏻‍🎨 Author: {author}
 📅 Created: {created}

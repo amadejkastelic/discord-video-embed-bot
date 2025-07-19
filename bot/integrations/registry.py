@@ -15,7 +15,6 @@ from bot.integrations.twitch import client as twitch_client
 from bot.integrations.twitter import client as twitter_client
 from bot.integrations.youtube import client as youtube_client
 
-
 CLASSES: typing.Set[typing.Type[base.BaseClientSingleton]] = {
     bluesky_client.BlueskyClientSingleton,
     facebook_client.FacebookClientSingleton,

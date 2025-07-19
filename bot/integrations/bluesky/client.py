@@ -10,8 +10,8 @@ from bot import constants
 from bot import domain
 from bot import exceptions
 from bot import logger
-from bot.common import utils
 from bot.common import stream
+from bot.common import utils
 from bot.integrations import base
 from bot.integrations.bluesky import config
 

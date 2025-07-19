@@ -17,7 +17,6 @@ from bot import service
 from bot.adapters import mixins
 from bot.common import utils
 
-
 MAX_RESIZE_TRIES = 3
 
 

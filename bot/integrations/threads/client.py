@@ -16,7 +16,6 @@ from bot.integrations import base
 from bot.integrations.threads import config
 from bot.integrations.threads import types
 
-
 HEADERS = {
     'Authority': 'www.threads.net',
     'Accept': '*/*',

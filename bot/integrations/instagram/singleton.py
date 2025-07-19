@@ -1,6 +1,5 @@
-from django.conf import settings
-
 import fake_useragent
+from django.conf import settings
 
 from bot import logger
 from bot.integrations import base
