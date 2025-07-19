@@ -1,10 +1,8 @@
-from bot.integrations import base
+from bot.adapters import base
 
 
-class DiscordConfig(base.BaseClientConfig):
-    """
-    No additional settings for Discord bot integration
-    """
+class DiscordConfig(base.BaseBotConfig):
+    api_token: str
 
 
 class DiscordConfigSchema(base.BaseClientConfigSchema):

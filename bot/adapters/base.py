@@ -6,8 +6,7 @@ from bot import constants
 
 
 class BaseBotConfig(pydantic.BaseModel):
-    enabled: bool = False
-    api_token: typing.Optional[str] = None
+    """Base configuration for bot adapters."""
 
 
 class BaseBot:

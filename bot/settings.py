@@ -207,7 +207,6 @@ AUTH_USER_MODEL = 'bot.User'
 
 BOT_CONFIGURATION = {
     'discord': {
-        'enabled': True,
         'api_token': os.environ.get('DISCORD_API_TOKEN', None),
     },
 }

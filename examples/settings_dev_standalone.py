@@ -12,8 +12,7 @@ INTEGRATION_CONFIGURATION.update(
 
 BOT_CONFIGURATION = {
     'discord': {
-        'enabled': False,
-        'api_token': '',
+        'api_token': None,
     },
 }
 

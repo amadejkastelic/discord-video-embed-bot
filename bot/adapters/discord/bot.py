@@ -20,7 +20,7 @@ class DiscordBot(base.BaseBot):
         self.client = client.DiscordClient(intents=intents)
 
     async def run(self) -> typing.NoReturn:
-        if self.config.enabled and self.config.api_token:
-            await self.client.start(token=self.config.api_token)
+        if not self.config.api_token:
+            raise exceptions.ConfigurationError('Discord bot missing API token')
 
-        raise exceptions.ConfigurationError('Discord bot not enabled or missing API token')
+        await self.client.start(token=self.config.api_token)

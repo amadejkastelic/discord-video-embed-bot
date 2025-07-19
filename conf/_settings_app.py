@@ -1,6 +1,5 @@
 BOT_CONFIGURATION = {
     'discord': {
-        'enabled': False,
         'api_token': None,
     },
 }
