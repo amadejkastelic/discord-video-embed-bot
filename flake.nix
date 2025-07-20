@@ -77,7 +77,7 @@
         let
           lib = pkgs.lib;
 
-          python = pkgs.python312;
+          python = pkgs.python313;
 
           env = import ./nix/python-env.nix {
             inherit
