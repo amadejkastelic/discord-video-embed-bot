@@ -97,7 +97,6 @@ YOUTUBE_POST_FORMAT = """🔗 URL: {url}
 NINEGAG_POST_FORMAT = """🔗 URL: {url}
 🧑🏻‍🎨 Author: {author}
 📅 Created: {created}
-👀 Views: {views}
 👍🏻 Likes: {likes}
 📕 Description: {description}\n
 """
