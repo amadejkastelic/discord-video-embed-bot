@@ -1,6 +1,6 @@
 [project]
 authors = [{ name = "Amadej Kastelic", email = "amadejkastelic7@gmail.com" }]
-requires-python = "<3.13,>=3.12"
+requires-python = "<=3.13,>3.12"
 dependencies = [
     "playwright==1.53.0",
     "discord-py<3.0.0,>=2.5.2",
@@ -60,7 +60,7 @@ package = true
 
 [tool.ruff]
 line-length = 120
-target-version = "py312"
+target-version = "py313"
 
 [tool.ruff.lint]
 select = ["E4", "E7", "E9", "F", "I"]
