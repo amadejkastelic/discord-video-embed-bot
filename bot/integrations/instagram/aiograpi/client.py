@@ -81,17 +81,14 @@ class InstagramClient(base.BaseClient):
         media_url = None
         if media_info.video_url:
             media_url = str(media_info.video_url)
-        elif len(media_info.video_versions) > 0:
-            media_url = media_info.video_versions[0].get('url')
         elif len(media_info.resources) > idx:
             media_url = media_info.resources[idx].video_url
             if not media_url and len(media_info.resources) > idx:
-                if media_info.resources[idx].video_versions:
-                    media_url = media_info.resources[idx].video_versions[0].get('url')
-                if not media_url:
-                    media_url = media_info.resources[idx].image_versions[0].get('url')
-        elif len(media_info.image_versions2.get('candidates', [])) > 0:
-            media_url = media_info.image_versions2['candidates'][0]['url']
+                media_url = media_info.resources[idx].thumbnail_url
+        elif len(media_info.image_versions2.candidates) > 0:
+            media_url = media_info.image_versions2.candidates[0].url
+        elif media_info.image_versions2.additional_candidates:
+            media_url = media_info.image_versions2.additional_candidates.smart_frame.url
 
         if media_url:
             post.buffer = await self._download(url=str(media_url), cookies=self.client.cookie_dict)
