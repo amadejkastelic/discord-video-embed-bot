@@ -4,9 +4,15 @@ old_validate_python = pydantic_core.SchemaValidator.validate_python
 
 
 def patched_validate_python(*args, **kwargs):
-    if getattr(args[0], 'title') == 'VideoPage':
+    if getattr(args[0], "title") == "VideoPage":
         try:
-            args[1]['itemInfo']['itemStruct']['video']['subtitleInfos'] = []
+            args[1]["itemInfo"]["itemStruct"]["video"]["subtitleInfos"] = []
+        except KeyError:
+            pass
+
+    if getattr(args[0], "title") == "Media":
+        try:
+            args[1]["clips_metadata"]["reusable_text_info"] = {}
         except KeyError:
             pass
 
