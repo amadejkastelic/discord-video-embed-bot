@@ -67,6 +67,8 @@ If you don't want to build the image yourself, you can pull a pre-built image (a
 docker pull ghcr.io/amadejkastelic/discord-video-embed-bot:latest
 ```
 
+It is also available on [Docker Hub](https://hub.docker.com/r/amadejkastelic/discord-video-embed-bot).
+
 You can run the container with the following command (make sure to mount settings):
 ```bash
 docker run --network=host --rm -v $(pwd)/settings.py:/app/settings.py discord-video-embed-bot discord_bot
