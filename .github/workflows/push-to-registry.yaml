@@ -4,6 +4,17 @@ name: Build and publish the container image
   push:
     tags:
       - '*'
+  workflow_dispatch:
+    inputs:
+      registry:
+        description: 'Registry to push to'
+        required: true
+        default: 'both'
+        type: choice
+        options:
+          - both
+          - ghcr
+          - dockerhub
 
 jobs:
   build-images:
@@ -68,10 +79,11 @@ jobs:
           path: ${{ steps.build.outputs.path }}
           retention-days: 1
 
-  push-image:
-    name: Push multi-arch image
+  push-ghcr:
+    name: Push to GitHub Container Registry
     needs: build-images
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' || inputs.registry == 'both' || inputs.registry == 'ghcr' }}
     permissions:
       contents: read
       packages: write
@@ -93,7 +105,7 @@ jobs:
           name: container-x86_64-linux
           path: ./x86_64-linux-image
 
-      - name: Log in to the Container registry
+      - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
@@ -113,3 +125,46 @@ jobs:
 
           # Push to registry
           docker push ghcr.io/${{ github.repository }}:${{ steps.read-tag.outputs.tag }}
+
+  push-dockerhub:
+    name: Push to Docker Hub
+    needs: build-images
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' || inputs.registry == 'both' || inputs.registry == 'dockerhub' }}
+    steps:
+      - name: Download tag artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: tag
+
+      - name: Read tag from file
+        id: read-tag
+        run: |
+          TAG=$(cat tag.txt)
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Download x86_64 image
+        uses: actions/download-artifact@v4
+        with:
+          name: container-x86_64-linux
+          path: ./x86_64-linux-image
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Load and push images
+        run: |
+          # Load images
+          docker load < ./x86_64-linux-image/$(ls ./x86_64-linux-image)
+
+          # Get the image name from loaded images
+          IMAGE_NAME=$(docker images --format "{{.Repository}}:{{.Tag}}" | head -n 1)
+
+          # Tag with Docker Hub and version
+          docker tag $IMAGE_NAME ${{ vars.DOCKERHUB_USERNAME }}/discord-video-embed-bot:${{ steps.read-tag.outputs.tag }}
+
+          # Push to registry
+          docker push ${{ vars.DOCKERHUB_USERNAME }}/discord-video-embed-bot:${{ steps.read-tag.outputs.tag }}
