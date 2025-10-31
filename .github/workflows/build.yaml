@@ -11,6 +11,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     name: Build
+    env:
+      NIX_DOWNLOAD_BUFFER_SIZE: 524288000  # 500 MiB
     steps:
       - name: Check out source repository
         uses: actions/checkout@v4
