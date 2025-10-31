@@ -1,6 +1,6 @@
 [project]
 authors = [{ name = "Amadej Kastelic", email = "amadejkastelic7@gmail.com" }]
-requires-python = "<=3.13,>=3.11"
+requires-python = "<3.14,>=3.11"
 dependencies = [
     "playwright==1.53.0",
     "discord-py<3.0.0,>=2.5.2",
