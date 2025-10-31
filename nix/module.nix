@@ -88,10 +88,11 @@ in
 
     systemd.services.discord-video-embed-bot = {
       description = "Discord Video Embed Bot";
-      after =
-        [ "network.target" ]
-        ++ lib.optional cfg.db.enable "postgresql.service"
-        ++ lib.optional cfg.cache.enable "memcached.service";
+      after = [
+        "network.target"
+      ]
+      ++ lib.optional cfg.db.enable "postgresql.service"
+      ++ lib.optional cfg.cache.enable "memcached.service";
       wantedBy = [ "multi-user.target" ];
       preStart = lib.mkIf cfg.db.enable ''
         ${cfg.package}/bin/manage migrate
