@@ -37,7 +37,7 @@ let
     };
 
 in
-pkgs.nixosTest {
+pkgs.testers.nixosTest {
   name = "discord-video-embed-bot-test";
 
   nodes = {
