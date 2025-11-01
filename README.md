@@ -1,4 +1,8 @@
 # discord-video-embed-bot
+
+[![License: GPL3](https://img.shields.io/badge/license-%20%20GNU%20GPLv3%20-blue)](https://github.com/amadejkastelic/discord-video-embed-bot/blob/main/LICENSE)
+[![Docker Pulls](https://img.shields.io/docker/pulls/amadejkastelic/discord-video-embed-bot)](https://hub.docker.com/repository/docker/amadejkastelic/discord-video-embed-bot/)
+
 A Discord bot that automatically embeds media and metadata of messages containing a link of a supported platform.
 
 ![image](https://github.com/amadejkastelic/discord-video-embed-bot/assets/26391003/bada7a36-db0d-44ba-89ee-afe4f79ad7d3)
