@@ -60,7 +60,7 @@
             }:
             import ./nix/module.nix {
               inherit config pkgs lib;
-              package = self.packages.${pkgs.system}.default;
+              package = self.packages.${pkgs.stdenv.hostPlatform.system}.default;
             };
 
           default = self.nixosModules.discord-video-embed-bot;
