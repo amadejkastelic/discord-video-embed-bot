@@ -40,7 +40,7 @@ jobs:
           name: tag
           path: tag.txt
 
-      - uses: nixbuild/nix-quick-install-action@v30
+      - uses: nixbuild/nix-quick-install-action@v34
         with:
           nix_on_tmpfs: true
 
