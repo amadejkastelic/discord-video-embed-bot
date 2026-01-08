@@ -56,8 +56,8 @@ class Service:
 
         try:
             post = await client.get_post(url)
-        except Exception as e:
-            logger.error('Error getting post', url=url, error=str(e))
+        except Exception:
+            logger.exception('Error getting post', url=url)
             return None
 
         post.set_format(
