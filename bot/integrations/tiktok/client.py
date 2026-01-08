@@ -1,16 +1,13 @@
 import asyncio
-import glob
 import io
 import os
+import tempfile
 import typing
-import urllib
 
-import ffmpeg
 import requests
 from django.conf import settings
 from tiktokapipy.async_api import AsyncTikTokAPI
 from tiktokapipy.models import user
-from tiktokapipy.models import video as tiktok_video
 
 from bot import constants
 from bot import domain
@@ -48,39 +45,114 @@ class TiktokClient(base.BaseClient):
     async def get_post(self, url: str) -> domain.Post:
         clean_url = self._clean_url(url)
 
-        async with AsyncTikTokAPI() as api:
-            video = await api.video(clean_url)
-            cookies = {cookie['name']: cookie['value'] for cookie in await api.context.cookies()}
+        # First, get metadata
+        metadata_cmd = [
+            'yt-dlp',
+            clean_url,
+            '--user-agent',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            '--dump-json',
+            '--no-playlist',
+            '--quiet',
+        ]
 
-            logger.debug('Trying to download tiktok video', url=video.video.play_addr, cookies=str(cookies))
+        result = await asyncio.create_subprocess_exec(
+            *metadata_cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        stdout, stderr = await asyncio.wait_for(result.communicate(), timeout=60)
 
-            if video.image_post:
-                buffer = await self._download_slideshow(
-                    video=video,
-                    cookies=cookies,
-                )
-            else:
-                buffer = await self._download(
-                    url=video.video.play_addr or video.video.download_addr,
-                    cookies=cookies,
-                    headers=HEADERS,
-                )
+        if result.returncode != 0:
+            error_msg = stderr.decode('utf-8') if stderr else 'Unknown error'
+            logger.error('yt-dlp metadata failed', url=clean_url, error=error_msg)
+            raise exceptions.IntegrationClientError(f'yt-dlp metadata failed: {error_msg}')
+
+        import json
+
+        info = json.loads(stdout.decode('utf-8'))
+
+        # Then download the video
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_path = os.path.join(tmpdir, 'video.mp4')
+
+            cmd = [
+                'yt-dlp',
+                clean_url,
+                '--user-agent',
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                '-f',
+                'best',
+                '-o',
+                output_path,
+                '--no-playlist',
+                '--quiet',
+            ]
+
+            result = await asyncio.create_subprocess_exec(
+                *cmd,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+            stdout, stderr = await asyncio.wait_for(result.communicate(), timeout=120)
+
+            if result.returncode != 0:
+                error_msg = stderr.decode('utf-8') if stderr else 'Unknown error'
+                logger.error('yt-dlp download failed', url=clean_url, error=error_msg)
+                raise exceptions.IntegrationClientError(f'yt-dlp download failed: {error_msg}')
+
+            if not os.path.exists(output_path):
+                logger.error('No video file created', url=clean_url)
+                raise exceptions.IntegrationClientError('No video downloaded')
+
+            with open(output_path, 'rb') as f:
+                buffer = io.BytesIO(f.read())
+
+            buffer.seek(0)
+
+            from datetime import datetime
+
+            upload_date = info.get('upload_date')
+            created_at = datetime.strptime(upload_date, '%Y%m%d') if upload_date else None
 
             return domain.Post(
                 url=url,
-                author=video.author.unique_id if isinstance(video.author, user.LightUser) else video.author,
-                description=video.desc,
-                views=video.stats.play_count,
-                likes=video.stats.digg_count,
+                author=info.get('uploader', '') or info.get('channel', ''),
+                description=info.get('description', ''),
+                views=info.get('view_count', 0),
+                likes=info.get('like_count', 0),
                 buffer=buffer,
-                created=video.create_time.astimezone(),
+                created=created_at,
+            )
+            stdout, stderr = await asyncio.wait_for(result.communicate(), timeout=120)
+
+            if result.returncode != 0:
+                error_msg = stderr.decode('utf-8') if stderr else 'Unknown error'
+                logger.error('yt-dlp failed', url=clean_url, error=error_msg)
+                raise exceptions.IntegrationClientError(f'yt-dlp failed: {error_msg}')
+
+            if not os.path.exists(output_path):
+                logger.error('No video file created', url=clean_url)
+                raise exceptions.IntegrationClientError('No video downloaded')
+
+            with open(output_path, 'rb') as f:
+                buffer = io.BytesIO(f.read())
+
+            buffer.seek(0)
+
+            return domain.Post(
+                url=url,
+                author='',
+                description='',
+                views=0,
+                likes=0,
+                buffer=buffer,
+                created=None,
             )
 
     async def get_comments(self, url: str, n: int = 5) -> typing.List[domain.Comment]:
-        clean_url = self._clean_url(url)
-
         async with AsyncTikTokAPI() as api:
-            video = await api.video(clean_url)
+            video = await api.video(self._clean_url(url))
 
             logger.debug('Trying to fetch tiktok comments', url=url)
 
@@ -92,76 +164,6 @@ class TiktokClient(base.BaseClient):
                 )
                 async for comment in video.comments.limit(n)
             ]
-
-    async def _download_slideshow(self, video: tiktok_video.Video, cookies: typing.Dict[str, str]) -> io.BytesIO:
-        vf = (
-            '"scale=iw*min(1080/iw\\,1920/ih):ih*min(1080/iw\\,1920/ih),'
-            'pad=1080:1920:(1080-iw)/2:(1920-ih)/2,'
-            'format=yuv420p"'
-        )
-        directory = '/tmp'
-
-        for i, image_data in enumerate(video.image_post.images):
-            url = image_data.image_url.url_list[-1]
-            urllib.request.urlretrieve(url, os.path.join(directory, f'temp_{video.id}_{i:02}.jpg'))
-
-        read = requests.get(video.music.play_url, cookies=cookies, headers=HEADERS, timeout=base.DEFAULT_TIMEOUT)
-        with open(os.path.join(directory, f'temp_{video.id}.mp3'), 'wb') as w:
-            for chunk in read.iter_content(chunk_size=512):
-                if chunk:
-                    w.write(chunk)
-
-        audio_duration = float(ffmpeg.probe(f'{directory}/temp_{video.id}.mp3')['format']['duration'])
-
-        if audio_duration <= (len(video.image_post.images) * 2.5):
-            command = [
-                'ffmpeg',
-                '-y',
-                '-r 2/5',
-                f'-i {directory}/temp_{video.id}_%02d.jpg',
-                f'-i {directory}/temp_{video.id}.mp3',
-                '-r 30',
-                f'-vf {vf}',
-                '-acodec copy',
-                f'-t {len(video.image_post.images) * 2.5}',
-                f'{directory}/temp_{video.id}.mp4',
-            ]
-        else:
-            command = [
-                'ffmpeg',
-                '-y',
-                '-loop 1',
-                '-framerate 1/2.5',
-                f'-i {directory}/temp_{video.id}_%02d.jpg',
-                f'-i {directory}/temp_{video.id}.mp3',
-                '-shortest',
-                '-acodec aac',
-                '-vcodec libx264',
-                '-movflags +faststart',
-                f'-vf {vf}',
-                f'{directory}/temp_{video.id}.mp4',
-            ]
-
-        ffmpeg_proc = await asyncio.create_subprocess_shell(
-            ' '.join(command),
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-        await ffmpeg_proc.communicate()
-        generated_files = glob.glob(os.path.join(directory, f'temp_{video.id}*'))
-
-        if not os.path.exists(os.path.join(directory, f'temp_{video.id}.mp4')):
-            for file in generated_files:
-                os.remove(file)
-            raise exceptions.IntegrationClientError('Something went wrong with piecing the slideshow together')
-
-        with open(os.path.join(directory, f'temp_{video.id}.mp4'), 'rb') as f:
-            ret = io.BytesIO(f.read())
-
-        for file in generated_files:
-            os.remove(file)
-
-        return ret
 
     @staticmethod
     def _clean_url(url: str) -> str:
