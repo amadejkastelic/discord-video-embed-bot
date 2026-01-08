@@ -22,7 +22,6 @@ dependencies = [
     "twitch-dl<3.0.0,>=2.9.2",
     "pydantic<3.0.0,>=2.7.1",
     "24ur-api[video]>=0.2.2,<1.0.0",
-    "tiktokapipy[download]<1.0.0.0,>=0.2.4.post2",
     "psycopg[binary]<4.0.0,>=3.2.3",
     "pytubefix>=8.12.1,<9.3.0",
     "markdownify<1.0.0,>=0.14.1",

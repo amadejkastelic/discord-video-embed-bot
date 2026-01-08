@@ -632,7 +632,6 @@ dependencies = [
     { name = "pytubefix" },
     { name = "reddownloader" },
     { name = "redvid" },
-    { name = "tiktokapipy", extra = ["download"] },
     { name = "truthbrush" },
     { name = "twitch-dl" },
     { name = "twscrape" },
@@ -672,7 +671,6 @@ requires-dist = [
     { name = "pytubefix", specifier = ">=8.12.1,<9.3.0" },
     { name = "reddownloader", specifier = ">=4.3.0,<5.0.0" },
     { name = "redvid", specifier = ">=2.0.5,<3.0.0" },
-    { name = "tiktokapipy", extras = ["download"], specifier = ">=0.2.4.post2,<1.0.0.0" },
     { name = "truthbrush", specifier = ">=0.1.9" },
     { name = "twitch-dl", specifier = ">=2.9.2,<3.0.0" },
     { name = "twscrape", specifier = ">=0.17,<1.0" },
@@ -2017,25 +2015,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/ef/52/9ba0f43b686e7f3ddfeaa78ac3af750292662284b3661e91ad5494f21dbc/structlog-25.5.0.tar.gz", hash = "sha256:098522a3bebed9153d4570c6d0288abf80a031dfdb2048d59a49e9dc2190fc98", size = 1460830, upload-time = "2025-10-27T08:28:23.028Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a8/45/a132b9074aa18e799b891b91ad72133c98d8042c70f6240e4c5f9dabee2f/structlog-25.5.0-py3-none-any.whl", hash = "sha256:a8453e9b9e636ec59bd9e79bbd4a72f025981b3ba0f5837aebf48f02f37a7f9f", size = 72510, upload-time = "2025-10-27T08:28:21.535Z" },
-]
-
-[[package]]
-name = "tiktokapipy"
-version = "0.2.4.post2"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "playwright" },
-    { name = "pydantic" },
-    { name = "requests" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/c6/02/3a1bd5704f8376752b6ef2095c2e24577ba88aec7e6663e8a7a843f5a42b/tiktokapipy-0.2.4.post2.tar.gz", hash = "sha256:1114ef422e3b0dab94010151f721c2e00ffea15b8f97be905c55d639449ccce1", size = 31213, upload-time = "2023-11-20T19:31:02.592Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/26/32/12a8b00eeacfc236fcac2a8a18dca227112aa14e6df81be06f2acbe3d61c/tiktokapipy-0.2.4.post2-py3-none-any.whl", hash = "sha256:4b5b06945e9b2a5d2f4295bed014cce9b463c32de36829e68fbfb640bac51a64", size = 34497, upload-time = "2023-11-20T19:31:00.748Z" },
-]
-
-[package.optional-dependencies]
-download = [
-    { name = "yt-dlp" },
 ]
 
 [[package]]

@@ -6,8 +6,6 @@ import typing
 
 import requests
 from django.conf import settings
-from tiktokapipy.async_api import AsyncTikTokAPI
-from tiktokapipy.models import user
 
 from bot import constants
 from bot import domain
@@ -149,21 +147,6 @@ class TiktokClient(base.BaseClient):
                 buffer=buffer,
                 created=None,
             )
-
-    async def get_comments(self, url: str, n: int = 5) -> typing.List[domain.Comment]:
-        async with AsyncTikTokAPI() as api:
-            video = await api.video(self._clean_url(url))
-
-            logger.debug('Trying to fetch tiktok comments', url=url)
-
-            return [
-                domain.Comment(
-                    author=comment.user.unique_id if isinstance(comment.user, user.LightUser) else comment.user,
-                    likes=comment.digg_count,
-                    comment=comment.text,
-                )
-                async for comment in video.comments.limit(n)
-            ]
 
     @staticmethod
     def _clean_url(url: str) -> str:
