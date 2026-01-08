@@ -20,4 +20,4 @@ jobs:
         run: |
           git remote add codeberg https://amadejkastelic:${CODEBERG_TOKEN}@codeberg.org/amadejkastelic/discord-video-embed-bot.git
           git push codeberg main:main -f
-          git push codeberg --tags
+          git push codeberg --tags -f
