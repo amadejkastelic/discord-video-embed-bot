@@ -1,5 +1,9 @@
 # discord-video-embed-bot
 
+> [!WARNING]
+> **This project is deprecated and no longer maintained.**
+> It has been superseded by [grabby](https://github.com/amadejkastelic/grabby), a Rust rewrite with the same features. Please use that instead.
+
 [![License: GPL3](https://img.shields.io/badge/license-%20%20GNU%20GPLv3%20-blue)](https://github.com/amadejkastelic/discord-video-embed-bot/blob/main/LICENSE)
 [![Docker Pulls](https://img.shields.io/docker/pulls/amadejkastelic/discord-video-embed-bot)](https://hub.docker.com/repository/docker/amadejkastelic/discord-video-embed-bot/)
 
